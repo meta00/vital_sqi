@@ -1,0 +1,1 @@
+{"py/object": "utils.StorageHolder.FileHolder", "channel_holders": {"# ECG Channel 1": {"py/set": [{"py/tuple": [6376, -0.0010898865949492645]}, {"py/tuple": [6191, -0.0034680715037766078]}]}}, "md5": "4972c8ab43c3b7c0db4bc741d40976f0", "current_channel": "", "prev_x": 6750.106609979333, "prev_y": 7404.020348454488}
