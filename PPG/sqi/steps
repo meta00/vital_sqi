@@ -1,0 +1,11 @@
+1) Apply high pass filtered
+   => Enhance the waveform
+   h_cutoff = 1,
+   h_fs = 100,
+   h_order = 1,   => the higher the order, the flatter the curve
+   loops <= 2
+
+2) Apply welch to the full filtered data => get the main frequencies
+
+   1s -> 100 sample -> 100 Hz
+
