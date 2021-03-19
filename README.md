@@ -1,1 +1,1 @@
-# ECG and PPG Notebooks
+# ECG and PPG SQI analyses
