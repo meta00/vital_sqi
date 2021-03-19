@@ -1,1 +1,1 @@
-# ECG and PPG SQI analyses test
+# ECG and PPG SQI analyses
