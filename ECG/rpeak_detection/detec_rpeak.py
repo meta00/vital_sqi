@@ -1,0 +1,1 @@
+from ecgdetectors import Detectors
