@@ -8,9 +8,14 @@ import matplotlib.pyplot as plt
 import os
 import plotly.graph_objects as go
 import plotly.io as pio
-from filtering import butter_lowpass_filter,butter_highpass_filter
+from .filtering import butter_lowpass_filter,butter_highpass_filter
 
 class waveform_template:
+    """
+    Various peak detection approaches getting from the paper
+    Systolic Peak Detection in Acceleration Photoplethysmograms Measured
+    from Emergency Responders in Tropical Conditions
+    """
     def __init__(self):
         self.clusters = 2
 
@@ -23,10 +28,15 @@ class waveform_template:
         mean_diff = mean_diff.reshape(-1, 1)
         return np.hstack((amplitude, mean_diff))
 
-    """
-    Method 1: using clustering technique
-    """
-    def detect_peak_trough_kmean(self,s,method=None,**kwargs):
+    def detect_peak_trough_kmean(self,s,**kwargs):
+        """
+        Method 1: using clustering technique
+        :param s: The input signals
+        :param method:
+        :param kwargs:
+        :return: tuple of 1-D numpy array
+        the first array is the peak list and the second array is the troughs list
+        """
         # squarring doesnot work
         # s = np.array(s) ** 2
         local_maxima = signal.argrelmax(s)[0]
@@ -39,14 +49,6 @@ class waveform_template:
         clusterer = KMeans(n_clusters=2, init='k-means++', n_init=10, max_iter=300,
                            tol=0.0001, precompute_distances='deprecated', verbose=0,
                            random_state=None, copy_x=True, n_jobs='deprecated', algorithm='auto')
-        # clusterer = GaussianMixture(n_components=2, covariance_type='full', tol=0.001, reg_covar=1e-06,
-        #                             max_iter=100,n_init=1, init_params='kmeans', weights_init=None,
-        #                             means_init=None,precisions_init=None, random_state=None,
-        #                             warm_start=False, verbose=0, verbose_interval=10)
-
-        # clusterer.fit(np.hstack((local_maxima_amplitude,middle,upper)).reshape(-1,1))
-        # systolic_group = clusterer.predict(np.max(local_maxima_amplitude).reshape(-1,1))[0]
-        # labels = clusterer.predict(local_maxima_amplitude.reshape(-1,1))
 
         convert_maxima = self.compute_feature(s, local_maxima)
         clusterer.fit(convert_maxima)
@@ -58,11 +60,6 @@ class waveform_template:
         # ========================================================
         # The same with troughs
 
-        # clusterer.fit(local_minima_amplitude.reshape(-1, 1))
-        # clusterer.fit(np.hstack((local_minima_amplitude, middle, lower)).reshape(-1, 1))
-        # trough_group = clusterer.predict(np.min(local_minima_amplitude).reshape(-1, 1))[0]
-        # labels = clusterer.predict(local_minima_amplitude.reshape(-1, 1))
-
         convert_minima = self.compute_feature(s, local_minima)
         clusterer.fit(convert_minima)
         trough_group = clusterer.predict(convert_minima[np.argmin(s[local_minima])].reshape(1, -1))
@@ -72,10 +69,13 @@ class waveform_template:
 
         return systolic_peaks_idx, trough_idx
 
-    """
-        Method 2: using local extreme technique 
-    """
     def detect_peak_trough_count_orig(self,s):
+        """
+        Method 2: using local extreme technique with threshold
+        :param s: Input signal
+        :return: tuple of 1-D numpy array
+        the first array is the peak list and the second array is the troughs list
+        """
         #squaring decrease the efficiency
         # s = np.array(s)**2
 
@@ -105,10 +105,13 @@ class waveform_template:
         through_finalist.append(right_trough)
         return peak_finalist,through_finalist
 
-    """
-            Method 3: analyze the slope sum to get local extreme - aka first derivative
-    """
+
     def detect_peak_trough_slope_sum(self,s):
+        """
+        Method 3: analyze the slope sum to get local extreme
+        :param s:
+        :return:
+        """
         peak_finalist = []
         trough_finalist = []
         onset_list = []
@@ -129,12 +132,7 @@ class waveform_template:
                 Zk = Zk + max(0,delta_y_k)
             Z.append(Zk)
         Z = np.array(Z)
-        # fig = go.Figure()
-        # fig.add_traces(go.Scatter(x=np.arange(1, len(Z)),
-        #                           y=Z, mode="lines"))
-        # fig.add_traces(go.Scatter(x=np.arange(1, len(Z)),
-        #                           y=s[w+1:N], mode="lines"))
-        # fig.show()
+
         fs = 100
         Z_threshold = 3 * np.mean(Z[:10*fs])
         threshold_base = Z_threshold
@@ -179,10 +177,12 @@ class waveform_template:
                 return idx
         return idx+1
 
-    """
-    Method 4 (examine second derivative)
-    """
     def detect_peak_trough_moving_average_threshold(self,s):
+        """
+        Method 4 (examine second derivative)
+        :param s:
+        :return:
+        """
         peak_finalist = []
         through_finalist = []
 
@@ -243,23 +243,18 @@ class waveform_template:
         convole = np.convolve(q_padded, np.ones(w)/w, 'valid')
         return convole
 
-
 if __name__ == "__main__":
-
-
-
+    """
+    Test the peak detection methods with 24EI dataset
+    """
     waveform = waveform_template()
     pio.renderers.default = "browser"
 
     DATA_PATH = os.path.join(os.getcwd(), "..", "data", "11")  # 24EI-011-PPG-day1-4.csv
     filename = "24EI-011-PPG-day1"  # 24EI-011-PPG-day1
     ROOT_SAVED_FOLDER = os.path.join(os.getcwd(),"..","data","peak_detection_ds")
-    # SAVED_FOLDER = os.path.join(ROOT_SAVED_FOLDER,filename)
-    # SAVED_FILE_FOLDER = os.path.join(SAVED_FOLDER,"ppg")
     SAVED_IMG_FOLDER = os.path.join(ROOT_SAVED_FOLDER, "img")
 
-    # file_cut = "24EI-013-PPG-day1-5"
-    # df_origin = pd.read_csv(os.path.join(DATA_PATH, filename + ".csv"))
     files = [os.path.join(ROOT_SAVED_FOLDER,f) for f in os.listdir(ROOT_SAVED_FOLDER)
              if os.path.isfile(os.path.join(ROOT_SAVED_FOLDER,f))]
     for file in files:

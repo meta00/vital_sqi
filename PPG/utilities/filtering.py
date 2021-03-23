@@ -9,6 +9,14 @@ def butter_lowpass(cutoff, fs, order=5):
     return b, a
 
 def butter_lowpass_filter(data, cutoff, fs, order=5):
+    """
+    Low pass filter as described in scipy package
+    :param data: list, array of input signal
+    :param cutoff:
+    :param fs:
+    :param order:
+    :return:
+    """
     b, a = butter_lowpass(cutoff, fs, order=order)
     y = lfilter(b, a, data)
     return y
@@ -20,21 +28,41 @@ def butter_highpass(cutoff, fs, order=5):
     return b, a
 
 def butter_highpass_filter(data, cutoff, fs, order=5):
+    """
+    High pass filter as described in scipy package
+    :param data: list, array of input signal
+    :param cutoff:
+    :param fs:
+    :param order:
+    :return:
+    """
     b, a = butter_highpass(cutoff, fs, order=order)
     y = signal.filtfilt(b, a, data)
     return y
 
-def smooth_window(s,span_size=5):
-    for i in range(0,len(s)):
-        if i-span_size<0:
-            s[i] = np.mean(s[:i+span_size])
-        elif i+span_size>=len(s):
-            s[i] = np.mean(s[i-span_size:])
-        else:
-            s[i] = np.mean(s[i-span_size:i+span_size])
-    return s
+def tapering(signal_data,window=None):
+    """
+    Pin the leftmost and rightmost signal to the zero baseline
+    and amplify the remainder according to the window shape
+    :param signal_data: list,
+    :param window:sequence, array of floats indicates the windows types
+    as described in scipy.windows
+    :return: the tapered signal
+    """
+    signal_data = signal_data-np.min(signal_data)
+    if window == None:
+        window = signal.windows.tukey(len(signal_data),0.9)
+    signal_data_tapered = np.array(window) * (signal_data)
+    return np.array(signal_data_tapered)
 
-def smooth(x,window_len=11,window='hanning'):
+def smooth(x,window_len=11,window='flat'):
+    """
+
+    :param x:
+    :param window_len:
+    :param window:
+    :return:
+    """
     if x.ndim != 1:
         raise(ValueError, "smooth only accepts 1 dimension arrays.")
 
@@ -71,15 +99,9 @@ def scale_pattern(s,window_size):
                 scale_res.append(np.mean(s[int(idx/span_ratio)]))
     else:
         scale_res = squeeze_template(s, window_size)
-        # squeeze_ratio = int(np.ceil(len(s)/window_size))
-        # for idx in range(0,int(window_size)):
-        #     if idx-squeeze_ratio<0:
-        #         scale_res.append(np.mean(s[:idx+squeeze_ratio]))
-        #     elif idx+squeeze_ratio>=window_size:
-        #         scale_res.append(np.mean(s[idx - squeeze_ratio:]))
-        #     else:
-        #         scale_res.append(np.mean(s[idx - squeeze_ratio:idx + squeeze_ratio]))
-    scale_res = smooth_window(scale_res, span_size=5)
+
+    # scale_res = smooth_window(scale_res, span_size=5)
+    scale_res = smooth(scale_res, span_size=5)
     return np.array(scale_res)
 
 def squeeze_template(s,width):
