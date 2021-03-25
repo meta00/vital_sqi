@@ -17,7 +17,7 @@ sys.path.append(os.path.join(os.getcwd(), "../PPG"))
 try:
     from preprocess.filtering import butter_lowpass_filter,butter_highpass_filter,\
         scale_pattern
-    from preprocess.trim_utilities import trim_invalid
+    from data.trim_utilities import trim_invalid
     from common.generate_template import \
         ppg_nonlinear_dynamic_system_template,ppg_absolute_dual_skewness_template,ppg_dual_doublde_frequency_template
 except:
