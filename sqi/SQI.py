@@ -2,9 +2,9 @@ import numpy as np
 from dtw import dtw
 from scipy.stats import kurtosis,skew,entropy
 import sys
-sys.path.append("..")
+sys.path.append("../PPG")
 try:
-    from ..utilities.generate_template import ppg_absolute_dual_skewness_template, \
+    from common.generate_template import ppg_absolute_dual_skewness_template, \
         ppg_dual_doublde_frequency_template,ppg_nonlinear_dynamic_system_template
 except:
     from utilities.generate_template import ppg_absolute_dual_skewness_template, \

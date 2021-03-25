@@ -1,21 +1,19 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
-from scipy.signal import argrelextrema
-from scipy import signal
 import os
 import sys
-sys.path.append("..")
+sys.path.append("../PPG")
 import plotly.graph_objects as go
 import plotly.io as pio
 
 try:
-    from ..utilities.peak_approaches import waveform_template
+    from common.peak_approaches import waveform_template
 except:
     from utilities.peak_approaches import waveform_template
 
 try:
-    from ..utilities.filtering import butter_lowpass_filter,butter_highpass_filter, \
+    from preprocess.filtering import butter_lowpass_filter,butter_highpass_filter, \
         scale_pattern, smooth_window, tapering
 except:
     from utilities.filtering import butter_lowpass_filter,butter_highpass_filter,\
@@ -55,12 +53,12 @@ if __name__ == "__main__":
     waveform = waveform_template()
     pio.renderers.default = "browser"
 
-    DATA_PATH = os.path.join(os.getcwd(), "..", "data", "11")  # 24EI-011-PPG-day1-4.csv
+    DATA_PATH = os.path.join(os.getcwd(), "../PPG", "data", "11")  # 24EI-011-PPG-day1-4.csv
     filename = "24EI-011-PPG-day1"  # 24EI-011-PPG-day1
-    ROOT_SAVED_FOLDER = os.path.join(os.getcwd(),"..","data","label_PPG_segment")
+    ROOT_SAVED_FOLDER = os.path.join(os.getcwd(), "../PPG", "data", "label_PPG_segment")
     SAVED_FOLDER = os.path.join(ROOT_SAVED_FOLDER,filename)
     SAVED_FILE_FOLDER = os.path.join(SAVED_FOLDER,"ppg")
-    SAVED_LABEL_FOLDER = os.path.join(ROOT_SAVED_FOLDER, "..","waveform_analysis")
+    SAVED_LABEL_FOLDER = os.path.join(ROOT_SAVED_FOLDER, "../PPG", "waveform_analysis")
     IMG_FOLDER = os.path.join(SAVED_LABEL_FOLDER, "img")
     TEMPLATE_FOLDER = os.path.join(SAVED_LABEL_FOLDER, "template")
     ANALYSIS_FOLDER = os.path.join(SAVED_LABEL_FOLDER, "analysis")

@@ -6,7 +6,7 @@ import dash_html_components as html
 import plotly.graph_objects as go
 import sys
 import os
-sys.path.append(os.path.join(os.getcwd(),".."))
+sys.path.append(os.path.join(os.getcwd(), "../../PPG/tools"))
 import pandas as pd
 
 try:

@@ -7,10 +7,11 @@ from scipy import signal
 import scipy
 from scipy.signal import argrelextrema
 import plotly.io as pio
-from scipy.integrate import solve_ivp,solve_bvp,odeint
+from scipy.integrate import solve_ivp
 import sys
-sys.path.append("..")
-from filtering import squeeze_template,scale_pattern
+sys.path.append("../PPG")
+from preprocess.filtering import squeeze_template
+
 
 def ppg_dual_doublde_frequency_template(width):
     """

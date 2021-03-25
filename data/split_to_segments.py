@@ -4,21 +4,21 @@ import plotly.graph_objects as go
 import numpy as np
 import sys
 import os
-sys.path.append(os.path.join(os.getcwd(),".."))
+sys.path.append(os.path.join(os.getcwd(), "../PPG"))
 
 try:
-    from ..utilities.peak_approaches import waveform_template
+    from common.peak_approaches import waveform_template
 except Exception as e:
     from utilities.peak_approaches import waveform_template
 
 
-sys.path.append(os.path.join(os.getcwd(),".."))
+sys.path.append(os.path.join(os.getcwd(), "../PPG"))
 
 try:
-    from ..utilities.filtering import butter_lowpass_filter,butter_highpass_filter,\
+    from preprocess.filtering import butter_lowpass_filter,butter_highpass_filter,\
         scale_pattern
-    from ..utilities.trim_utilities import trim_invalid
-    from ..utilities.generate_template import \
+    from preprocess.trim_utilities import trim_invalid
+    from common.generate_template import \
         ppg_nonlinear_dynamic_system_template,ppg_absolute_dual_skewness_template,ppg_dual_doublde_frequency_template
 except:
     from utilities.filtering import butter_lowpass_filter,butter_highpass_filter,\
@@ -30,9 +30,9 @@ except:
 import plotly.io as pio
 pio.renderers.default = "browser"
 
-DATA_PATH = os.path.join(os.getcwd(), "..", "data", "18")  # 24EI-011-PPG-day1-4.csv
+DATA_PATH = os.path.join(os.getcwd(), "../PPG", "data", "18")  # 24EI-011-PPG-day1-4.csv
 filename = "24EI-018-PPG-day1"  # 24EI-011-PPG-day1
-ROOT_SAVED_FOLDER = os.path.join(os.getcwd(), "..", "data", "label_PPG_segment")
+ROOT_SAVED_FOLDER = os.path.join(os.getcwd(), "../PPG", "data", "label_PPG_segment")
 SAVED_FOLDER = os.path.join(ROOT_SAVED_FOLDER, filename)
 SAVED_FILE_FOLDER = os.path.join(SAVED_FOLDER, "ppg")
 SAVED_IMG_FOLDER = os.path.join(SAVED_FOLDER, "img")

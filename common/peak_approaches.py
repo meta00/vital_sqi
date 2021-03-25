@@ -1,14 +1,10 @@
-import pandas as pd
 import numpy as np
-from sklearn.mixture import GaussianMixture
 from sklearn.cluster import KMeans
-import scipy
 from scipy import signal
-import matplotlib.pyplot as plt
 import os
 import plotly.graph_objects as go
 import plotly.io as pio
-from .filtering import butter_lowpass_filter,butter_highpass_filter
+from preprocess.filtering import butter_highpass_filter
 
 class waveform_template:
     """
@@ -250,9 +246,9 @@ if __name__ == "__main__":
     waveform = waveform_template()
     pio.renderers.default = "browser"
 
-    DATA_PATH = os.path.join(os.getcwd(), "..", "data", "11")  # 24EI-011-PPG-day1-4.csv
+    DATA_PATH = os.path.join(os.getcwd(), "../PPG", "data", "11")  # 24EI-011-PPG-day1-4.csv
     filename = "24EI-011-PPG-day1"  # 24EI-011-PPG-day1
-    ROOT_SAVED_FOLDER = os.path.join(os.getcwd(),"..","data","peak_detection_ds")
+    ROOT_SAVED_FOLDER = os.path.join(os.getcwd(), "../PPG", "data", "peak_detection_ds")
     SAVED_IMG_FOLDER = os.path.join(ROOT_SAVED_FOLDER, "img")
 
     files = [os.path.join(ROOT_SAVED_FOLDER,f) for f in os.listdir(ROOT_SAVED_FOLDER)

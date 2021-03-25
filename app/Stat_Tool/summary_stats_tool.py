@@ -204,7 +204,7 @@ def fill_patient_detail(workbook, ppg_wearable_files,file_number =0,patient_numb
         patient_number = patient_number + 18
         file_number = file_number+1
         write_log(file_number,patient_number)
-        workbook.save(filename="Signal_Summary_Stats.xlsx")
+        workbook.save(filename= "Signal_Summary_Stats.xlsx")
         sftp.close()
 
 """
@@ -252,4 +252,4 @@ if __name__ == "__main__":
 
     fill_patient_detail(workbook, ppg_wearable_files, file_number, patient_number=current_patient_idx)
 
-    workbook.save(filename="Signal_Summary_Stats.xlsx")
+    workbook.save(filename= "Signal_Summary_Stats.xlsx")
