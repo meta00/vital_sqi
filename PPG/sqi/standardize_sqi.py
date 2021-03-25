@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.mixture import GaussianMixture
-from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
-import scipy
 from scipy.signal import argrelextrema
 from scipy import signal
 import os
@@ -12,30 +9,23 @@ sys.path.append("..")
 import plotly.graph_objects as go
 import plotly.io as pio
 
-from utilities.peak_approaches import waveform_template
+try:
+    from ..utilities.peak_approaches import waveform_template
+except:
+    from utilities.peak_approaches import waveform_template
 
 try:
-    from ..utilities.filtering import butter_lowpass_filter,butter_highpass_filter,\
-        smooth,scale_pattern,smooth_window,get_clipping_pivots
-    from ..utilities.generate_template import custom_window
+    from ..utilities.filtering import butter_lowpass_filter,butter_highpass_filter, \
+        scale_pattern, smooth_window, tapering
 except:
     from utilities.filtering import butter_lowpass_filter,butter_highpass_filter,\
-        smooth,scale_pattern,smooth_window
-    from utilities.generate_template import custom_window
+        scale_pattern,smooth_window,tapering
 
 try:
-    from ..sqi.SQI import dtw_sqi,kurtosis_sqi,skewness_sqi,zero_crossings_rate_sqi,entropy_sqi,signal_to_noise_sqi
+    from ..sqi.sqi_stats import dtw_sqi,kurtosis_sqi,skewness_sqi,zero_crossings_rate_sqi,entropy_sqi,signal_to_noise_sqi
 except:
     from sqi.SQI import dtw_sqi,kurtosis_sqi, skewness_sqi, zero_crossings_rate_sqi, entropy_sqi, signal_to_noise_sqi
 
-
-def tapering(signal_data,scan_window = 100):
-    local_minima = argrelextrema(signal_data, np.less)
-
-    signal_data = signal_data-np.min(signal_data)
-    window = signal.windows.tukey(len(signal_data),0.9)
-    signal_data_tapered = np.array(window) * (signal_data) #-min(signal_data)
-    return np.array(signal_data_tapered)
 
 sqi_dict = {
         'kurtosis_sqi': [],
@@ -55,6 +45,11 @@ sqi_methods = [kurtosis_sqi,
                     dtw_sqi,
                     dtw_sqi
                ]
+
+"""
+Compute the relevant SQI scores of the mean template for each segment
+The output is the csv file as in the fourth page of file PPG label criteria.pdf
+"""
 if __name__ == "__main__":
 
     waveform = waveform_template()
@@ -79,11 +74,10 @@ if __name__ == "__main__":
 
     """
     Load data -> lowpass filter x2  
-    Standard scale or MinMax scale on the whole segment
+    Standard scale / MinMax scale on the whole segment
     cut data using trough peak detection,
-    Taper -> Confirm
+    Tapering  
     Squeezing and Spanning 
-    
     """
     for file in files:
         sig = np.loadtxt(file, delimiter=',', unpack=True)
@@ -123,19 +117,14 @@ if __name__ == "__main__":
                     template.append(segment_taper)
                     fig.add_traces(go.Scatter(x=np.arange(1, width),
                                               y=segment_taper, mode="markers"))
-        # fig.show()
-
         template_mean = (np.mean(np.array(template), axis=0))
         fig.add_traces(go.Scatter(x=np.arange(1, width),
                                   y=template_mean, mode="lines"))
-        # fig.show()
         fig.write_image(os.path.join(IMG_FOLDER, file.split("\\")[-1].split(".")[0] + '.png'))
-        # print(template_mean)
         """
         Compute the sqi and append to the dataframe
         """
         for sqi_method,sqi_name in zip(sqi_methods,sqi_dict.keys()):
-            # row_content.append(sqi_method(np.array(template)))
             if sqi_name == 'dtw_template1':
                 sqi_dict[sqi_name].append(sqi_method(template_mean,0))
             elif sqi_name == 'dtw_template2':
@@ -144,7 +133,6 @@ if __name__ == "__main__":
                 sqi_dict[sqi_name].append(sqi_method(template_mean,2))
             else:
                 sqi_dict[sqi_name].append(sqi_method(template_mean))
-
 
         saved_filename = file.split("\\")[-1].split(".")[0]
         mmscaler = MinMaxScaler()

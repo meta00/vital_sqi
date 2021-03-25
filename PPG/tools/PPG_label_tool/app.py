@@ -132,6 +132,38 @@ def upload_to_s3(file_name,file_content):
   s3 = make_s3_connection()
   s3.upload_fileobj(io.BytesIO(bytearray(file_content,'utf-8')), BUCKET, file_name)
 
+def parse_file_label(div_list):
+    file_list = []
+    systolic_list = []
+    diastolic_list = []
+    amplitude_list = []
+    trend_list = []
+    width_list = []
+    auc_list = []
+    dicrotic = []
+    flatten = []
+    peak_detection = []
+    label_list = []
+    for i in range(len(div_list)):
+        component_dict = div_list[i]
+        content_component = component_dict['props']['children']
+        file_list.append(content_component[1]['props']['children'])
+        label_radioitem_list = (content_component[2]['props']['children'][1]['props']['children'])
+
+        systolic_list.append(label_radioitem_list[0]['props']['children']['props']['value'])
+        diastolic_list.append(label_radioitem_list[1]['props']['children']['props']['value'])
+        amplitude_list.append(label_radioitem_list[2]['props']['children']['props']['value'])
+        auc_list.append(label_radioitem_list[3]['props']['children']['props']['value'])
+        dicrotic.append(label_radioitem_list[4]['props']['children']['props']['value'])
+        flatten.append(label_radioitem_list[5]['props']['children']['props']['value'])
+        peak_detection.append(label_radioitem_list[6]['props']['children']['props']['value'])
+        label_list.append(label_radioitem_list[7]['props']['children']['props']['value'])
+        # label_list.append(content_component[2]['props']['value'])
+
+    return file_list,systolic_list,diastolic_list,amplitude_list,\
+           trend_list,width_list,auc_list,dicrotic,flatten,peak_detection,label_list
+
+
 @app.callback(Output('file-to-download', 'children'),
             [Input('confirm-button', 'n_clicks')]+
             [Input(component_id="output-image-upload",component_property='children')])

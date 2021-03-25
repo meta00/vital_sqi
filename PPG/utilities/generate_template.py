@@ -2,118 +2,54 @@ import numpy as np
 
 from scipy.special import erf
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler,StandardScaler
-import scipy.integrate as integrate
+from sklearn.preprocessing import MinMaxScaler
 from scipy import signal
+import scipy
 from scipy.signal import argrelextrema
-
-
-def smooth(x, window_len=11, window='flat'):
-    """smooth the data using a window with requested size.
-
-    This method is based on the convolution of a scaled window with the signal.
-    The signal is prepared by introducing reflected copies of the signal
-    (with the window size) in both ends so that transient parts are minimized
-    in the begining and end part of the output signal.
-
-    input:
-        x: the input signal
-        window_len: the dimension of the smoothing window; should be an odd integer
-        window: the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
-            flat window will produce a moving average smoothing.
-
-    output:
-        the smoothed signal
-
-    example:
-
-    t=linspace(-2,2,0.1)
-    x=sin(t)+randn(len(t))*0.1
-    y=smooth(x)
-
-    see also:
-
-    numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
-    scipy.signal.lfilter
-
-    TODO: the window parameter could be the window itself if an array instead of a string
-    NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
-    """
-
-    if x.ndim != 1:
-        raise(ValueError, "smooth only accepts 1 dimension arrays.")
-
-    if x.size < window_len:
-        raise(ValueError, "Input vector needs to be bigger than window size.")
-
-    if window_len < 3:
-        return x
-
-    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
-        raise(ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
-
-    s = np.r_[x[window_len - 1:0:-1], x, x[-2:-window_len - 1:-1]]
-    # print(len(s))
-    if window == 'flat':  # moving average
-        w = np.ones(window_len, 'd')
-    else:
-        w = eval('np.' + window + '(window_len)')
-
-    y = np.convolve(w / w.sum(), s, mode='valid')
-    return y
-
-# def erf(z):
-#     func = lambda x: np.power(np.e, -x ** 2)
-#     if not isinstance(z,int):
-#         z_res = []
-#         for z_ in z:
-#             z_res.append(2/np.pi * integrate.quad(func,0,z_)[0])
-#         return np.array(z_res)
-#     return 2/np.pi * integrate.quad(func,0,z)[0]
-
-# def omega(x):
-#     return 0.5*(1+erf(x/np.sqrt(2)))
-
-# def omega(x):
-#     if not isinstance(x, int):
-#         z_res = []
-#         for z in x:
-#             z_res.append(integrate.quad(gaussian_func, z,-np.inf)[0])
-#         return np.array(z_res)
-#     return integrate.quad(gaussian_func, 0, x)[0]
+import plotly.io as pio
+from scipy.integrate import solve_ivp,solve_bvp,odeint
+import sys
+sys.path.append("..")
+from filtering import squeeze_template,scale_pattern
 
 def ppg_dual_doublde_frequency_template(width):
+    """
+    Generate a PPG template by using 2 sine waveforms.
+    The first waveform double the second waveform frequency
+    :param width: the sample size of the generated waveform
+    :return: a 1-D numpy array of PPG waveform
+    having diastolic peak at the low position
+    """
     t = np.linspace(0, 1, width, False)  # 1 second
-    sig = np.sin(2 * np.pi * 2 * t - np.pi / 2) + np.sin(2 * np.pi * 1 * t - np.pi / 4)
+    sig = np.sin(2 * np.pi * 2 * t - np.pi / 2) + np.sin(2 * np.pi * 1 * t - np.pi / 6)
     sig_scale = MinMaxScaler().fit_transform(np.array(sig).reshape(-1, 1))
     return sig_scale.reshape(-1)
 
-def compute_omega(x):
-    return (1 + erf(x/np.sqrt(2))) / 2
-
-def gaussian_func(x): #aka pdf
-    # 1. / (np.sqrt(2. * np.pi)) * np.exp(-.5 * (x1) ** 2)
-    return 1/(np.sqrt(2*np.pi)) * np.exp(-(x**2)/2)
-    # return 1/(np.sqrt(2*np.pi))*np.power(np.e,-(x**2)/2)
-
-# def pdf(x):
-#     return 1/sqrt(2*pi) * exp(-x**2/2)
-
-# def skew_func(x,alpha=1):
-#     return 2*gaussian_func(x)*omega(alpha*x)
-
 def skew_func(x,e=0,w=1,a=0):
     """
-    :param x: input
+    :param x: input sequence of time points
     :param e: location
     :param w: scale
-    :param a:
-    :return:
+    :param a: the order
+    :return: a 1-D numpy array of a skewness distribution
     """
     t = (x-e) / w
-    return 2 / w * gaussian_func(t) * compute_omega(a*t)
+    omega = (1 + erf((a * t) / np.sqrt(2))) / 2
+    gaussian_dist = 1/(np.sqrt(2*np.pi)) * np.exp(-(t**2)/2)
+    return 2 / w * gaussian_dist * omega
 
 def ppg_absolute_dual_skewness_template(width,e_1=1,w_1=2.5,e_2=3,w_2=3,a=4):
+    """
+    Generate a PPG template by using 2 skewness distribution.
+    :param width: the sample size of the generated waveform
+    :param e_1: the epsilon location of the first skew distribution
+    :param w_1: the scale of the first skew distribution
+    :param e_2: the epsilon location of the second skew distribution
+    :param w_2: the scale of the second skew distribution
+    :param a: the order
+    :return: a 1-D numpy array of PPG waveform
+    having diastolic peak at the high position
+    """
     x = np.linspace(0, 11, width, False)
     p_1 = skew_func(x,e_1,w_1,a)
     p_2 = skew_func(x,e_2,w_2,a)
@@ -121,26 +57,12 @@ def ppg_absolute_dual_skewness_template(width,e_1=1,w_1=2.5,e_2=3,w_2=3,a=4):
     sig_scale = MinMaxScaler().fit_transform(np.array(p_).reshape(-1, 1))
     return sig_scale.reshape(-1)
 
-def squeeze_template(s,width):
-    s = np.array(s)
-    total_len = len(s)
-    span_unit = 2
-    out_res = []
-    for i in range(width):
-        if i == 0:
-            centroid = (total_len/width)*i
-        else:
-            centroid = (total_len/width)*i
-        left_point = int(centroid)-span_unit
-        right_point = int(centroid+span_unit)
-        if left_point <0:
-            left_point=0
-        if right_point >len(s):
-            left_point=len(s)
-        out_res.append(np.mean(s[left_point:right_point]))
-    return np.array(out_res)
-
 def ppg_nonlinear_dynamic_system_template(width):
+    """
+
+    :param width:
+    :return:
+    """
     x1 = 0.15
     x2 = 0.15
     u = 0.5
@@ -153,9 +75,7 @@ def ppg_nonlinear_dynamic_system_template(width):
     dt = 0.1
     for t in np.arange(1,width,dt):
         y1 = 0.5 * (np.abs(x1+1) - np.abs(x1-1))
-        # y1 = np.tanh(x1*2)
         y2 = 0.5 * (np.abs(x2 + 1) - np.abs(x2 - 1))
-        # y2 = np.tanh(x2 * 2)
         dx1 = -x1 + (1 + u) * y1 - beta * y2 + gamma1
         dx2 = -x2 + (1 + u) * y2 + beta * y1 + gamma2
 
@@ -166,7 +86,6 @@ def ppg_nonlinear_dynamic_system_template(width):
         x2_list.append(x2)
 
     local_minima = argrelextrema(np.array(x2_list), np.less)[0]
-    # local_minima = np.where(x2_list==np.min(x2_list))[0]
     s = np.array(x2_list[local_minima[-2]:local_minima[-1]+1])
 
     rescale_signal = squeeze_template(s,width)
@@ -177,98 +96,169 @@ def ppg_nonlinear_dynamic_system_template(width):
     out_scale = MinMaxScaler().fit_transform(np.array(signal_data_tapered).reshape(-1, 1))
     return out_scale.reshape(-1)
 
-def rescale(arr, width=50):
-    n = len(arr)
-    factor = int(np.ceil(width/n))
-    return np.interp(np.linspace(0, n, factor*n+1), np.arange(n), arr)
+def interp(ys, mul):
+    # linear extrapolation for last (mul - 1) points
+    ys = list(ys)
+    ys.append(2*ys[-1] - ys[-2])
+    # make interpolation function
+    xs = np.arange(len(ys))
+    fn = scipy.interpolate.interp1d(xs, ys, kind="cubic")
+    # call it on desired data points
+    new_xs = np.arange(len(ys) - 1, step=1./mul)
+    return fn(new_xs)
 
-def scale_pattern(s,window_size):
-    scale_res = []
-    if len(s) == window_size:
-        return np.array(s)
-    if len(s)<window_size:
-        #spanning the signal
-        span_ratio = (window_size/len(s))
-        for idx in range(0,int(window_size)):
-            if idx-span_ratio<0:
-                scale_res.append(s[0])
-            else:
-                scale_res.append(np.mean(s[int(idx/span_ratio)]))
-    else:
-        squeeze_ratio = int(np.ceil(len(s)/window_size))
-        for idx in range(0,int(window_size)):
-            if idx-squeeze_ratio<0:
-                scale_res.append(np.mean(s[:idx+squeeze_ratio]))
-            elif idx+squeeze_ratio>=window_size:
-                scale_res.append(np.mean(s[idx - squeeze_ratio:]))
-            else:
-                scale_res.append(np.mean(s[idx - squeeze_ratio:idx + squeeze_ratio]))
-    scale_res = smooth_window(scale_res, span_size=5)
-    return np.array(scale_res)
+"""
+Equation (3) from the paper
+A dynamical model for generating synthetic electrocardiogram signals
+"""
+def ecg_dynamic_template(width,sfecg = 256,N = 256,Anoise = 0,hrmean = 60,
+                         hrstd=1,lfhfratio = 0.5,sfint = 512,
+                         ti=np.array([-70, -15, 0, 15, 100]),
+                         ai=np.array([1.2, -5, 30, -7.5, 0.75]),
+                         bi=np.array([0.25, 0.1, 0.1, 0.1, 0.4])
+                         ):
+    #convert to radians
+    ti = ti*np.pi/180
 
-def smooth_window(s,span_size=5):
-    for i in range(0,len(s)):
-        if i-span_size<0:
-            s[i] = np.mean(s[:i+span_size])
-        elif i+span_size>=len(s):
-            s[i] = np.mean(s[i-span_size:])
-        else:
-            s[i] = np.mean(s[i-span_size:i+span_size])
-    return s
+    # adjust extrema parameters for mean heart rate
+    hrfact = np.sqrt(hrmean / 60)
+    hrfact2 = np.sqrt(hrfact)
+    bi = hrfact * bi
+    ti = np.multiply([hrfact2, hrfact, 1, hrfact, hrfact2], ti)
 
-def ecg_dynamic_equation_template(width):
+    flo = 0.1;fhi=0.25;flostd=0.01;fhistd=0.01;fid=1;
 
-    times = [-0.2,-0.05,0,0.05,0.3] #PQRST
-    theta_i = [-np.pi/3,-np.pi/12,0,np.pi/12,np.pi/2]
-    a_i = [1.2,-5,30,-7.5,0.75]
-    b_i = [0.25,0.1,0.1,0.1,0.4]
+    # calculate time scales for rr and total output
+    sampfreqrr = 1;
+    trr = 1 / sampfreqrr;
+    rrmean = (60 / hrmean);
+    Nrr = 2 ** (np.ceil(np.log2(N * rrmean / trr)));
 
-    A = 0.15
-    f2 = 0.25
-    t = 0.1
-    x0 = 0
-    y0 = 0
-    z0 = A * np.sin(2 * np.pi * f2 * t)
+    rr0 = rr_process(flo,fhi,flostd,fhistd,lfhfratio,hrmean,hrstd,sampfreqrr,Nrr)
 
-    z = z0
-    x = x0
-    y = y0
+    #upsample rr time series from 1 Hz to sfint Hz
+    rr = interp(rr0,sfint)
+    dt = 1 / sfint;
+    rrn = np.zeros(len(rr));
+    tecg = 0;
+    i = 0;
+    while i < len(rr):
+        tecg = tecg + rr[i];
+        ip = int(np.round(tecg / dt));
+        rrn[i: ip+1] = rr[i];
+        i = ip + 1;
+    Nt = ip
+    x0 = [1, 0, 0.04];
+    tspan = np.arange(0, (Nt - 1) * dt, dt)
+    args = (rrn,sfint,ti,ai,bi)
+    solv_ode = solve_ivp(ordinary_differential_equation, [tspan[0],tspan[-1]],
+                         x0,t_eval=np.arange(20.5,21.5,0.00001), args=args)
+    Y = (solv_ode.y)[2]
 
-    alpha = 1 - np.sqrt(x ** 2 + y ** 2)
-    omega = 2*np.pi/times
-    theta = np.arctan2(y, x)
+    # if len(Y) > width:
+    #     z = squeeze_template(Y,125)
+    return Y
 
-    for dt in np.arange(-0.5,0.5,0.01):
+def ordinary_differential_equation(t, x_equations, rr=None,sfint=None,ti=None,ai=None,bi=None):
+    x = x_equations[0]
+    y = x_equations[1]
+    z = x_equations[2]
 
-        dx = alpha * x - omega * y
-        dy = alpha * y + omega * x
-        dz = compute_dz(theta,theta_i,a_i,b_i,z,z0)
+    ta = np.arctan2(y, x);
+    r0 = 1;
+    a0 = 1.0 - np.sqrt(x ** 2 + y ** 2) / r0;
+    ip = int(1 + np.floor(t * sfint));
+    try:
+        w0 = 2 * np.pi / rr[ip]
+    except Exception as e:
+        w0 = 2 * np.pi / rr[-1]
 
+    fresp = 0.25;
+    zbase = 0.005 * np.sin(2 * np.pi * fresp * t);
 
-    return z
+    dx1dt = a0 * x - w0 * y;
+    dx2dt = a0 * y + w0 * x;
 
-def compute_dz(theta,theta_i,a_i,b_i,z,z0):
-    dz = 0
-    for i in range(len(theta_i)): #PQRST
-        delta_theta = (theta-theta_i[i])//(2*np.pi)
-        dz = dz - a_i[i]*delta_theta*np.exp\
-            (-(theta_i[i]**2)/(2*(b_i[i]**2)))
-    dz = dz - (z-z0)
-    return dz
+    dti = np.fmod(ta - ti, 2 * np.pi)
+    dx3dt = -np.sum(ai*dti*np.exp(-0.5 * np.divide(dti, bi) ** 2))
+    dx3dt = dx3dt - 1.0 * (z - zbase)
+
+    return [dx1dt,dx2dt,dx3dt]
+
+def rr_process(flo, fhi, flostd, fhistd, lfhfratio, hrmean, hrstd, sfrr, n):
+    w1 = 2 * np.pi * flo;
+    w2 = 2 * np.pi * fhi;
+    c1 = 2 * np.pi * flostd;
+    c2 = 2 * np.pi * fhistd;
+    sig2 = 1;
+    sig1 = lfhfratio;
+    rrmean = 60 / hrmean;
+    rrstd = 60 * hrstd / (hrmean * hrmean);
+    """
+    Generating RR-intervals which have a bimodal power spectrum 
+    consisting of the sum of two Gaussian distributions
+    """
+    df = sfrr / n;
+    w = np.arange(0,n).T*2*np.pi*df
+    dw1 = w - w1
+    dw2 = w - w2
+
+    Hw1 = sig1 * np.exp(-0.5 * (dw1 / c1)** 2) / np.sqrt(2 * np.pi * np.power(c1,2));
+    Hw2 = sig2 * np.exp(-0.5 * (dw2 / c2)** 2) / np.sqrt(2 * np.pi * np.power(c2,2));
+    Hw = Hw1 + Hw2;
+    """
+    An RR-interval time series T(t)
+    with power spectrum is S(f)
+    generated by taking the inverse Fourier transform of 
+    a sequence of complex numbers with amplitudes sqrt(S(f))
+    and phases which are randomly distributed between 0 and 2pi
+    """
+    Hw0_half =  np.array(Hw[0:int(n / 2)])
+    Hw0 = np.append(Hw0_half, np.flip(Hw0_half))
+    Sw = (sfrr / 2) * (Hw0**.5);
+
+    ph0 = 2 * np.pi * np.random.rand(int(n / 2) - 1, 1)
+    # ph0 = 2 * np.pi * 0.001*np.arange(127).reshape(-1,1)
+    ph = np.vstack((0, ph0, 0, -np.flip(ph0)))
+
+    SwC = np.multiply(Sw.reshape(-1, 1), np.exp(1j * ph))  # create the complex number
+    inverse_res = np.fft.ifft(SwC.reshape(-1))
+    x = (1 / n) * np.real(inverse_res);
+
+    """
+        By multiplying this time series by an appropriate scaling constant 
+        and adding an offset value, 
+        the resulting time series can be given any required mean and standard deviation
+    """
+    xstd = np.std(x);
+    ratio = rrstd / xstd;
+    rr = rrmean + x * ratio;
+    return rr
 
 if __name__ == "__main__":
     width = 50 #any number
+    pio.renderers.default = "browser"
 
-    # first template window
-    template_1 = ppg_absolute_dual_skewness_template(width, e_1=2, w_1=2, e_2=3.5)
 
-    # second template window
-    template_2 = ppg_dual_doublde_frequency_template(width)
+    ecg_template_1 = ecg_dynamic_template(width=125)
 
-    template_3 = ppg_nonlinear_dynamic_system_template(width)
+    # first ppg template window
+    template_1 = ppg_absolute_dual_skewness_template(width=120, e_1=2, w_1=2, e_2=3.5)
+
+    # second ppg template window
+    template_2 = ppg_dual_doublde_frequency_template(width=120)
+
+    # third ppg template windows
+    template_3 = ppg_nonlinear_dynamic_system_template(width=120)
 
     plt.plot(template_1)
     plt.plot(template_2)
     plt.plot(template_3)
+    # plt.plot(ecg_template_1)
 
     plt.show()
+
+    # fig = go.Figure()
+    # fig.add_traces(go.Scatter(x=np.arange(1, len(ecg_template_1)),
+    #                           y=ecg_template_1, mode="lines"))
+    # fig.show()
