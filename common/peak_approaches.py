@@ -7,15 +7,34 @@ import plotly.io as pio
 from preprocess.filtering import butter_highpass_filter
 
 class waveform_template:
-    """
-    Various peak detection approaches getting from the paper
+    """Various peak detection approaches getting from the paper
     Systolic Peak Detection in Acceleration Photoplethysmograms Measured
     from Emergency Responders in Tropical Conditions
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
     """
     def __init__(self):
         self.clusters = 2
 
     def compute_feature(self, s, local_extrema):
+        """
+
+        Parameters
+        ----------
+        s :
+            
+        local_extrema :
+            
+
+        Returns
+        -------
+
+        """
         amplitude = s[local_extrema]
         diff = np.diff(amplitude)
         diff = np.hstack((diff[0], diff, diff[-1]))
@@ -25,13 +44,23 @@ class waveform_template:
         return np.hstack((amplitude, mean_diff))
 
     def detect_peak_trough_kmean(self,s,**kwargs):
-        """
-        Method 1: using clustering technique
-        :param s: The input signals
-        :param method:
-        :param kwargs:
-        :return: tuple of 1-D numpy array
-        the first array is the peak list and the second array is the troughs list
+        """Method 1: using clustering technique
+
+        Parameters
+        ----------
+        s :
+            The input signals
+        method :
+            param kwargs:
+        **kwargs :
+            
+
+        Returns
+        -------
+        type
+            tuple of 1-D numpy array
+            the first array is the peak list and the second array is the troughs list
+
         """
         # squarring doesnot work
         # s = np.array(s) ** 2
@@ -66,11 +95,19 @@ class waveform_template:
         return systolic_peaks_idx, trough_idx
 
     def detect_peak_trough_count_orig(self,s):
-        """
-        Method 2: using local extreme technique with threshold
-        :param s: Input signal
-        :return: tuple of 1-D numpy array
-        the first array is the peak list and the second array is the troughs list
+        """Method 2: using local extreme technique with threshold
+
+        Parameters
+        ----------
+        s :
+            Input signal
+
+        Returns
+        -------
+        type
+            tuple of 1-D numpy array
+            the first array is the peak list and the second array is the troughs list
+
         """
         #squaring decrease the efficiency
         # s = np.array(s)**2
@@ -103,10 +140,16 @@ class waveform_template:
 
 
     def detect_peak_trough_slope_sum(self,s):
-        """
-        Method 3: analyze the slope sum to get local extreme
-        :param s:
-        :return:
+        """Method 3: analyze the slope sum to get local extreme
+
+        Parameters
+        ----------
+        s :
+            return:
+
+        Returns
+        -------
+
         """
         peak_finalist = []
         trough_finalist = []
@@ -166,6 +209,21 @@ class waveform_template:
         return peak_finalist, onset_list
 
     def search_for_onset(Z,idx,local_max):
+        """
+
+        Parameters
+        ----------
+        Z :
+            
+        idx :
+            
+        local_max :
+            
+
+        Returns
+        -------
+
+        """
         # while Z[idx] > 0.01*local_max:
         while Z[idx] > 0:
             idx = idx -1
@@ -174,10 +232,16 @@ class waveform_template:
         return idx+1
 
     def detect_peak_trough_moving_average_threshold(self,s):
-        """
-        Method 4 (examine second derivative)
-        :param s:
-        :return:
+        """Method 4 (examine second derivative)
+
+        Parameters
+        ----------
+        s :
+            return:
+
+        Returns
+        -------
+
         """
         peak_finalist = []
         through_finalist = []
@@ -233,6 +297,19 @@ class waveform_template:
         return peak_finalist,through_finalist
 
     def get_moving_average(self,q,w):
+        """
+
+        Parameters
+        ----------
+        q :
+            
+        w :
+            
+
+        Returns
+        -------
+
+        """
         # shifting = np.ceil(w-w/2)-1
         # remaining = w-1-shifting
         q_padded = np.pad(q, (w // 2, w - 1 - w // 2), mode='edge')
