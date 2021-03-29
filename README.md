@@ -1,5 +1,8 @@
-# ECG and PPG SQI analyses
+# vital_sqi: A python package for signal quality control of physiological signals
 
+# Description
+- SQI indexes.
+- QC pipeline for ECG and PPG.
 ## PPG
 1. Data format
    
@@ -140,3 +143,11 @@ There are 3 types of SQI: statistical domain, signal processing domain & DTW dom
 2.2. Noise removal: The following is considered noise, thus removed. The recording is then split into files.
 
 2.3.
+
+# Installation
+```
+pip install vital_sqi
+```
+# Contributing
+# License
+
