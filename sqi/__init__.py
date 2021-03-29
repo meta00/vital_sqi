@@ -7,3 +7,9 @@ A subpackage for signal quality index calculation, including:
 	- Peak detection based
 	- Heart rate variability based
 """
+
+from vital_sqi.sqi import (
+	dwt_sqi,
+	rpeaks_sqi,
+	standard_sqi
+)

@@ -9,7 +9,7 @@ import os
 sys.path.append(os.path.join(os.getcwd(), "../PPG"))
 
 try:
-    from common.peak_approaches import waveform_template
+    from common.rpeak_detection import waveform_template
 except Exception as e:
     from utilities.peak_approaches import waveform_template
 
@@ -17,7 +17,7 @@ except Exception as e:
 sys.path.append(os.path.join(os.getcwd(), "../PPG"))
 
 try:
-    from preprocess.filtering import butter_lowpass_filter,butter_highpass_filter,\
+    from preprocess.band_filter import butter_lowpass_filter,butter_highpass_filter,\
         scale_pattern
     from data.trim_utilities import trim_invalid
     from common.generate_template import \

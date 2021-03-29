@@ -10,12 +10,12 @@ import plotly.graph_objects as go
 import plotly.io as pio
 
 try:
-    from common.peak_approaches import waveform_template
+    from common.rpeak_detection import waveform_template
 except:
     from utilities.peak_approaches import waveform_template
 
 try:
-    from preprocess.filtering import butter_lowpass_filter,butter_highpass_filter, \
+    from preprocess.band_filter import butter_lowpass_filter,butter_highpass_filter, \
         scale_pattern, smooth_window, tapering
 except:
     from utilities.filtering import butter_lowpass_filter,butter_highpass_filter,\
