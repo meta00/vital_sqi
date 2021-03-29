@@ -9,7 +9,7 @@ import os
 sys.path.append(os.path.join(os.getcwd(), "../PPG"))
 
 try:
-    from common.rpeak_detection import waveform_template
+    from vital_sqi.common import waveform_template
 except Exception as e:
     from utilities.peak_approaches import waveform_template
 
@@ -17,10 +17,10 @@ except Exception as e:
 sys.path.append(os.path.join(os.getcwd(), "../PPG"))
 
 try:
-    from preprocess.band_filter import butter_lowpass_filter,butter_highpass_filter,\
+    from vital_sqi.preprocess import butter_lowpass_filter,butter_highpass_filter,\
         scale_pattern
-    from data.trim_utilities import trim_invalid
-    from common.generate_template import \
+    from vital_sqi.data import trim_invalid
+    from vital_sqi.common.generate_template import \
         ppg_nonlinear_dynamic_system_template,ppg_absolute_dual_skewness_template,ppg_dual_doublde_frequency_template
 except:
     from utilities.filtering import butter_lowpass_filter,butter_highpass_filter,\

@@ -5,7 +5,7 @@ from scipy import signal
 import os
 import plotly.graph_objects as go
 import plotly.io as pio
-from preprocess.band_filter import butter_highpass_filter
+from vital_sqi.preprocess import butter_highpass_filter
 
 class waveform_template:
     """Various peak detection approaches getting from the paper

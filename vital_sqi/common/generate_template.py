@@ -11,7 +11,7 @@ import plotly.io as pio
 from scipy.integrate import solve_ivp
 import sys
 sys.path.append("../PPG")
-from preprocess.band_filter import squeeze_template
+from vital_sqi.preprocess import squeeze_template
 
 
 def ppg_dual_doublde_frequency_template(width):

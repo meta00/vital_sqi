@@ -10,12 +10,12 @@ import plotly.graph_objects as go
 import plotly.io as pio
 
 try:
-    from common.rpeak_detection import waveform_template
+    from vital_sqi.common import waveform_template
 except:
     from utilities.peak_approaches import waveform_template
 
 try:
-    from preprocess.band_filter import butter_lowpass_filter,butter_highpass_filter, \
+    from vital_sqi.preprocess import butter_lowpass_filter,butter_highpass_filter, \
         scale_pattern, smooth_window, tapering
 except:
     from utilities.filtering import butter_lowpass_filter,butter_highpass_filter,\
@@ -24,7 +24,7 @@ except:
 try:
     from ..sqi.sqi_stats import dtw_sqi,kurtosis_sqi,skewness_sqi,zero_crossings_rate_sqi,entropy_sqi,signal_to_noise_sqi
 except:
-    from sqi.dwt_sqi import dtw_sqi,kurtosis_sqi, skewness_sqi, zero_crossings_rate_sqi, entropy_sqi, signal_to_noise_sqi
+    from vital_sqi.sqi.dwt_sqi import dtw_sqi,kurtosis_sqi, skewness_sqi, zero_crossings_rate_sqi, entropy_sqi, signal_to_noise_sqi
 
 
 sqi_dict = {
