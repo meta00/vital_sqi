@@ -1,3 +1,5 @@
+"""Signal quality indexes based on xxx domains"""
+
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
@@ -22,7 +24,7 @@ except:
 try:
     from ..sqi.sqi_stats import dtw_sqi,kurtosis_sqi,skewness_sqi,zero_crossings_rate_sqi,entropy_sqi,signal_to_noise_sqi
 except:
-    from sqi.SQI import dtw_sqi,kurtosis_sqi, skewness_sqi, zero_crossings_rate_sqi, entropy_sqi, signal_to_noise_sqi
+    from sqi.dwt_sqi import dtw_sqi,kurtosis_sqi, skewness_sqi, zero_crossings_rate_sqi, entropy_sqi, signal_to_noise_sqi
 
 
 sqi_dict = {

@@ -1,3 +1,5 @@
+"""Signal quality indexes based on dynamic template matching"""
+
 import numpy as np
 from dtw import dtw
 from scipy.stats import kurtosis,skew,entropy

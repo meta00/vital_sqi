@@ -1,3 +1,4 @@
+""" Filtering of raw signals by bandpass"""
 import numpy as np
 from scipy.signal import butter, lfilter, freqz
 from scipy import signal

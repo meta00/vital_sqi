@@ -1,3 +1,4 @@
+"""Generating templates of ECG and PPG complexes"""
 import numpy as np
 
 from scipy.special import erf

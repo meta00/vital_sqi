@@ -1,3 +1,5 @@
+""" Splitting long recordings into segments"""
+
 import pandas as pd
 from tqdm import tqdm
 import plotly.graph_objects as go

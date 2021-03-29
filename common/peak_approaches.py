@@ -1,3 +1,4 @@
+"""R peak detection approaches for PPG and ECG"""
 import numpy as np
 from sklearn.cluster import KMeans
 from scipy import signal

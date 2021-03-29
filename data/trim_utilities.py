@@ -1,3 +1,5 @@
+"""Trimming raw signals using: invalid values, noise at start/end of
+recordings etc."""
 import numpy as np
 from scipy import signal
 
