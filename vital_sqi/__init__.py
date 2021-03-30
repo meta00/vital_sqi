@@ -11,3 +11,4 @@ from vital_sqi import (
 	preprocess,
 	sqi
 )
+__version__ = '0.1.0'
