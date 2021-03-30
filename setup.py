@@ -27,10 +27,14 @@ setup(
     python_requires = '>=3.6',
     zip_safe = False,
     url = 'https://github.com/meta00/vital_sqi',
-    license = 'GPL 3.0',
+    license = 'MIT',
     classifiers = [
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.7'
+        'Programming Language :: Python :: 3.8'
+
     ],
 )
