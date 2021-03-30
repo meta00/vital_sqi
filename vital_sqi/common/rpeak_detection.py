@@ -5,7 +5,12 @@ from scipy import signal
 import os
 import plotly.graph_objects as go
 import plotly.io as pio
-from vital_sqi.preprocess import butter_highpass_filter
+
+from preprocess.filtering import butter_highpass_filter
+from .generate_template import ecg_dynamic_template
+import warnings
+from ecgdetectors import Detectors,panPeakDetect
+
 
 class waveform_template:
     """Various peak detection approaches getting from the paper
@@ -19,8 +24,93 @@ class waveform_template:
     -------
 
     """
-    def __init__(self):
+    def __init__(self, wave_type='ppg'):
         self.clusters = 2
+        self.wavet_type = wave_type
+
+
+    def hamilton_detector(self,s,fs=256,detector_type="pan_tompkins"):
+        """
+        ECG peak detector from the github https://github.com/berndporr/py-ecg-detectors
+
+        Parameters
+        ----------
+        s :
+            Input signal
+
+        fs:
+            The signal frequency. Default is '256 Hz'
+
+        detector_type:
+            'hamilton': Open Source ECG Analysis Software Documentation, E.P.Limited, 2002.
+
+            'christov':Real time electrocardiogram QRS detection using combined
+            adaptive threshold
+
+            'engzee': A single scan algorithm for QRS detection and
+            feature extraction
+
+            'swt': Real-time QRS detector using Stationary Wavelet Transform for Automated ECG Analysis.
+            Uses the Pan and Tompkins thresolding.
+
+            'mva': Frequency Bands Effects on QRS Detection.
+
+            'mtemp':
+
+            'pan_tompkins': A Real-Time QRS Detection Algorithm
+
+            Default = 'pan_tompkins'
+
+
+        Returns
+        -------
+        type
+            an array of 1-D numpy array represent the peak list
+
+        """
+        if self.wave_type =='ppg':
+            warnings.warn("A ECG detectors is using on PPG waveform. Output may produce incorrect result")
+        self.fs = fs
+        detector = Detectors(fs)
+        if detector_type == 'hamilton':
+            res = detector.hamilton_detector(s)
+        elif detector_type == 'christov':
+            res = detector.christov_detector(s)
+        elif detector_type == 'engzee':
+            res = detector.engzee_detector(s)
+        elif detector_type == 'swt':
+            res = detector.swt_detector(s)
+        elif detector_type == 'mva':
+            res = detector.two_average_detector(s)
+        elif detector_type == 'mtemp':
+            res = self.matched_filter_detector(s)
+        else:
+            res = detector.pan_tompkins_detector(s)
+        return np.array(res)
+
+    def matched_filter_detector(self, unfiltered_ecg):
+        """
+        FIR matched filter using template of QRS complex.
+        Template provided in generate_template file
+        """
+        template = ecg_dynamic_template(self.fs)
+
+        f0 = 0.1 / self.fs
+        f1 = 48 / self.fs
+
+        b, a = signal.butter(4, [f0 * 2, f1 * 2], btype='bandpass')
+
+        prefiltered_ecg = signal.lfilter(b, a, unfiltered_ecg)
+
+        matched_coeffs = template[::-1]  # time reversing template
+
+        detection = signal.lfilter(matched_coeffs, 1, prefiltered_ecg)  # matched filter FIR filtering
+        squared = detection * detection  # squaring matched filter output
+        squared[:len(template)] = 0
+
+        squared_peaks = panPeakDetect(squared, self.fs)
+
+        return squared_peaks
 
     def compute_feature(self, s, local_extrema):
         """
