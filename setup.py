@@ -24,6 +24,7 @@ setup(
                       'plotly',
                       'dtw-python',
                       'py-ecg-detectors'],
+    python_requires = '>3.6',
     zip_safe = False,
     url = 'https://github.com/meta00/vital_sqi',
     license = 'GPL 3.0',
