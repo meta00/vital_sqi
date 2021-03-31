@@ -2,17 +2,14 @@
 import numpy as np
 from sklearn.cluster import KMeans
 from scipy import signal
-import os
-import plotly.graph_objects as go
-import plotly.io as pio
 
-from preprocess.filtering import butter_highpass_filter
-from .generate_template import ecg_dynamic_template
+from vital_sqi.preprocess.band_filter import BandpassFilter
+from vital_sqi.common.generate_template import ecg_dynamic_template
 import warnings
 from ecgdetectors import Detectors,panPeakDetect
 
 
-class waveform_template:
+class PeakDetector:
     """Various peak detection approaches getting from the paper
     Systolic Peak Detection in Acceleration Photoplethysmograms Measured
     from Emergency Responders in Tropical Conditions
@@ -29,8 +26,10 @@ class waveform_template:
         self.wavet_type = wave_type
 
 
-    def hamilton_detector(self,s,fs=256,detector_type="pan_tompkins"):
+    def ecg_detector(self,s,fs=256,detector_type="pan_tompkins"):
         """
+        Expose
+
         ECG peak detector from the github https://github.com/berndporr/py-ecg-detectors
 
         Parameters
@@ -88,8 +87,48 @@ class waveform_template:
             res = detector.pan_tompkins_detector(s)
         return np.array(res)
 
+    def ppg_detector(self,s,detector_type="count_orig",clusterer="kmean",preprocess = True,cubing=False):
+        """
+        Expose
+
+        PPG peak detector from the paper
+        Systolic Peak Detection in Acceleration Photoplethysmograms Measured
+        from Emergency Responders in Tropical Conditions
+
+        :param s: the input signal
+        :param detector_type:
+        :param clusterer:
+        :return:
+        """
+
+        if preprocess:
+            filter = BandpassFilter()
+            s = filter.signal_highpass_filter(s, cutoff=1, fs=100, order=2)
+            s = filter.signal_lowpass_filter(s, cutoff=12, fs=100, order=2)
+        if  cubing:
+            s = s**3
+
+        if self.wavet_type != "ppg":
+            warnings.warn("A PPG detectors is using on  unrecognized PPG waveform. Output may produce incorrect result")
+
+        try:
+            if detector_type == "cluster":
+                peak_finalist, through_finalist = self.detect_peak_trough_clusterer(s)
+            elif detector_type == "slope_sum":
+                peak_finalist, through_finalist = self.detect_peak_trough_slope_sum(s)
+            elif detector_type == "moving_average":
+                peak_finalist, through_finalist = self.detect_peak_trough_moving_average_threshold(s)
+            else:
+                peak_finalist, through_finalist = self.detect_peak_trough_count_orig(s)
+        except Exception as err:
+            print(err)
+            return signal.find_peaks(s),[]
+
+        return peak_finalist,through_finalist
+
     def matched_filter_detector(self, unfiltered_ecg):
         """
+        handy
         FIR matched filter using template of QRS complex.
         Template provided in generate_template file
         """
@@ -114,7 +153,7 @@ class waveform_template:
 
     def compute_feature(self, s, local_extrema):
         """
-
+        handy
         Parameters
         ----------
         s :
@@ -134,8 +173,10 @@ class waveform_template:
         mean_diff = mean_diff.reshape(-1, 1)
         return np.hstack((amplitude, mean_diff))
 
-    def detect_peak_trough_kmean(self,s,**kwargs):
-        """Method 1: using clustering technique
+    def detect_peak_trough_clusterer(self,s,clusterer='kmean',**kwargs):
+        """
+        handy
+        Method 1: using clustering technique
 
         Parameters
         ----------
@@ -186,7 +227,9 @@ class waveform_template:
         return systolic_peaks_idx, trough_idx
 
     def detect_peak_trough_count_orig(self,s):
-        """Method 2: using local extreme technique with threshold
+        """
+        handy
+        Method 2: using local extreme technique with threshold
 
         Parameters
         ----------
@@ -229,9 +272,10 @@ class waveform_template:
         through_finalist.append(right_trough)
         return peak_finalist,through_finalist
 
-
     def detect_peak_trough_slope_sum(self,s):
-        """Method 3: analyze the slope sum to get local extreme
+        """
+        handy
+        Method 3: analyze the slope sum to get local extreme
 
         Parameters
         ----------
@@ -301,7 +345,7 @@ class waveform_template:
 
     def search_for_onset(Z,idx,local_max):
         """
-
+        handy
         Parameters
         ----------
         Z :
@@ -323,7 +367,9 @@ class waveform_template:
         return idx+1
 
     def detect_peak_trough_moving_average_threshold(self,s):
-        """Method 4 (examine second derivative)
+        """
+        handy
+        Method 4 (examine second derivative)
 
         Parameters
         ----------
@@ -338,7 +384,8 @@ class waveform_template:
         through_finalist = []
 
         #Bandpass filter
-        S = butter_highpass_filter(s,0.5,fs=100)
+        filter = BandpassFilter()
+        S = filter.signal_highpass_filter(s,0.5,fs=100)
         # S = butter_lowpass_filter(S,8,fs=100)
         # S = s
         #Clipping the output by keeping the signal above zero will produce signal Z
@@ -389,7 +436,7 @@ class waveform_template:
 
     def get_moving_average(self,q,w):
         """
-
+        handy
         Parameters
         ----------
         q :
@@ -406,34 +453,3 @@ class waveform_template:
         q_padded = np.pad(q, (w // 2, w - 1 - w // 2), mode='edge')
         convole = np.convolve(q_padded, np.ones(w)/w, 'valid')
         return convole
-
-if __name__ == "__main__":
-    """
-    Test the peak detection methods with 24EI dataset
-    """
-    waveform = waveform_template()
-    pio.renderers.default = "browser"
-
-    DATA_PATH = os.path.join(os.getcwd(), "../PPG", "data", "11")  # 24EI-011-PPG-day1-4.csv
-    filename = "24EI-011-PPG-day1"  # 24EI-011-PPG-day1
-    ROOT_SAVED_FOLDER = os.path.join(os.getcwd(), "../PPG", "data", "peak_detection_ds")
-    SAVED_IMG_FOLDER = os.path.join(ROOT_SAVED_FOLDER, "img")
-
-    files = [os.path.join(ROOT_SAVED_FOLDER,f) for f in os.listdir(ROOT_SAVED_FOLDER)
-             if os.path.isfile(os.path.join(ROOT_SAVED_FOLDER,f))]
-    for file in files:
-
-        s = np.loadtxt(file, delimiter=',', unpack=True)
-
-        peak_shortlist, trough_shortlist = waveform.detect_peak_trough_kmean(s)
-        print(peak_shortlist)
-        fig = go.Figure()
-        fig.add_traces(go.Scatter(x=np.arange(1, len(s)),
-                                  y=s, mode="lines"))
-
-        fig.add_traces(go.Scatter(x=peak_shortlist,
-                                      y=s[peak_shortlist], mode="markers"))
-        fig.add_traces(go.Scatter(x=trough_shortlist,
-                                      y=s[trough_shortlist], mode="markers"))
-
-        fig.write_image(os.path.join(SAVED_IMG_FOLDER, (file.split("\\")[-1]).split(".")[0] + '.png'))

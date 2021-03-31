@@ -1,145 +1,155 @@
-"""Signal quality indexes based on xxx domains"""
+"""Signal quality indexes based on dynamic template matching"""
 
-import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler,MinMaxScaler
-import os
-import sys
-sys.path.append("../PPG")
-import plotly.graph_objects as go
-import plotly.io as pio
-
-try:
-    from vital_sqi.common import waveform_template
-except:
-    from utilities.peak_approaches import waveform_template
-
-try:
-    from vital_sqi.preprocess import butter_lowpass_filter,butter_highpass_filter, \
-        scale_pattern, smooth_window, tapering
-except:
-    from utilities.filtering import butter_lowpass_filter,butter_highpass_filter,\
-        scale_pattern,smooth_window,tapering
-
-try:
-    from ..sqi.sqi_stats import dtw_sqi,kurtosis_sqi,skewness_sqi,zero_crossings_rate_sqi,entropy_sqi,signal_to_noise_sqi
-except:
-    from vital_sqi.sqi.dwt_sqi import dtw_sqi,kurtosis_sqi, skewness_sqi, zero_crossings_rate_sqi, entropy_sqi, signal_to_noise_sqi
-
-
-sqi_dict = {
-        'kurtosis_sqi': [],
-        'skewness_sqi': [],
-        'entropy_sqi': [],
-        'signal_to_noise_sqi': [],
-        'zero_crossings_rate_sqi': [],
-        'dtw_template1':[],
-        'dtw_template2':[],
-        'dtw_template3':[]
-}
-sqi_methods = [kurtosis_sqi,
-                   skewness_sqi, entropy_sqi,
-                   signal_to_noise_sqi,
-                   zero_crossings_rate_sqi,
-                    dtw_sqi,
-                    dtw_sqi,
-                    dtw_sqi
-               ]
+from scipy.stats import kurtosis,skew,entropy
 
 """
-Compute the relevant SQI scores of the mean template for each segment
-The output is the csv file as in the fourth page of file PPG label criteria.pdf
+Most of the sqi scores are obtained from the following paper
+Elgendi, Mohamed, Optimal signal quality index for photoplethysmogram signals, Bioengineering,
 """
-if __name__ == "__main__":
 
-    waveform = waveform_template()
-    pio.renderers.default = "browser"
-
-    DATA_PATH = os.path.join(os.getcwd(), "../PPG", "data", "11")  # 24EI-011-PPG-day1-4.csv
-    filename = "24EI-011-PPG-day1"  # 24EI-011-PPG-day1
-    ROOT_SAVED_FOLDER = os.path.join(os.getcwd(), "../PPG", "data", "label_PPG_segment")
-    SAVED_FOLDER = os.path.join(ROOT_SAVED_FOLDER,filename)
-    SAVED_FILE_FOLDER = os.path.join(SAVED_FOLDER,"ppg")
-    SAVED_LABEL_FOLDER = os.path.join(ROOT_SAVED_FOLDER, "../PPG", "waveform_analysis")
-    IMG_FOLDER = os.path.join(SAVED_LABEL_FOLDER, "img")
-    TEMPLATE_FOLDER = os.path.join(SAVED_LABEL_FOLDER, "template")
-    ANALYSIS_FOLDER = os.path.join(SAVED_LABEL_FOLDER, "analysis")
-
-    df_label = pd.read_csv(os.path.join(SAVED_LABEL_FOLDER,os.listdir(SAVED_LABEL_FOLDER)[1]),header=0)
-    short_list = np.array(df_label["file_name"])
-
-    files = [os.path.join(SAVED_FILE_FOLDER,f) for f in os.listdir(SAVED_FILE_FOLDER)
-             if f in short_list]# if os.isfile(os.path.join(ROOT_SAVED_FOLDER, f))]
-    print(files)
-
+def perfusion_sqi(x,y,filter=True):
     """
-    Load data -> lowpass filter x2  
-    Standard scale / MinMax scale on the whole segment
-    cut data using trough peak detection,
-    Tapering  
-    Squeezing and Spanning 
+    Expose
+    The perfusion index is the ratio of the pulsatile blood flow to the nonpulsatile
+    or static blood in peripheral tissue.
+    In other words, it is the difference of the amount of light absorbed through the pulse of
+    when light is transmitted through the finger, which can be defined as follows:
+    PSQI=[(ymax−ymin)/x¯|]×100
+    where PSQI is the perfusion index, x¯ is the statistical mean of the x signal (raw PPG signal),
+    and y is the filtered PPG signal
+    :param x: float, mean of the raw signal
+    :param y: list, array of filter signnal
+    :return:
     """
-    for file in files:
-        sig = np.loadtxt(file, delimiter=',', unpack=True)
-        sig = butter_highpass_filter(sig, cutoff=1, fs=100, order=1)
-        sig = butter_highpass_filter(sig, cutoff=1, fs=100, order=1)
-        scaler = StandardScaler()
-        sig = scaler.fit_transform(sig.reshape(-1,1)).reshape(-1)
+    if filter:
+        return (np.max(y)-np.min(y))/np.abs(x)*100
 
-        peak_shortlist, trough_shortlist = waveform.detect_peak_trough_count_orig(sig)
+def kurtosis_sqi(x,axis=0, fisher=True, bias=True, nan_policy='propagate'):
+    """
+    Expose
+    Kurtosis is a measure of whether the data are heavy-tailed or light-tailed relative to a normal distribution.
+    That is, data sets with high kurtosis tend to have heavy tails, or outliers.
+    Data sets with low kurtosis tend to have light tails, or lack of outliers.
+    A uniform distribution would be the extreme case.
 
-        width = np.median(np.diff(trough_shortlist))
-        template = []
-        fig = go.Figure()
-        fig.update_layout(
-            title=file.split("\\")[-1],
-            font=dict(
-                family="Courier New, monospace",
-                size=18,
-                color="RebeccaPurple"
-            )
-        )
-        for left_trough,right_trough in zip(trough_shortlist[:-1],trough_shortlist[1:]):
-            segment = sig[left_trough:right_trough+1]
-            segment_taper = tapering(segment)
-            if (len(segment_taper)<2*width):
-                segment_taper = scale_pattern(segment_taper, width)
-                template.append(segment_taper)
-                fig.add_traces(go.Scatter(x=np.arange(1, width),
-                                          y=segment_taper, mode="markers"))
-            else:
-                segments = []
-                segments = segments + [segment_taper[int(width * i):int(width * (i + 1))]
-                                       for i in range(0, int(np.ceil(len(segment_taper) / width)))]
+    Kurtosis is a statistical measure used to describe the distribution of observed data around the mean.
+    It represents a heavy tail and peakedness or a light tail and flatness of a distribution
+    relative to the normal distribution, which is defined as:
 
-                for seg in segments:
-                    segment_taper = scale_pattern(seg, width)
-                    template.append(segment_taper)
-                    fig.add_traces(go.Scatter(x=np.arange(1, width),
-                                              y=segment_taper, mode="markers"))
-        template_mean = (np.mean(np.array(template), axis=0))
-        fig.add_traces(go.Scatter(x=np.arange(1, width),
-                                  y=template_mean, mode="lines"))
-        fig.write_image(os.path.join(IMG_FOLDER, file.split("\\")[-1].split(".")[0] + '.png'))
-        """
-        Compute the sqi and append to the dataframe
-        """
-        for sqi_method,sqi_name in zip(sqi_methods,sqi_dict.keys()):
-            if sqi_name == 'dtw_template1':
-                sqi_dict[sqi_name].append(sqi_method(template_mean,0))
-            elif sqi_name == 'dtw_template2':
-                sqi_dict[sqi_name].append(sqi_method(template_mean,1))
-            elif sqi_name == 'dtw_template3':
-                sqi_dict[sqi_name].append(sqi_method(template_mean,2))
-            else:
-                sqi_dict[sqi_name].append(sqi_method(template_mean))
+    :param x: list, the array of signal
+    :return:
+    """
+    return kurtosis(x,axis, fisher, bias, nan_policy)
 
-        saved_filename = file.split("\\")[-1].split(".")[0]
-        mmscaler = MinMaxScaler()
+def skewness_sqi(x,axis=0, bias=True, nan_policy='propagate'):
+    """
+    Expose
+    Skewness is a measure of symmetry, or more precisely, the lack of symmetry.
+    A distribution, or data set, is symmetric if it looks the same to the left and right of the center point.
 
-        np.savetxt(os.path.join(TEMPLATE_FOLDER, saved_filename + '.csv'),
-                   MinMaxScaler().fit_transform(template_mean.reshape(-1,1)), delimiter=',')  # as an array
+    Skewness is a measure of the symmetry (or the lack of it) of a probability distribution, which is defined as
+    SSQI=1/N∑i=1N[xi−μˆx/σ]3
+    where μˆx and σ are the empirical estimate of the mean and standard deviation of xi,
+    respectively; and N is the number of samples in the PPG signal.
+    :param x: list, the array of signal
+    :return:
+    """
+    return skew(x,axis, bias, nan_policy)
 
-    for sqi_name in sqi_dict.keys():
-        df_label[sqi_name] = sqi_dict[sqi_name]
-    df_label.to_csv(os.path.join(ANALYSIS_FOLDER,filename+"-analysis.csv"))
+def entropy_sqi(x,qk=None, base=None, axis=0):
+    """
+    Expose
+    Calculate the entropy information from the template distribution. Using scipy package function
+    :param x: list the input signal
+    :param qk: list, array against which the relative entropy is computed
+    :param base: float,
+    :param axis:
+    :return:
+    """
+    x_ = x - min(x)
+    return entropy(x_,qk,base,axis)
+
+def signal_to_noise_sqi(a, axis=0, ddof=0):
+    """
+    Expose
+    A measure used in science and engineering that compares the level of a desired signal
+    to the level of background noise
+    :param a:
+    :param axis:
+    :param ddof:
+    :return:
+    """
+    a = np.asanyarray(a)
+    m = a.mean(axis)
+    sd = a.std(axis=axis, ddof=ddof)
+    return np.where(sd == 0, 0, m/sd)
+
+def zero_crossings_rate_sqi(y, threshold=1e-10, ref_magnitude=None, pad=True, zero_pos=True, axis=-1):
+    """
+    Expose
+    Reuse the function from librosa package
+    This is the rate of sign-changes in the processed signal, that is, the rate at
+    which the signal changes from positive to negative or back
+    :param y: list, array of signal
+    :param threshold:float > 0, default = 1e-10 if specified, values where -threshold <= y <= threshold are clipped to 0
+    :param ref_magnitude:float >0 If numeric, the threshold is scaled relative to ref_magnitude.
+            If callable, the threshold is scaled relative to ref_magnitude(np.abs(y)).
+    :param pad: boolean, if True, then y[0] is considered a valid zero-crossing.
+    :param zero_pos: the crossing marker
+    :param axis: axis along which to compute zero-crossings.
+    :return: float, indicator array of zero-crossings in `y` along the selected axis
+    """
+    # Clip within the threshold
+    if threshold is None:
+        threshold = 0.0
+
+    if callable(ref_magnitude):
+        threshold = threshold * ref_magnitude(np.abs(y))
+
+    elif ref_magnitude is not None:
+        threshold = threshold * ref_magnitude
+
+    if threshold > 0:
+        y = y.copy()
+        y[np.abs(y) <= threshold] = 0
+
+    # Extract the sign bit
+    if zero_pos:
+        y_sign = np.signbit(y)
+    else:
+        y_sign = np.sign(y)
+
+    # Find the change-points by slicing
+    slice_pre = [slice(None)] * y.ndim
+    slice_pre[axis] = slice(1, None)
+
+    slice_post = [slice(None)] * y.ndim
+    slice_post[axis] = slice(-1)
+
+    # Since we've offset the input by one, pad back onto the front
+    padding = [(0, 0)] * y.ndim
+    padding[axis] = (1, 0)
+
+    crossings =  np.pad(
+        (y_sign[tuple(slice_post)] != y_sign[tuple(slice_pre)]),
+        padding,
+        mode="constant",
+        constant_values=pad,
+    )
+
+    return np.mean(crossings, axis=0, keepdims=True)[0]
+
+def mean_crossing_rate_sqi(y, threshold=1e-10, ref_magnitude=None, pad=True, zero_pos=True, axis=-1):
+    """
+    Expose
+    Same as zero crossing rate but this function interests in the rate of crossing signal mean
+    :param y:
+    :param threshold:
+    :param ref_magnitude:
+    :param pad:
+    :param zero_pos:
+    :param axis:
+    :return:
+    """
+    return zero_crossings_rate_sqi(y-np.mean(y), threshold,ref_magnitude, pad, zero_pos, axis)

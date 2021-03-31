@@ -2,14 +2,19 @@
 recordings etc."""
 import numpy as np
 from scipy import signal
+import pandas as pd
+import warnings
 
-def trim_invalid(df,as_dataframe=True):
+def remove_invalid(df,as_dataframe=True):
     """
-
+    Exposed
+    Remove  the list of invalid data signal
     :param df:
     :param as_dataframe:
     :return:
     """
+
+    #TODO Cover the case of different input instead of SMARTCARE device
     if as_dataframe:
         pleth_array = np.array(df["PLETH"])
         spo2_array = np.array(df["SPO2_PCT"])
@@ -30,7 +35,32 @@ def trim_invalid(df,as_dataframe=True):
 
     return start_milestone,end_milestone
 
-def cut_milestone_to_keep_milestone(start_cut_pivot,end_cut_pivot,length_df):
+def trim_data(data,minute_remove=1,sampling_rate=100):
+    """
+    Expose
+    :param data:
+    :param minute_remove:
+    :param sampling_rate:
+    :return:
+    """
+    # check if the input trimming length exceed the data length
+    if minute_remove*sampling_rate*2 > len(data):
+        warnings.warn("Input trimming length exceed the data length. Return the same array")
+        return data
+    if type(data) == type(pd.DataFrame()):
+        data = data.iloc[minute_remove * 60 * sampling_rate:-(minute_remove * 60 * sampling_rate)]
+    else:
+        data = data[minute_remove * 60 * sampling_rate:-(minute_remove * 60 * sampling_rate)]
+    return data
+
+def get_start_end_points(start_cut_pivot,end_cut_pivot,length_df):
+    """
+    handy
+    :param start_cut_pivot: array of starting points of the removal segment
+    :param end_cut_pivot: array of relevant ending points of removal segment
+    :param length_df: the length of the origin signal
+    :return:
+    """
     if 0 not in np.array(start_cut_pivot):
         start_milestone = np.hstack((0, np.array(end_cut_pivot) + 1))
         if length_df - 1 not in np.array(end_cut_pivot):
@@ -43,6 +73,13 @@ def cut_milestone_to_keep_milestone(start_cut_pivot,end_cut_pivot,length_df):
     return start_milestone,end_milestone
 
 def concate_removed_index(start_list,end_list,remove_sliding_window = 0):
+    """
+    handy
+    :param start_list:
+    :param end_list:
+    :param remove_sliding_window:
+    :return:
+    """
     start_list = np.array(start_list)
     end_list = np.array(end_list)
     diff_list = start_list[1:]-end_list[:-1]
@@ -52,11 +89,31 @@ def concate_removed_index(start_list,end_list,remove_sliding_window = 0):
     end_out_list = np.delete(end_list, end_list_rm_indices)
     return start_out_list,end_out_list
 
-def trim_by_frequency_partition(df_examine,
+def cut_invalid_rr_peak(df):
+    """
+    expose
+    :param df:
+    :return:
+    """
+    #TODO
+    return
+
+def cut_by_frequency_partition(df_examine,
                                 window_size=None,peak_threshold_ratio=None,
                                 lower_bound_threshold=None,
                                 remove_sliding_window=None,
                                 overlap_rate =None):
+    """
+    Expose
+
+    :param df_examine:
+    :param window_size:
+    :param peak_threshold_ratio:
+    :param lower_bound_threshold:
+    :param remove_sliding_window:
+    :param overlap_rate:
+    :return:
+    """
     if window_size == None:
         window_size = 500
     if window_size > len(df_examine):
@@ -100,6 +157,6 @@ def trim_by_frequency_partition(df_examine,
     start_trim_by_freq, end_trim_by_freq = concate_removed_index(remove_start_indices, remove_end_indices,
                                                                 remove_sliding_window)
     start_milestone_by_freq,end_milestone_by_freq = \
-        cut_milestone_to_keep_milestone(start_trim_by_freq, end_trim_by_freq,len(df_examine))
+        get_start_end_points(start_trim_by_freq, end_trim_by_freq,len(df_examine))
 
     return start_milestone_by_freq,end_milestone_by_freq

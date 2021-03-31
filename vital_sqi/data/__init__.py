@@ -7,5 +7,5 @@ edit, resample.
 
 from vital_sqi.data import (
 	segment_split,
-	trim_utilites
+	removal_utilities
 )

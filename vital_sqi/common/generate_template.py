@@ -9,13 +9,12 @@ import scipy
 from scipy.signal import argrelextrema
 import plotly.io as pio
 from scipy.integrate import solve_ivp
-import sys
-sys.path.append("../PPG")
-from vital_sqi.preprocess import squeeze_template
+from vital_sqi.preprocess.preprocess_signal import squeeze_template
 
 
-def ppg_dual_doublde_frequency_template(width):
+def ppg_dual_double_frequency_template(width):
     """
+    EXPOSE
     Generate a PPG template by using 2 sine waveforms.
     The first waveform double the second waveform frequency
     :param width: the sample size of the generated waveform
@@ -29,6 +28,7 @@ def ppg_dual_doublde_frequency_template(width):
 
 def skew_func(x,e=0,w=1,a=0):
     """
+    handy
     :param x: input sequence of time points
     :param e: location
     :param w: scale
@@ -42,6 +42,7 @@ def skew_func(x,e=0,w=1,a=0):
 
 def ppg_absolute_dual_skewness_template(width,e_1=1,w_1=2.5,e_2=3,w_2=3,a=4):
     """
+    EXPOSE
     Generate a PPG template by using 2 skewness distribution.
     :param width: the sample size of the generated waveform
     :param e_1: the epsilon location of the first skew distribution
@@ -61,7 +62,7 @@ def ppg_absolute_dual_skewness_template(width,e_1=1,w_1=2.5,e_2=3,w_2=3,a=4):
 
 def ppg_nonlinear_dynamic_system_template(width):
     """
-
+    EXPOSE
     :param width:
     :return:
     """
@@ -99,6 +100,12 @@ def ppg_nonlinear_dynamic_system_template(width):
     return out_scale.reshape(-1)
 
 def interp(ys, mul):
+    """
+    handy func
+    :param ys:
+    :param mul:
+    :return:
+    """
     # linear extrapolation for last (mul - 1) points
     ys = list(ys)
     ys.append(2*ys[-1] - ys[-2])
@@ -119,6 +126,21 @@ def ecg_dynamic_template(width,sfecg = 256,N = 256,Anoise = 0,hrmean = 60,
                          ai=np.array([1.2, -5, 30, -7.5, 0.75]),
                          bi=np.array([0.25, 0.1, 0.1, 0.1, 0.4])
                          ):
+    """
+    EXPOSE
+    :param width:
+    :param sfecg:
+    :param N:
+    :param Anoise:
+    :param hrmean:
+    :param hrstd:
+    :param lfhfratio:
+    :param sfint:
+    :param ti:
+    :param ai:
+    :param bi:
+    :return:
+    """
     #convert to radians
     ti = ti*np.pi/180
 
@@ -162,6 +184,17 @@ def ecg_dynamic_template(width,sfecg = 256,N = 256,Anoise = 0,hrmean = 60,
     return Y
 
 def ordinary_differential_equation(t, x_equations, rr=None,sfint=None,ti=None,ai=None,bi=None):
+    """
+    handy
+    :param t:
+    :param x_equations:
+    :param rr:
+    :param sfint:
+    :param ti:
+    :param ai:
+    :param bi:
+    :return:
+    """
     x = x_equations[0]
     y = x_equations[1]
     z = x_equations[2]
@@ -188,6 +221,19 @@ def ordinary_differential_equation(t, x_equations, rr=None,sfint=None,ti=None,ai
     return [dx1dt,dx2dt,dx3dt]
 
 def rr_process(flo, fhi, flostd, fhistd, lfhfratio, hrmean, hrstd, sfrr, n):
+    """
+    handy
+    :param flo:
+    :param fhi:
+    :param flostd:
+    :param fhistd:
+    :param lfhfratio:
+    :param hrmean:
+    :param hrstd:
+    :param sfrr:
+    :param n:
+    :return:
+    """
     w1 = 2 * np.pi * flo;
     w2 = 2 * np.pi * fhi;
     c1 = 2 * np.pi * flostd;
@@ -248,15 +294,15 @@ if __name__ == "__main__":
     template_1 = ppg_absolute_dual_skewness_template(width=120, e_1=2, w_1=2, e_2=3.5)
 
     # second ppg template window
-    template_2 = ppg_dual_doublde_frequency_template(width=120)
+    template_2 = ppg_dual_double_frequency_template(width=120)
 
     # third ppg template windows
     template_3 = ppg_nonlinear_dynamic_system_template(width=120)
 
-    plt.plot(template_1)
-    plt.plot(template_2)
-    plt.plot(template_3)
-    # plt.plot(ecg_template_1)
+    # plt.plot(template_1)
+    # plt.plot(template_2)
+    # plt.plot(template_3)
+    plt.plot(ecg_template_1)
 
     plt.show()
 
