@@ -29,7 +29,7 @@ setup(
                         'lightgbm>=3.2.0',
                         'xgboost>=1.3.3',
                       'py-ecg-detectors>=1.0.2'],
-    python_requires = '>3.6',
+    python_requires = '>=3.7',
     zip_safe = False,
     url = 'https://github.com/meta00/vital_sqi',
     license = 'MIT',
@@ -39,6 +39,5 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.7'
         'Programming Language :: Python :: 3.8'
-
     ],
 )
