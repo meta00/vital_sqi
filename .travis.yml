@@ -7,7 +7,7 @@ python:
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - pip install -U tox-travis
-  - pip install flake8 tox
+  - pip install flake8 tox pytest
   - pip install .
 # Command to run tests, e.g. python setup.py test
 script:
