@@ -21,5 +21,5 @@ from vital_sqi.sqi.standard_sqi import (
 	mean_crossing_rate_sqi
 	)
 from vital_sqi.sqi.rpeaks_sqi import (
-
+	
 	)
