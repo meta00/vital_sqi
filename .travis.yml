@@ -8,7 +8,7 @@ python:
 install:
   - pip install -U tox-travis
   - pip install flake8 tox pytest
-  - pip install matplotlib=3.3.4
+  - pip install matplotlib==3.3.4
   - pip install .
 # Command to run tests, e.g. python setup.py test
 script:
