@@ -8,10 +8,11 @@ python:
 install:
   - pip install -U tox-travis
   - pip install flake8 tox pytest
+  - pip intall matplotlib=3.3.4
   - pip install .
 # Command to run tests, e.g. python setup.py test
 script:
-  - pytest tests
+  - ls
 
 # Assuming you have installed the travis-ci CLI tool, after you
 # create the Github repo and add it to Travis, run the
