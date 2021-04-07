@@ -1,8 +1,8 @@
 dtw-python>=1.1.6
 heartpy>=1.2.6
 hrv-analysis>=1.0.3
-matplotlib>=3.3.3
-numpy>=1.19.5
+matplotlib=3.3.4
+numpy>=1.20.2
 pandas>=1.2.1
 plotly>=4.14.3
 scikit-learn>=0.24.1

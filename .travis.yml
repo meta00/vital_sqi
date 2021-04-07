@@ -4,14 +4,21 @@ language: python
 python:
   - 3.8
   - 3.7
+env:
+  - CODECOV_TOKEN="9a888fe7-3751-4899-8561-2bc01821ec2e"
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - pip install -U tox-travis
-  - pip install flake8 tox
-  - pip install .
+  - pip install flake8 tox pytest
+  - pip install matplotlib==3.3.4
+  - pip install pytest-cov codecov
+  - pip install -e .
 # Command to run tests, e.g. python setup.py test
-script: ls
-
+script:
+  - python -c "import numpy; print(numpy.version.version)"
+  - pytest --cov=vital_sqi tests
+after_success:
+  - codecov
 # Assuming you have installed the travis-ci CLI tool, after you
 # create the Github repo and add it to Travis, run the
 # following command to finish PyPI deployment setup:
