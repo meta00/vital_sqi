@@ -48,11 +48,11 @@ class BandpassFilter:
                     Specified in decibels, as a positive number
             :return:
             """
-        b, a = self.signal_bypass(cutoff, order,a_pass,btype='low')
+        b, a = self.signal_bypass(cutoff, order, a_pass, rp, rs,btype='low')
         y = lfilter(b, a, data)
         return y
 
-    def signal_highpass_filter(self,data, cutoff, order=5, a_pass=3):
+    def signal_highpass_filter(self,data, cutoff, order=5, a_pass=3,rp=4,rs=40):
         """
             High pass filter as described in scipy package
             :param data: list, array of input signal
@@ -61,7 +61,7 @@ class BandpassFilter:
             :param order:
             :return:
             """
-        b, a = self.signal_bypass(cutoff, order,a_pass,btype='high')
+        b, a = self.signal_bypass(cutoff, order,a_pass,rp,rs,btype='high')
         y = signal.filtfilt(b, a, data)
         return y
 

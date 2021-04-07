@@ -17,7 +17,7 @@ def tapering(signal_data,window=None):
     signal_data_tapered = np.array(window) * (signal_data)
     return np.array(signal_data_tapered)
 
-def smooth(x,window_len=11,window='flat'):
+def smooth(x,window_len=5,window='flat'):
     """
     expose
     :param x:
@@ -25,6 +25,7 @@ def smooth(x,window_len=11,window='flat'):
     :param window:
     :return:
     """
+    x = np.array(x)
     if x.ndim != 1:
         raise(ValueError, "smooth only accepts 1 dimension arrays.")
 
@@ -44,7 +45,8 @@ def smooth(x,window_len=11,window='flat'):
     else:
         w = eval('np.' + window + '(window_len)')
 
-    y = np.convolve(w / w.sum(), s, mode='valid')
+    # y = np.convolve(w / w.sum(), s, mode='valid')
+    y = np.convolve(w / w.sum(), x, mode='same')
     return y
 
 def scale_pattern(s,window_size):
@@ -69,8 +71,9 @@ def scale_pattern(s,window_size):
         scale_res = squeeze_template(s, window_size)
 
     # scale_res = smooth_window(scale_res, span_size=5)
-    scale_res = smooth(scale_res, span_size=5)
-    return np.array(scale_res)
+    # scale_res = smooth(scale_res, span_size=5)
+    smmoothed_scale_res = smooth(scale_res)
+    return np.array(smmoothed_scale_res)
 
 def squeeze_template(s,width):
     """
