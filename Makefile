@@ -40,6 +40,9 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 vital_sqi tests
 
+lint-file: $(filename) ## lint file with flake8
+	flake8 $(filename)
+
 doc-style: $(filename) ## convert documentation style to numpy style
 	pyment -o numpydoc -w $(filename)
 
