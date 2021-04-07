@@ -15,7 +15,7 @@ class TestPeakDetector(object):
         pass
 
 class TestECGDetector(object):
-    def test_ecg_detector(self,s,fs=256,detector_type="pan_tompkins"):
+    def test_ecg_detector(self):
         detector = PeakDetector()
         pass
 

@@ -15,6 +15,7 @@ install:
   - pip install -e .
 # Command to run tests, e.g. python setup.py test
 script:
+  - python -c "import numpy; print(numpy.version.version)"
   - pytest --cov=vital_sqi tests
 after_success:
   - codecov
