@@ -76,7 +76,7 @@ def ppg_nonlinear_dynamic_system_template(width):
     x2_list = [x2]
 
     dt = 0.1
-    for t in np.arange(1,width,dt):
+    for t in np.arange(1,100,dt):
         y1 = 0.5 * (np.abs(x1+1) - np.abs(x1-1))
         y2 = 0.5 * (np.abs(x2 + 1) - np.abs(x2 - 1))
         dx1 = -x1 + (1 + u) * y1 - beta * y2 + gamma1
@@ -282,31 +282,3 @@ def rr_process(flo, fhi, flostd, fhistd, lfhfratio, hrmean, hrstd, sfrr, n):
     ratio = rrstd / xstd;
     rr = rrmean + x * ratio;
     return rr
-
-if __name__ == "__main__":
-    width = 50 #any number
-    pio.renderers.default = "browser"
-
-
-    ecg_template_1 = ecg_dynamic_template(width=125)
-
-    # first ppg template window
-    template_1 = ppg_absolute_dual_skewness_template(width=120, e_1=2, w_1=2, e_2=3.5)
-
-    # second ppg template window
-    template_2 = ppg_dual_double_frequency_template(width=120)
-
-    # third ppg template windows
-    template_3 = ppg_nonlinear_dynamic_system_template(width=120)
-
-    # plt.plot(template_1)
-    # plt.plot(template_2)
-    # plt.plot(template_3)
-    plt.plot(ecg_template_1)
-
-    plt.show()
-
-    # fig = go.Figure()
-    # fig.add_traces(go.Scatter(x=np.arange(1, len(ecg_template_1)),
-    #                           y=ecg_template_1, mode="lines"))
-    # fig.show()

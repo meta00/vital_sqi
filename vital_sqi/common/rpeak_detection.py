@@ -8,6 +8,12 @@ from vital_sqi.common.generate_template import ecg_dynamic_template
 import warnings
 from ecgdetectors import Detectors,panPeakDetect
 
+ADAPTIVE_THRESHOLD = 1
+COUNT_ORIG_METHOD = 2
+CLUSTERER_METHOD = 3
+SLOPE_SUM_METHOD = 4
+MOVING_AVERAGE_METHOD = 5
+DEFAULT_SCIPY = 6
 
 class PeakDetector:
     """Various peak detection approaches getting from the paper
@@ -21,12 +27,12 @@ class PeakDetector:
     -------
 
     """
-    def __init__(self, wave_type='ppg'):
+    def __init__(self, wave_type='ppg',fs=100):
         self.clusters = 2
-        self.wavet_type = wave_type
+        self.wave_type = wave_type
+        self.fs = fs
 
-
-    def ecg_detector(self,s,fs=256,detector_type="pan_tompkins"):
+    def ecg_detector(self,s,detector_type="pan_tompkins"):
         """
         Expose
 
@@ -69,8 +75,7 @@ class PeakDetector:
         """
         if self.wave_type =='ppg':
             warnings.warn("A ECG detectors is using on PPG waveform. Output may produce incorrect result")
-        self.fs = fs
-        detector = Detectors(fs)
+        detector = Detectors(self.fs)
         if detector_type == 'hamilton':
             res = detector.hamilton_detector(s)
         elif detector_type == 'christov':
@@ -87,7 +92,8 @@ class PeakDetector:
             res = detector.pan_tompkins_detector(s)
         return np.array(res)
 
-    def ppg_detector(self,s,detector_type="count_orig",clusterer="kmean",preprocess = True,cubing=False):
+    def ppg_detector(self,s,detector_type=ADAPTIVE_THRESHOLD,
+                     clusterer="kmean",preprocess = True,cubing=False):
         """
         Expose
 
@@ -103,28 +109,33 @@ class PeakDetector:
 
         if preprocess:
             filter = BandpassFilter()
-            s = filter.signal_highpass_filter(s, cutoff=1, fs=100, order=2)
-            s = filter.signal_lowpass_filter(s, cutoff=12, fs=100, order=2)
-        if  cubing:
+            s = filter.signal_highpass_filter(s, cutoff=1, order=2)
+            s = filter.signal_lowpass_filter(s, cutoff=12, order=2)
+        if cubing:
             s = s**3
 
-        if self.wavet_type != "ppg":
+        if self.wave_type != "ppg":
             warnings.warn("A PPG detectors is using on  unrecognized PPG waveform. Output may produce incorrect result")
 
         try:
-            if detector_type == "cluster":
-                peak_finalist, through_finalist = self.detect_peak_trough_clusterer(s)
-            elif detector_type == "slope_sum":
-                peak_finalist, through_finalist = self.detect_peak_trough_slope_sum(s)
-            elif detector_type == "moving_average":
-                peak_finalist, through_finalist = self.detect_peak_trough_moving_average_threshold(s)
+            if detector_type == CLUSTERER_METHOD:
+                peak_finalist, trough_finalist = self.detect_peak_trough_clusterer(s)
+            elif detector_type == SLOPE_SUM_METHOD:
+                peak_finalist, trough_finalist = self.detect_peak_trough_slope_sum(s)
+            elif detector_type == MOVING_AVERAGE_METHOD:
+                peak_finalist, trough_finalist = self.detect_peak_trough_moving_average_threshold(s)
+            elif detector_type == COUNT_ORIG_METHOD:
+                peak_finalist, trough_finalist = self.detect_peak_trough_count_orig(s)
+            elif detector_type == DEFAULT_SCIPY:
+                peak_finalist, trough_finalist = self.detect_peak_trough_default_scipy(s)
             else:
-                peak_finalist, through_finalist = self.detect_peak_trough_count_orig(s)
+                peak_finalist, trough_finalist = self.detect_peak_trough_adaptive_threshold(s)
+
         except Exception as err:
             print(err)
             return signal.find_peaks(s),[]
 
-        return peak_finalist,through_finalist
+        return peak_finalist,trough_finalist
 
     def matched_filter_detector(self, unfiltered_ecg):
         """
@@ -225,6 +236,51 @@ class PeakDetector:
         trough_idx = local_minima[np.where(labels == trough_group)]
 
         return systolic_peaks_idx, trough_idx
+
+    def get_ROI(self, s, mva):
+        start_pos = []
+        end_pos = []
+        for idx in range(len(s)-1):
+            if mva[idx]>s[idx] and mva[idx+1] < s[idx+1]:
+                start_pos.append(idx)
+            elif mva[idx]<s[idx] and mva[idx+1] > s[idx+1] and len(start_pos)>len(end_pos):
+                end_pos.append(idx)
+        if len(start_pos) > len(end_pos):
+            end_pos.append(len(s)-1)
+        return start_pos,end_pos
+
+    def detect_peak_trough_adaptive_threshold(self,s,adaptive_size=0.75,overlap=0,sliding=1):
+        """
+
+        :param s:
+        :param adaptive_size:
+        :param overlap: overlapping ratio
+        :return:
+        """
+        adaptive_window = adaptive_size * self.fs # number of instances in the adaptive window
+        adaptive_threshold = self.get_moving_average(s, int(adaptive_window*2+1))
+
+        start_ROIs, end_ROIs = self.get_ROI(s, adaptive_threshold)
+        peak_finalist = []
+        for start_ROI,end_ROI in zip(start_ROIs,end_ROIs):
+            region = s[start_ROI:end_ROI+1]
+            peak_finalist.append(np.argmax(region)+start_ROI)
+
+        trough_finalist = []
+        for idx in range(len(peak_finalist)-1):
+            region = s[peak_finalist[idx]:peak_finalist[idx+1]]
+            trough_finalist.append(np.argmin(region)+peak_finalist[idx])
+
+        return peak_finalist,trough_finalist
+
+    def detect_peak_trough_default_scipy(self,s):
+        peak_finalist = signal.find_peaks(s)[0]
+        trough_finalist = []
+        for idx in range(len(peak_finalist) - 1):
+            region = s[peak_finalist[idx]:peak_finalist[idx + 1]]
+            trough_finalist.append(np.argmin(region) + peak_finalist[idx])
+
+        return peak_finalist, trough_finalist
 
     def detect_peak_trough_count_orig(self,s):
         """
