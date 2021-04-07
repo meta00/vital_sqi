@@ -7,7 +7,7 @@ class TestPerfusionSqi(object):
 class TestKurtosisSqi(object):
     def test_on_kurtosis_sqi(self):
         pass
-class TestSkewnessSqi(object)
+class TestSkewnessSqi(object):
     def test_on_skewness_sqi(self):
         pass
 class TestEntropySqi(object):
