@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/meta00/vital_sqi.svg?token=CDjcmJqzLe7opuWagsPJ&branch=main)](https://travis-ci.com/meta00/vital_sqi)
+
 # vital_sqi: A python package for signal quality control of physiological signals
 
 # Description
