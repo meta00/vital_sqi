@@ -15,6 +15,9 @@ export PRINT_HELP_PYSCRIPT
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
+build: ## install package with editable option
+	pip install -e .
+
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
 clean-build: ## remove build artifacts
@@ -37,8 +40,11 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 vital_sqi tests
 
+doc-style: $(filename) ## convert documentation style to numpy style
+	pyment -o numpydoc -w $(filename)
+
 test: ## run tests quickly with the default Python
-	pytest
+	pytest tests
 
 test-all: ## run tests on every Python version with tox
 	tox
@@ -53,3 +59,4 @@ dist: clean ## builds source and wheel package
 
 install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
+
