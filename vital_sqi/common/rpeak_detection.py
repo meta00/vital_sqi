@@ -15,6 +15,12 @@ SLOPE_SUM_METHOD = 4
 MOVING_AVERAGE_METHOD = 5
 DEFAULT_SCIPY = 6
 
+ADAPTIVE_THRESHOLD = 1
+COUNT_ORIG_METHOD = 2
+CLUSTERER_METHOD = 3
+SLOPE_SUM_METHOD = 4
+MOVING_AVERAGE_METHOD = 5
+DEFAULT_SCIPY = 6
 
 class PeakDetector:
     """Various peak detection approaches getting from the paper
@@ -28,7 +34,6 @@ class PeakDetector:
     -------
 
     """
-
     def __init__(self, wave_type='ppg', fs=100):
         self.clusters = 2
         self.wave_type = wave_type
@@ -123,7 +128,6 @@ class PeakDetector:
         if self.wave_type != "ppg":
             warnings.warn("A PPG detectors is using on  unrecognized "
                           "PPG waveform. Output may produce incorrect result")
-
         try:
             if detector_type == CLUSTERER_METHOD:
                 peak_finalist, trough_finalist = \
@@ -143,12 +147,12 @@ class PeakDetector:
             else:
                 peak_finalist, trough_finalist = \
                     self.detect_peak_trough_adaptive_threshold(s)
-
         except Exception as err:
             print(err)
             return signal.find_peaks(s), []
 
         return peak_finalist, trough_finalist
+
 
     def matched_filter_detector(self, unfiltered_ecg):
         """
@@ -272,6 +276,7 @@ class PeakDetector:
     def detect_peak_trough_adaptive_threshold(self, s,
                                               adaptive_size=0.75,
                                               overlap=0, sliding=1):
+
         """
 
         :param s:

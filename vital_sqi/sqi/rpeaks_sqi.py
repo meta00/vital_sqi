@@ -59,7 +59,6 @@ def get_all_features_heartpy(data_sample,sample_rate=100,rpeak_detector = 0):
             frequency_domain_features = {k: np.nan for k in fd_features}
             return time_domain_features,frequency_domain_features
 
-
     if rpeak_detector in [1,2,3,4]:
         detector = PeakDetector(wave_type='ecg')
         peak_list = detector.ppg_detector(data_sample,rpeak_detector,preprocess=False)[0]
