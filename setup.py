@@ -17,6 +17,7 @@ setup(
     py_modules = ['common', 'data', 'preprocess', 'sqi'],
     install_requires = ['dtw-python>=1.1.6',
                         'heartpy>=1.2.6',
+                        'pmdarima>=1.8.0',
                         'hrv-analysis>=1.0.3',
                         'matplotlib>=3.3.3',
                         'numpy>=1.20.2',
