@@ -1,8 +1,5 @@
 import pytest
-
-
 from vital_sqi.sqi.dtw_sqi import dtw_sqi
-
 
 class TestDtwSqi(object):
     x = [0, 1, 2, 3]
