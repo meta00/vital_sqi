@@ -15,12 +15,6 @@ SLOPE_SUM_METHOD = 4
 MOVING_AVERAGE_METHOD = 5
 DEFAULT_SCIPY = 6
 
-ADAPTIVE_THRESHOLD = 1
-COUNT_ORIG_METHOD = 2
-CLUSTERER_METHOD = 3
-SLOPE_SUM_METHOD = 4
-MOVING_AVERAGE_METHOD = 5
-DEFAULT_SCIPY = 6
 
 class PeakDetector:
     """Various peak detection approaches getting from the paper
@@ -153,7 +147,6 @@ class PeakDetector:
 
         return peak_finalist, trough_finalist
 
-
     def matched_filter_detector(self, unfiltered_ecg):
         """
         handy
@@ -276,7 +269,6 @@ class PeakDetector:
     def detect_peak_trough_adaptive_threshold(self, s,
                                               adaptive_size=0.75,
                                               overlap=0, sliding=1):
-
         """
 
         :param s:
