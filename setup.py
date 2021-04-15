@@ -12,10 +12,10 @@ setup(
     description = "Signal quality control pipeline for electrocardiogram and "
                  "photoplethysmogram",
     long_description = long_description,
-    author='Heloise Greeff, Hai Ho Bich, Stefan Karolcik, Khoa Le Dinh Van, Kien Trinh Trung (aphabetical order)'
-    author_email = 'heloise.greeff@eng.ox.ac.uk, haihb@oucru.org, s.karolcik@imperial.ac.uk, khoaldv@oucru.org, kientt@oucru.org'
-    maintainer='Hai Ho, Khoa Le'
-    maintainer_email='haihb@oucru.org, khoaldv@oucru.org'
+    autho r= 'Heloise Greeff, Hai Ho Bich, Stefan Karolcik, Khoa Le Dinh Van, Kien Trinh Trung (alphabetical order)',
+    author_email = 'heloise.greeff@eng.ox.ac.uk, haihb@oucru.org, s.karolcik@imperial.ac.uk, khoaldv@oucru.org, kientt@oucru.org',
+    maintainer = 'Hai Ho, Khoa Le',
+    maintainer_email = 'haihb@oucru.org, khoaldv@oucru.org',
     py_modules = ['common', 'data', 'preprocess', 'sqi'],
     install_requires = ['dtw-python>=1.1.6',
                         'heartpy>=1.2.6',
