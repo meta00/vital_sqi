@@ -12,7 +12,7 @@ setup(
     description = "Signal quality control pipeline for electrocardiogram and "
                  "photoplethysmogram",
     long_description = long_description,
-    autho r= 'Heloise Greeff, Hai Ho, Stefan Karolcik, Khoa Le, Kien Trinh (alphabetical order)',
+    author = 'Heloise Greeff, Hai Ho, Stefan Karolcik, Khoa Le, Kien Trinh (alphabetical order)',
     author_email = 'heloise.greeff@eng.ox.ac.uk, haihb@oucru.org, s.karolcik@imperial.ac.uk, khoaldv@oucru.org, kientt@oucru.org',
     maintainer = 'Hai Ho, Khoa Le',
     maintainer_email = 'haihb@oucru.org, khoaldv@oucru.org',
