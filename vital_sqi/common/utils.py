@@ -31,3 +31,5 @@ def check_valid_signal(x):
         raise ValueError("Invalid signal: Expect numeric array, instead found "
                          "array with types {0}: ".format(type_unique))
     return True
+def calculate_sampling_rate(x):
+    return None
