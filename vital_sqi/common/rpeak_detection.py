@@ -27,6 +27,7 @@ class PeakDetector:
     -------
 
     """
+
     def __init__(self, wave_type='ppg',fs=100):
         self.clusters = 2
         self.wave_type = wave_type
