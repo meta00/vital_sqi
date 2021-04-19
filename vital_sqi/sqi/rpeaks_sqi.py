@@ -1,6 +1,7 @@
 """Signal quality indexes based on R peak detection"""
 import numpy as np
-
+from scipy import signal
+from scipy import interpolate
 import heartpy as hp
 from heartpy.datautils import rolling_mean
 from hrvanalysis import get_time_domain_features,get_frequency_domain_features,\
@@ -134,6 +135,96 @@ def get_peak_error_features(data_sample,sample_rate=100,rpeak_detector = 0,low_r
         error_sqi[rule+"_error"] = ectopic_ratio
 
     return error_sqi
+
+def calculate_Spectrum(rr_intervals, method='welch',
+                           sampling_frequency=4,
+                           interpolation_method="linear",
+                           power_type='density',
+                           vlf_min= 0.003, vlf_max= 0.04,
+                           hf_min= 0.15, hf_max= 0.4,
+                           ):
+    """
+    Returns the frequency and power of the signal.
+
+    Parameters
+    ---------
+    rr_intervals : array-like
+        list of RR interval (in ms)
+    method : str
+        Method used to calculate the psd or powerband or spectrogram.
+        available methods are:
+        'welch': apply welch method to compute PSD
+        'lomb': apply lomb method to compute PSD
+        'ar': method to compute the periodogram - if compute PSD then power_type = 'density'
+        'spectrogram': method to compute the spectrogram, output an extra list represent timestamp
+        'powerband': compute the power density at 4 power band.
+            The min-max boundary of power need to be defined
+
+    sampling_frequency : int
+        Frequency of the spectrum need to be observed. Common value range from 1 Hz to 10 Hz,
+        by default set to 4 Hz. Detail can be found from the ECG book
+    interpolation_method : str
+        Kind of interpolation as a string, by default "linear". Applicable for welch
+    power_type: str
+        'density':
+        'spectrogram':
+
+    Returns
+    ---------
+    freq : list
+        Frequency of the corresponding psd points.
+    psd : list
+        Power Spectral Density of the signal.
+    """
+
+    # create timestamp to do the interpolation
+    ts_rr = [np.sum(rr_intervals[:i]) / 1000 for i in range(len(rr_intervals))]
+    # convert each RR interval (unit ms) to bpm - representative
+    bpm_list = (1000 * 60) / rr_intervals
+
+    first = ts_rr[0]
+    last = ts_rr[-1]
+    # interpolate the data
+
+    if method == 'welch':
+        # ---------- Interpolation of signal ---------- #
+        # funct = interpolate.interp1d(x=timestamp_list, y=nn_intervals, kind=interpolation_method)
+        interpolator = interpolate.interp1d(ts_rr, bpm_list, kind=interpolation_method)
+        # create timestamp for the interpolate rr
+        time_offset = 1 / sampling_frequency
+        # ts_interpolate = [np.sum(RR[:i]) / 100 for i in range(len(IRR))]
+        ts_interpolate = np.arange(0, last - first, time_offset)
+
+        # timestamps_interpolation = _create_interpolated_timestamp_list(nn_intervals, sampling_frequency)
+        nni_interpolation = interpolator(ts_interpolate)
+
+        # ---------- Remove DC Component ---------- #
+        nni_normalized = nni_interpolation - np.mean(nni_interpolation)
+
+        #  --------- Compute Power Spectral Density  --------- #
+        freq, psd = signal.welch(x=nni_normalized, fs=sampling_frequency, window='hann',
+                                 nfft=4096)
+
+    elif method == 'lomb':
+        freq, psd = signal.lombscargle(ts_rr, bpm_list, sampling_frequency)
+        # freq, psd = LombScargle(timestamp_list, nn_intervals,
+        #                         normalization='psd').autopower(minimum_frequency=vlf_band[0],
+        #                                                        maximum_frequency=hf_band[1])
+    elif method == 'ar':
+        freq, psd = signal.periodogram(bpm_list, sampling_frequency, window='boxcar',
+                                       nfft=None, detrend='constant',
+                                       return_onesided=True,
+                                       scaling=power_type, axis=- 1)
+    elif method == 'powerband':
+        # TODO
+        freq, psd, t = signal.spectrogram(bpm_list, sampling_frequency)
+
+    elif method == 'spectrogram':
+        freq, psd, t = signal.spectrogram(bpm_list, sampling_frequency)
+    else:
+        raise ValueError("Not a valid method. Choose between 'lomb' and 'welch'")
+
+    return freq, psd
 
 #TODO remove test file
 import pandas as pd
