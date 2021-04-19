@@ -15,6 +15,12 @@ SLOPE_SUM_METHOD = 4
 MOVING_AVERAGE_METHOD = 5
 DEFAULT_SCIPY = 6
 
+ADAPTIVE_THRESHOLD = 1
+COUNT_ORIG_METHOD = 2
+CLUSTERER_METHOD = 3
+SLOPE_SUM_METHOD = 4
+MOVING_AVERAGE_METHOD = 5
+DEFAULT_SCIPY = 6
 
 class PeakDetector:
     """Various peak detection approaches getting from the paper
