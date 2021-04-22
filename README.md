@@ -121,19 +121,6 @@ There are 3 types of SQI: statistical domain, signal processing domain & DTW dom
 - signal processing domain: zero_crossings_rate_sqi, signal_to_noise_sqi, mean_crossing_rate_sqi
 - DTW domain: dtw_sqi
 
-### tools package
-1) PPG_Explore_Tool
-
-    -  Load CSV file and display through Plotly
-    -  Trim invalid signal as described in 2.1 & 2.2
-    -  Trim additive noise signal by using Welch technique to check if the selected range of samples
-    has additional frequency. 
-
-2) PPG_label_tool
-
-    -   Load multiple CSV files of preprocessed and splited signal.
-    -   Use radio button to identify the segments property and save to csv file  
-
 ## ECG
 
 1. Data format
