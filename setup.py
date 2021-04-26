@@ -33,7 +33,7 @@ setup(
                         'xgboost>=1.3.3',
                         'py-ecg-detectors>=1.0.2',
                         'pyEDFlib>=0.1.20',
-                        'pycwt>=0.3.0'
+                        'pycwt>=0.3.0',
                         'wfdb>=3.3.0'],
     python_requires = '>=3.7',
     zip_safe = False,
