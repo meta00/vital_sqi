@@ -1,6 +1,13 @@
 import numpy as np
 from scipy import signal
 from scipy import interpolate
+import pycwt as wavelet
+
+mother_wave_dict = {
+    'gaussian': wavelet.DOG(),
+    'paul': wavelet.Paul(),
+    'mexican_hat': wavelet.MexicanHat()
+}
 
 def calculate_power(freq,pow,fmin,fmax):
     """
@@ -26,9 +33,55 @@ def calculate_power(freq,pow,fmin,fmax):
 
     return band_power
 
-def calculate_Spectrum(rr_intervals, method='welch',
-                           sampling_frequency=4,
-                           interpolation_method="linear",
+def get_interpolated_data(ts_rr,bpm_list,sampling_frequency,
+                          interpolation_method="linear"):
+    """
+
+    Parameters
+    ----------
+    ts_rr
+    bpm_list
+    sampling_frequency
+    interpolation_method
+
+    Returns
+    -------
+
+    """
+    first = ts_rr[0]
+    last = ts_rr[-1]
+    # interpolate the data
+    # ---------- Interpolation of signal ---------- #
+    # funct = interpolate.interp1d(x=timestamp_list, y=nn_intervals, kind=interpolation_method)
+    interpolator = interpolate.interp1d(ts_rr, bpm_list, kind=interpolation_method)
+    # create timestamp for the interpolate rr
+    time_offset = 1 / sampling_frequency
+    # ts_interpolate = [np.sum(RR[:i]) / 100 for i in range(len(IRR))]
+    ts_interpolate = np.arange(0, last - first, time_offset)
+
+    # timestamps_interpolation = _create_interpolated_timestamp_list(nn_intervals, sampling_frequency)
+    nni_interpolation = interpolator(ts_interpolate)
+    return nni_interpolation
+
+def get_time_and_bpm(rr_intervals):
+    """
+
+    Parameters
+    ----------
+    rr_intervals
+
+    Returns
+    -------
+
+    """
+    # create timestamp to do the interpolation
+    ts_rr = [np.sum(rr_intervals[:i]) / 1000 for i in range(len(rr_intervals))]
+    # convert each RR interval (unit ms) to bpm - representative
+    bpm_list = (1000 * 60) / rr_intervals
+    return ts_rr, bpm_list
+
+def calculate_spectrum(rr_intervals, method='welch',
+                           hr_sampling_frequency=4,
                            power_type='density',
                            ):
     """
@@ -64,48 +117,78 @@ def calculate_Spectrum(rr_intervals, method='welch',
     psd : list
         Power Spectral Density of the signal.
     """
-
-    # create timestamp to do the interpolation
-    ts_rr = [np.sum(rr_intervals[:i]) / 1000 for i in range(len(rr_intervals))]
-    # convert each RR interval (unit ms) to bpm - representative
-    bpm_list = (1000 * 60) / rr_intervals
-
-    first = ts_rr[0]
-    last = ts_rr[-1]
-    # interpolate the data
+    ts_rr, bpm_list = get_time_and_bpm(rr_intervals)
 
     if method == 'welch':
-        # ---------- Interpolation of signal ---------- #
-        # funct = interpolate.interp1d(x=timestamp_list, y=nn_intervals, kind=interpolation_method)
-        interpolator = interpolate.interp1d(ts_rr, bpm_list, kind=interpolation_method)
-        # create timestamp for the interpolate rr
-        time_offset = 1 / sampling_frequency
-        # ts_interpolate = [np.sum(RR[:i]) / 100 for i in range(len(IRR))]
-        ts_interpolate = np.arange(0, last - first, time_offset)
-
-        # timestamps_interpolation = _create_interpolated_timestamp_list(nn_intervals, sampling_frequency)
-        nni_interpolation = interpolator(ts_interpolate)
-
+        nni_interpolation = get_interpolated_data(ts_rr, bpm_list,hr_sampling_frequency)
         # ---------- Remove DC Component ---------- #
         nni_normalized = nni_interpolation - np.mean(nni_interpolation)
 
         #  --------- Compute Power Spectral Density  --------- #
-        freq, psd = signal.welch(x=nni_normalized, fs=sampling_frequency, window='hann',
+        freq, psd = signal.welch(x=nni_normalized, fs=hr_sampling_frequency, window='hann',
                                  nfft=4096)
 
     elif method == 'lomb':
-        freq = np.linspace(1e-5, sampling_frequency, 100)
+        freq = np.linspace(1e-5, hr_sampling_frequency, 100)
         psd = signal.lombscargle(ts_rr, bpm_list, freq)
 
     elif method == 'ar':
-        freq, psd = signal.periodogram(bpm_list, sampling_frequency, window='boxcar',
+        freq, psd = signal.periodogram(bpm_list, hr_sampling_frequency, window='boxcar',
                                        nfft=None, detrend='constant',
                                        return_onesided=True,
                                        scaling=power_type, axis=- 1)
 
     elif method == 'spectrogram':
-        freq, t, psd = signal.spectrogram(bpm_list, sampling_frequency)
+        freq, t, psd = signal.spectrogram(bpm_list, hr_sampling_frequency)
     else:
         raise ValueError("Not a valid method. Choose between 'lomb' and 'welch'")
 
     return freq,psd
+
+def calculate_power_wavelet(rr_intervals,heart_rate = 4,mother_wave='morlet'):
+    """
+
+    Parameters
+    ----------
+    rr_intervals
+    heart_rate
+    mother_wave
+
+    Returns
+    -------
+
+    """
+    ts_rr, bpm_list = get_time_and_bpm(rr_intervals)
+    dt = 1 / heart_rate
+    if mother_wave in mother_wave_dict.keys():
+        mother_morlet = mother_wave_dict[mother_wave]
+    else:
+        mother_morlet = wavelet.Morlet()
+
+    wave, scales, freqs, coi, fft, fftfreqs = \
+        wavelet.cwt(bpm_list, dt,wavelet = mother_morlet)
+    powers = (np.abs(wave)) ** 2
+    return freqs,powers
+
+import pandas as pd
+import os
+from vital_sqi.common.rpeak_detection import PeakDetector
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pycwt as wavelet
+if __name__ == "__main__":
+    df_rr = pd.read_csv(os.path.join(os.getcwd(), "../../../..", "data",
+                                  "RR_intervals.csv"))
+    rr_intervals = np.array(df_rr.iloc[:,1])
+
+
+    freq,psd = calculate_power_wavelet(rr_intervals,mother_wave='paul')
+
+    freq_sftf, psd_sftf = calculate_spectrum(rr_intervals)
+    freq_lomb,psd_lomb = calculate_spectrum(rr_intervals,method='lomb')
+    freq_ar,psd_ar = calculate_spectrum(rr_intervals, method='ar')
+    freq_spectrogram, psd_spectrogram = calculate_spectrum(rr_intervals, method='spectrogram')
+
+    # sns.heatmap(psd_spectrogram[:5,:])
+    # plt.show()
+    print(psd_spectrogram)
