@@ -149,7 +149,7 @@ class PeakDetector:
                     self.detect_peak_trough_adaptive_threshold(s)
         except Exception as err:
             print(err)
-            return signal.find_peaks(s), []
+            return signal.find_peaks(s)[0], []
 
         return peak_finalist, trough_finalist
 

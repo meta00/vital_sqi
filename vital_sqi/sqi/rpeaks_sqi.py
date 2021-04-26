@@ -137,6 +137,30 @@ def get_peak_error_features(data_sample,sample_rate=100,rpeak_detector = 0,low_r
 
     return error_sqi
 
+def calculate_power(freq,pow,fmin,fmax):
+    """
+    compute the power within the band range
+    Parameters
+    ----------
+    freq
+    pow
+    fmin
+    fmax
+
+    Returns
+    -------
+
+    """
+
+    # case heatmap spectrogram -> compute the total power with time series -or the mean power
+    if pow.ndim == 2:
+        pow = np.mean(pow,axis=1)
+
+    band = pow[(freq >= fmin and freq < fmax)]
+    band_power = np.sum(band)/(2*np.power(len(pow),2))
+
+    return band_power
+
 def calculate_Spectrum(rr_intervals, method='welch',
                            sampling_frequency=4,
                            interpolation_method="linear",
@@ -207,40 +231,23 @@ def calculate_Spectrum(rr_intervals, method='welch',
                                  nfft=4096)
 
     elif method == 'lomb':
-        freq, psd = signal.lombscargle(ts_rr, bpm_list, sampling_frequency)
-        # freq, psd = LombScargle(timestamp_list, nn_intervals,
-        #                         normalization='psd').autopower(minimum_frequency=vlf_band[0],
-        #                                                        maximum_frequency=hf_band[1])
+        freq = np.linspace(1e-5, sampling_frequency, 100)
+        psd = signal.lombscargle(ts_rr, bpm_list, freq)
+
     elif method == 'ar':
         freq, psd = signal.periodogram(bpm_list, sampling_frequency, window='boxcar',
                                        nfft=None, detrend='constant',
                                        return_onesided=True,
                                        scaling=power_type, axis=- 1)
-    elif method == 'powerband':
-        # TODO
-        freq, psd, t = signal.spectrogram(bpm_list, sampling_frequency)
 
     elif method == 'spectrogram':
-        freq, psd, t = signal.spectrogram(bpm_list, sampling_frequency)
+        freq, t, psd = signal.spectrogram(bpm_list, sampling_frequency)
     else:
         raise ValueError("Not a valid method. Choose between 'lomb' and 'welch'")
 
-    return freq, psd
+    vlf = calculate_power(freq,psd,vlf_min,vlf_max)
+    lf = calculate_power(freq,psd,vlf_max,hf_min)
+    hf = calculate_power(freq, psd, hf_min, hf_max)
+    vhf = calculate_power(freq, psd, hf_max, sampling_frequency)
 
-#TODO remove test file
-import pandas as pd
-import  os
-if __name__ == "__main__":
-    filename = "24EI-011-PPG-day1-0237.csv"
-    df = pd.read_csv(os.path.join(os.getcwd(), "../../../..", "Work", "data",
-                                  "peak_detection_ds", filename))
-    y = np.array(df).reshape(-1)
-    # time_domain_features, frequency_domain_features, \
-    # geometrical_features, csi_cvi_features = get_all_features_hrva(y,rpeak_method=2)
-    #
-    # time_domain_features_heartpy, frequency_domain_features_heartpy = \
-    #     get_all_features_heartpy(y,rpeak_detector=1)
-
-    peak_error_features = get_peak_error_features(y,rpeak_detector=1)
-
-    print("")
+    return vlf,lf,hf,vhf
