@@ -36,6 +36,7 @@ setup(
                         'pycwt>=0.3.0a22',
                         'statsmodels>=0.12.2',
                         'wfdb>=3.3.0'],
+                        'datetimerange>=1.0.0'],
     python_requires = '>=3.7',
     zip_safe = False,
     url = 'https://github.com/meta00/vital_sqi',
