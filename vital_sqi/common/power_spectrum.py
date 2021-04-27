@@ -43,7 +43,8 @@ def get_interpolated_data(ts_rr,bpm_list,sampling_frequency,
     ts_rr
     bpm_list
     sampling_frequency
-    interpolation_method
+    interpolation_method : str
+        Kind of interpolation as a string, by default "linear". Applicable for welch
 
     Returns
     -------
@@ -69,11 +70,15 @@ def get_time_and_bpm(rr_intervals):
 
     Parameters
     ----------
-    rr_intervals
+    rr_intervals: array-like
+        list of RR interval (in ms)
 
     Returns
     -------
-
+    ts_rr : list
+        the generated time for each heart beat (in s).
+    bpm_list : list
+        the beat per minute index of to the peak
     """
     # create timestamp to do the interpolation
     ts_rr = [np.sum(rr_intervals[:i]) / 1000 for i in range(len(rr_intervals))]
@@ -81,7 +86,7 @@ def get_time_and_bpm(rr_intervals):
     bpm_list = (1000 * 60) / rr_intervals
     return ts_rr, bpm_list
 
-def calculate_spectrum(rr_intervals, method='welch',
+def calculate_psd(rr_intervals, method='welch',
                            hr_sampling_frequency=4,
                            power_type='density',
                            max_lag=3
@@ -99,15 +104,12 @@ def calculate_spectrum(rr_intervals, method='welch',
         'welch': apply welch method to compute PSD
         'lomb': apply lomb method to compute PSD
         'ar': method to compute the periodogram - if compute PSD then power_type = 'density'
-        'spectrogram': method to compute the spectrogram, output an extra list represent timestamp
-        'powerband': compute the power density at 4 power band.
-            The min-max boundary of power need to be defined
 
-    sampling_frequency : int
+
+    hr_sampling_frequency : int
         Frequency of the spectrum need to be observed. Common value range from 1 Hz to 10 Hz,
         by default set to 4 Hz. Detail can be found from the ECG book
-    interpolation_method : str
-        Kind of interpolation as a string, by default "linear". Applicable for welch
+
     power_type: str
         'density':
         'spectrogram':
@@ -142,13 +144,33 @@ def calculate_spectrum(rr_intervals, method='welch',
         model = AutoReg(psd,max_lag)
         res = model.fit()
         model.predict(res.params)
-
-    elif method == 'spectrogram':
-        freq, t, psd = signal.spectrogram(bpm_list, hr_sampling_frequency)
     else:
-        raise ValueError("Not a valid method. Choose between 'lomb' and 'welch'")
+        raise ValueError("Not a valid method. Choose between 'ar', 'lomb' and 'welch'")
 
     return freq,psd
+
+def calculate_spectrogram(rr_intervals, hr_sampling_frequency=4):
+    """
+    Method to compute the spectrogram, output an extra list represent timestamp
+
+    Parameters
+    ----------
+    rr_intervals: array-like
+        list of RR interval (in ms)
+    hr_sampling_frequency: int
+        values = The range of heart rate frequency * 2
+    Returns
+    -------
+    freq : list
+        Frequency of the corresponding psd points.
+    psd : list
+        Power Spectral Density of the signal.
+    t: list
+        Time points of the corresponding psd
+    """
+    ts_rr, bpm_list = get_time_and_bpm(rr_intervals)
+    freq, t, psd = signal.spectrogram(bpm_list, hr_sampling_frequency)
+    return freq,psd,t
 
 def calculate_power_wavelet(rr_intervals,heart_rate = 4,mother_wave='morlet'):
     """
