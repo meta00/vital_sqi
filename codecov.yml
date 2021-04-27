@@ -1,0 +1,21 @@
+codecov:
+  require_ci_to_pass: yes
+
+coverage:
+  status:
+    project:
+      default: false  # disable the default status that measures entire project
+      tests:
+        paths:
+          - "tests/"
+        target: 10%
+      source:
+        paths:
+          - "examples/"
+        target: 10%
+        threshold: 0.002
+    patch:
+      default:
+        target: 0%  # new contributions should have a coverage at least equal to targetcomment:
+ comment:
+  after_n_builds: 3
