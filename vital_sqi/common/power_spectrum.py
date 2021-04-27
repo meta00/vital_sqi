@@ -2,6 +2,7 @@ import numpy as np
 from scipy import signal
 from scipy import interpolate
 import pycwt as wavelet
+from statsmodels.tsa.ar_model import AutoReg, ar_select_order
 
 mother_wave_dict = {
     'gaussian': wavelet.DOG(),
@@ -83,6 +84,7 @@ def get_time_and_bpm(rr_intervals):
 def calculate_spectrum(rr_intervals, method='welch',
                            hr_sampling_frequency=4,
                            power_type='density',
+                           max_lag=3
                            ):
     """
     Returns the frequency and power of the signal.
@@ -137,6 +139,9 @@ def calculate_spectrum(rr_intervals, method='welch',
                                        nfft=None, detrend='constant',
                                        return_onesided=True,
                                        scaling=power_type, axis=- 1)
+        model = AutoReg(psd,max_lag)
+        res = model.fit()
+        model.predict(res.params)
 
     elif method == 'spectrogram':
         freq, t, psd = signal.spectrogram(bpm_list, hr_sampling_frequency)
@@ -169,26 +174,3 @@ def calculate_power_wavelet(rr_intervals,heart_rate = 4,mother_wave='morlet'):
         wavelet.cwt(bpm_list, dt,wavelet = mother_morlet)
     powers = (np.abs(wave)) ** 2
     return freqs,powers
-
-import pandas as pd
-import os
-from vital_sqi.common.rpeak_detection import PeakDetector
-import seaborn as sns
-import matplotlib.pyplot as plt
-import pycwt as wavelet
-if __name__ == "__main__":
-    df_rr = pd.read_csv(os.path.join(os.getcwd(), "../../../..", "data",
-                                  "RR_intervals.csv"))
-    rr_intervals = np.array(df_rr.iloc[:,1])
-
-
-    freq,psd = calculate_power_wavelet(rr_intervals,mother_wave='paul')
-
-    freq_sftf, psd_sftf = calculate_spectrum(rr_intervals)
-    freq_lomb,psd_lomb = calculate_spectrum(rr_intervals,method='lomb')
-    freq_ar,psd_ar = calculate_spectrum(rr_intervals, method='ar')
-    freq_spectrogram, psd_spectrogram = calculate_spectrum(rr_intervals, method='spectrogram')
-
-    # sns.heatmap(psd_spectrogram[:5,:])
-    # plt.show()
-    print(psd_spectrogram)
