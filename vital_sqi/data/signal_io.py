@@ -22,9 +22,9 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
     channel_name :
         (Default value = None)
     sampling_rate :
-         (Default value = None)
+        (Default value = None)
     start_datetime : optional
-         (Default value = None)
+        (Default value = None)
 
     Returns
     -------
@@ -118,9 +118,11 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
     Parameters
     ----------
     signal_sqi : SignalSQI object containing signals, sampling rate and sqi
-
+        
     file_name : name of file to write, with extension. For edf file_type,
-    possible extensions are edf, edf+, bdf, bdf+. For mit file_type,
+        
+    possible extensions are edf, edf+, bdf, bdf+. For mit file_type, :
+        
     possible extensions are... :
         
     file_type : edf or mit or csv
@@ -136,6 +138,8 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
 
     Returns
     -------
+
+    
     """
     signals = signal_sqi.signals
     sampling_rate = signal_sqi.sampling_rate
@@ -170,25 +174,113 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
     return True
 
 
-def PPG_reader(file_name, signal_idx, timestamp_idx, sampling_rate):
+def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
+               timestamp_unit = 'ms', sampling_rate=None, start_datetime=None):
     """
 
     Parameters
     ----------
-    file_name :
+    file_name : str
+        absolute path to ppg file
+        
+    signal_idx : list
+        name of one column containing signal
+        
+    timestamp_idx : list
+        name of one column containing timestamps
+        
+    info_idx : list
+        name of the columns for other info
+        
+    timestamp_unit : str
+        unit of timestamp, only 'ms' or 's' accepted
+         (Default value = 'ms')
+    sampling_rate : float
+        if None, sampling_rate can be inferred from the
+        timestamps
+         (Default value = None)
+    start_datetime : str
+        in '%Y-%m-%d '%H:%M:%S.%f' format
+         (Default value = None)
+
+    Returns
+    -------
+    object of class SignalSQI
+    
+    """
+    cols = timestamp_idx + signal_idx + info_idx
+    tmp = pd.read_csv(file_name,
+                      usecols=cols,
+                      skipinitialspace=True,
+                      skip_blank_lines=True)
+    timestamps = tmp[timestamp_idx[0]]
+    if start_datetime is None:
+        start_datetime = timestamps[0]
+    if isinstance(start_datetime, str):
+        try:
+            start_datetime = dt.datetime.strptime(start_datetime, '%Y-%m-%d '
+                                                             '%H:%M:%S')
+        except Exception:
+            start_datetime = None
+            pass
+    else:
+        start_datetime = None
+    if sampling_rate is None:
+        if timestamp_unit is None:
+            raise Exception("Missing sampling_rate, not able to infer "
+                            "sampling_rate without timestamp_unit")
+        elif timestamp_unit == 'ms':
+            timestamps = timestamps/1000
+        elif timestamp_unit != 's':
+            raise Exception("Timestamp unit must be either second (s) or "
+                            "millisecond (ms)")
+        sampling_rate = utils.calculate_sampling_rate(timestamps.to_numpy())
+    signals = tmp[signal_idx[0]].to_numpy()
+    info = tmp[info_idx].to_dict('list')
+    out = SignalSQI(signals=signals, wave_type='ppg',
+                        sampling_rate=sampling_rate,
+                        start_datetime=start_datetime,
+                        info=info)
+    return out
+
+
+def PPG_writer(signal_sqi, file_name, file_type = 'csv'):
+    """
+
+    Parameters
+    ----------
+    signal_sqi : object of class SignalSQI
+        
+    file_name : str
+        absolute path
         
 
     Returns
     -------
-
+    bool
     """
-    signals = pd.read_csv(file_name, usecols = [timestamps, signal_idx])
-    return True
-
-def PPG_writer(signal_sqi, file_name, file_type):
+    timestamps = utils.generate_timestamp(
+            start_datetime=signal_sqi.start_datetime,
+            sampling_rate=signal_sqi.sampling_rate,
+            signal_length=len(signal_sqi.signals))
+    signals = signal_sqi.signals
+    timestamps = np.array(timestamps)
+    out_df = pd.DataFrame({'time': timestamps, 'pleth': signals})
+    if file_type == 'csv':
+        out_df.to_csv(file_name, index=False, header=True)
+    if file_type == 'excel':
+        out_df.to_excel(file_name, index=False, header=True)
     return True
 
 # out = ECG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
 #             '/test_data/ecg_test_w.csv', 'csv', sampling_rate = 100)
 # ECG_writer(out, '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
 #             '/test_data/ecg_test_w.csv', 'csv')
+
+# out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
+#             '/test_data/ppg_smartcare.csv', timestamp_idx = [
+#     'TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
+#                                                          'SPO2_PCT','PERFUSION_INDEX'],
+#                  start_datetime = '2020-04-12 10:00:00')
+# PPG_writer(out, '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
+#             '/test_data/ppg_smartcare_w.csv')
