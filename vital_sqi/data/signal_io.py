@@ -271,16 +271,3 @@ def PPG_writer(signal_sqi, file_name, file_type = 'csv'):
     if file_type == 'excel':
         out_df.to_excel(file_name, index=False, header=True)
     return True
-
-# out = ECG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
-#             '/test_data/ecg_test_w.csv', 'csv', sampling_rate = 100)
-# ECG_writer(out, '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
-#             '/test_data/ecg_test_w.csv', 'csv')
-
-# out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
-#             '/test_data/ppg_smartcare.csv', timestamp_idx = [
-#     'TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
-#                                                          'SPO2_PCT','PERFUSION_INDEX'],
-#                  start_datetime = '2020-04-12 10:00:00')
-# PPG_writer(out, '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
-#             '/test_data/ppg_smartcare_w.csv')
