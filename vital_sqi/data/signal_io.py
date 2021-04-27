@@ -183,8 +183,12 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, sampling_rate):
 
     """
     signals = pd.read_csv(file_name, usecols = [timestamps, signal_idx])
+    return True
 
-out = ECG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
-            '/test_data/ecg_test_w.csv', 'csv', sampling_rate = 100)
+def PPG_writer(signal_sqi, file_name, file_type):
+    return True
+
+# out = ECG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
+#             '/test_data/ecg_test_w.csv', 'csv', sampling_rate = 100)
 # ECG_writer(out, '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
 #             '/test_data/ecg_test_w.csv', 'csv')
