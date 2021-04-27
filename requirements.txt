@@ -17,3 +17,4 @@ pyEDFlib>=0.1.20
 pycwt>=0.3.0a22
 statsmodels>=0.12.2
 wfdb>=3.3.0
+datetimerange>=1.0.0
