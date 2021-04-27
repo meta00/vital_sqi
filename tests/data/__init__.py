@@ -11,6 +11,4 @@ from vital_sqi.data.removal_utilities import (
 	cut_invalid_rr_peak,
 	cut_by_frequency_partition
 )
-from vital_sqi.data.segment_split import (
-	split_by_time
-	)
+from vital_sqi.data.segment_split import *
