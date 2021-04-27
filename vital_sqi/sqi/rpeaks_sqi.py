@@ -10,7 +10,7 @@ from hrvanalysis.preprocessing import remove_outliers,remove_ectopic_beats,inter
 from heartpy.analysis import calc_ts_measures, calc_rr, calc_fd_measures,\
     clean_rr_intervals,calc_poincare,calc_breathing
 from heartpy.peakdetection import check_peaks, detect_peaks
-
+from statsmodels.tsa.stattools import acf
 from vital_sqi.common.rpeak_detection import PeakDetector
 
 def get_all_features_hrva(data_sample,sample_rate=100,rpeak_method=0):
