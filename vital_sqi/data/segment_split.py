@@ -59,7 +59,8 @@ def save_each_segment(filename,segment_list,save_file_folder,
 
 def split_to_subsegments(signal_data,filename=None,sampling_rate=100.0,
                          segment_length_second=30.0,minute_remove=5.0,
-                         split_type="time",is_trim=False,save_file_folder=None,
+                         signal_type="ecg",split_type="time",
+                         is_trim=False,save_file_folder=None,
                          save_image=False,save_img_folder=None,display_trough_peak=True):
     """
     Expose
@@ -76,7 +77,7 @@ def split_to_subsegments(signal_data,filename=None,sampling_rate=100.0,
         filename = 'segment'
     if save_file_folder == None:
         save_file_folder = '.'
-    save_file_folder = os.path.join(save_file_folder, "ppg")
+    save_file_folder = os.path.join(save_file_folder, signal_type)
     if not os.path.exists(save_file_folder):
         os.makedirs(save_file_folder)
 
@@ -115,7 +116,7 @@ def get_split_time_index(segment_seconds,sequence):
     :param sequence:
     :return:
     """
-    indices = [segment_seconds * i
+    indices = [int(segment_seconds * i)
                for i in range(0, int(np.ceil(len(sequence) / segment_seconds)))]
     return indices
 
@@ -130,10 +131,11 @@ def get_split_rr_index(segment_seconds,sequence):
     detector = PeakDetector()
     indices = [0]
     for i in range(0, int(np.ceil(len(sequence) / segment_seconds))):
-        chunk = sequence[segment_seconds * i:segment_seconds * (i + 1) + 60]
+        chunk = sequence[int(segment_seconds * i):
+                         int(segment_seconds * (i + 1) + 60)]
         peak_list, trough_list = detector.ppg_detector(chunk)
         if len(trough_list)>0:
-            indices.append(trough_list[-1]+segment_seconds * i)
+            indices.append(int(trough_list[-1]+segment_seconds * i))
         else:
-            indices.append(segment_seconds * (i+1))
+            indices.append(int(segment_seconds * (i+1)))
     return indices

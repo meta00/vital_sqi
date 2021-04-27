@@ -10,7 +10,7 @@ signals, Bioengineering.
 """
 
 
-def perfusion_sqi(x, y, filter=True):
+def perfusion_sqi(x, y):
     """The perfusion index is the ratio of the pulsatile blood flow to the
     nonpulsatile or static blood in peripheral tissue.
     In other words, it is the difference of the amount of light absorbed
@@ -25,16 +25,13 @@ def perfusion_sqi(x, y, filter=True):
     x :
         float, mean of the raw signal
     y :
-        list, array of filter signnal
-    filter :
-         (Default value = True)
+        list, array of filtered signal
 
     Returns
     -------
 
     """
-    if filter:
-        return (np.max(y)-np.min(y))/np.abs(x)*100
+    return (np.max(y)-np.min(y))/np.abs(x)*100
 
 
 def kurtosis_sqi(x, axis=0, fisher=True, bias=True,
@@ -68,6 +65,7 @@ def kurtosis_sqi(x, axis=0, fisher=True, bias=True,
     -------
 
     """
+    
     return kurtosis(x, axis, fisher, bias, nan_policy)
 
 

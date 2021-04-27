@@ -1,5 +1,6 @@
 """Signal quality indexes based on R peak detection"""
 import numpy as np
+from scipy import signal
 
 import heartpy as hp
 from heartpy.datautils import rolling_mean
@@ -43,12 +44,21 @@ def get_all_features_hrva(data_sample,sample_rate=100,rpeak_method=0):
            geometrical_features,csi_cvi_features
 
 def get_all_features_heartpy(data_sample,sample_rate=100,rpeak_detector = 0):
+    # time domain features
+    td_features = ["bpm", "ibi", "sdnn", "sdsd", "rmssd",
+                   "pnn20", "pnn50", "hr_mad", "sd1", "sd2",
+                   "s", "sd1/sd2", "breathingrate"]
+    # frequency domain features
+    fd_features = ["lf", "hf", "lf/hf"]
     try:
         wd, m = hp.process(data_sample, sample_rate,calc_freq = True)
     except Exception as e:
-        print(e)
-        wd, m = hp.process(data_sample, sample_rate)
-
+        try:
+            wd, m = hp.process(data_sample, sample_rate)
+        except:
+            time_domain_features = {k: np.nan for k in td_features}
+            frequency_domain_features = {k: np.nan for k in fd_features}
+            return time_domain_features,frequency_domain_features
     if rpeak_detector in [1,2,3,4]:
         detector = PeakDetector(wave_type='ecg')
         peak_list = detector.ppg_detector(data_sample,rpeak_detector,preprocess=False)[0]
@@ -71,13 +81,6 @@ def get_all_features_heartpy(data_sample,sample_rate=100,rpeak_detector = 0):
 
         wd, m = calc_fd_measures(measures=measures,working_data=working_data)
 
-    # time domain features
-    td_features = ["bpm","ibi","sdnn","sdsd","rmssd",
-                   "pnn20","pnn50","hr_mad","sd1","sd2",
-                   "s","sd1/sd2","breathingrate"]
-    # frequency domain features
-    fd_features = ["lf","hf","lf/hf"]
-
     time_domain_features = {k:m[k] for k in td_features}
 
     frequency_domain_features = {}
@@ -93,12 +96,16 @@ def get_all_features_heartpy(data_sample,sample_rate=100,rpeak_detector = 0):
 
 def get_peak_error_features(data_sample,sample_rate=100,rpeak_detector = 0,low_rri=300,
                             high_rri=2000):
+    rules = ["malik", "karlsson", "kamath", "acar"]
     try:
         wd, m = hp.process(data_sample, sample_rate, calc_freq=True)
     except:
-        wd, m = hp.process(data_sample, sample_rate)
-
-    rules = ["malik","karlsson","kamath","acar"]
+        try:
+            wd, m = hp.process(data_sample, sample_rate)
+        except:
+            error_dict = {rule+"_error":np.nan  for rule in rules}
+            error_dict["outlier_error"] = np.nan
+            return error_dict
 
     if rpeak_detector in [1, 2, 3, 4]:
         detector = PeakDetector(wave_type='ecg')
@@ -128,21 +135,3 @@ def get_peak_error_features(data_sample,sample_rate=100,rpeak_detector = 0,low_r
         error_sqi[rule+"_error"] = ectopic_ratio
 
     return error_sqi
-
-#TODO remove test file
-import pandas as pd
-import  os
-if __name__ == "__main__":
-    filename = "24EI-011-PPG-day1-0237.csv"
-    df = pd.read_csv(os.path.join(os.getcwd(), "../../../..", "Work", "data",
-                                  "peak_detection_ds", filename))
-    y = np.array(df).reshape(-1)
-    # time_domain_features, frequency_domain_features, \
-    # geometrical_features, csi_cvi_features = get_all_features_hrva(y,rpeak_method=2)
-    #
-    # time_domain_features_heartpy, frequency_domain_features_heartpy = \
-    #     get_all_features_heartpy(y,rpeak_detector=1)
-
-    peak_error_features = get_peak_error_features(y,rpeak_detector=1)
-
-    print("")
