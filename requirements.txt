@@ -15,3 +15,4 @@ pmdarima>=1.8.0
 py-ecg-detectors>=1.0.2
 pyEDFlib>=0.1.20
 wfdb>=3.3.0
+datetimerange>=1.0.0
