@@ -56,12 +56,11 @@ def calculate_sampling_rate(timestamps):
             for i in range(1, len(timestamps)):
                 timestamps_second.append((timestamps[i] - timestamps[
                 i - 1]).total_seconds())
-            steps = np.diff(timestamps_second)
-            sampling_rate = round(1 / np.min(steps[steps != 0]), ndigits = 0)
         except Exception:
             sampling_rate = None
             pass
-
+    steps = np.diff(timestamps_second)
+    sampling_rate = round(1 / np.min(steps[steps != 0]), ndigits = 0)
     return sampling_rate
 
 
