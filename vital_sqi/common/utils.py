@@ -1,6 +1,7 @@
 import numpy as np
 import datetime as dt
 from datetimerange import DateTimeRange
+import dateparser
 def check_valid_signal(x):
     """Check whether signal is valid, i.e. an array_like numeric, or raise errors.
 
@@ -48,9 +49,8 @@ def calculate_sampling_rate(timestamps):
         timestamps_second = timestamps
     else:
         try:
-            v_str_to_datetime = np.vectorize(dt.datetime.strptime)
-            timestamps = v_str_to_datetime(timestamps, '%Y-%m-%d '
-                                                   '%H:%M:%S.%f')
+            v_parse_datetime = np.vectorize(parse_datetime)
+            timestamps = v_parse_datetime(timestamps)
             timestamps_second = []
             timestamps_second.append(0)
             for i in range(1, len(timestamps)):
@@ -92,3 +92,56 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
         raise Exception("Timestamp series generated is not valid, please "
                         "check sampling rate.")
     return timestamps
+
+def parse_datetime(string, type='datetime'):
+    """
+    A simple dateparser that detects common  datetime formats
+
+    Parameters
+    ----------
+    string : str
+        a date string in format as denoted below.
+
+    Returns
+    -------
+    datetime.datetime
+        datetime object of a time.
+
+    """
+    # some common formats.
+    date_formats = ['%Y-%m-%d',
+                    '%d-%m-%Y',
+                    '%d.%m.%Y',
+                    '%Y.%m.%d',
+                    '%d %b %Y',
+                    '%Y/%m/%d',
+                    '%d/%m/%Y']
+    datime_formats = ['%Y-%m-%d %H:%M:%S.%f',
+                      '%d-%m-%Y %H:%M:%S.%f',
+                      '%d.%m.%Y %H:%M:%S.%f',
+                      '%Y.%m.%d %H:%M:%S.%f',
+                      '%d %b %Y %H:%M:%S.%f',
+                      '%Y/%m/%d %H:%M:%S.%f',
+                      '%d/%m/%Y %H:%M:%S.%f',
+                      '%Y-%m-%d %I:%M:%S.%f',
+                      '%d-%m-%Y %I:%M:%S.%f',
+                      '%d.%m.%Y %I:%M:%S.%f',
+                      '%Y.%m.%d %I:%M:%S.%f',
+                      '%d %b %Y %I:%M:%S.%f',
+                      '%Y/%m/%d %I:%M:%S.%f',
+                      '%d/%m/%Y %I:%M:%S.%f']
+    if type == 'date':
+        formats = date_formats
+    if type == 'datetime':
+        formats =  datime_formats
+    for f in formats:
+        try:
+            return datetime.strptime(string, f)
+        except:
+            pass
+    try:
+        return dateparser.parse(string)
+    except:
+        raise ValueError('Datetime string must be of standard Python format '
+                         '(https://docs.python.org/3/library/time.html), '
+                         'e.g., `%d-%m-%Y`, eg. `24-01-2020`')
