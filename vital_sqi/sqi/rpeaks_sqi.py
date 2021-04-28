@@ -10,7 +10,7 @@ from hrvanalysis.preprocessing import remove_outliers,remove_ectopic_beats,inter
 from heartpy.analysis import calc_ts_measures, calc_rr, calc_fd_measures,\
     clean_rr_intervals,calc_poincare,calc_breathing
 from heartpy.peakdetection import check_peaks, detect_peaks
-
+from statsmodels.tsa.stattools import acf
 from vital_sqi.common.rpeak_detection import PeakDetector
 
 def get_all_features_hrva(data_sample,sample_rate=100,rpeak_method=0):
@@ -135,3 +135,28 @@ def get_peak_error_features(data_sample,sample_rate=100,rpeak_detector = 0,low_r
         error_sqi[rule+"_error"] = ectopic_ratio
 
     return error_sqi
+
+def correlogram_sqi(data_sample,sample_rate=100,time_lag=3,n_selection = 3):
+    """
+    The method is based on the paper 'Classification of the Quality of Wristband-based
+    Photoplethysmography Signals'
+    Parameters
+    ----------
+    data_sample
+    sample_rate
+    time_lag
+
+    Returns
+    -------
+
+    """
+    nlags = time_lag*sample_rate
+    corr = acf(data_sample,nlags=nlags)
+    corr_peaks_idx = signal.find_peaks(corr)[0]
+    corr_peaks_value = corr[corr_peaks_idx]
+    if n_selection > len(corr_peaks_value):
+        n_selection = len(corr_peaks_value)
+
+    corr_sqi = [i for i in corr_peaks_idx[:n_selection]]+\
+          [i for i in corr_peaks_value[:n_selection]]
+    return corr_sqi
