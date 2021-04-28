@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import signal
 
-def tapering(signal_data,window=None):
+def tapering(signal_data,window=None,shift_min_to_zero=True):
     """
     expose
     Pin the leftmost and rightmost signal to the zero baseline
@@ -11,7 +11,8 @@ def tapering(signal_data,window=None):
     as described in scipy.windows
     :return: the tapered signal
     """
-    signal_data = signal_data-np.min(signal_data)
+    if shift_min_to_zero:
+        signal_data = signal_data-np.min(signal_data)
     if window == None:
         window = signal.windows.tukey(len(signal_data),0.9)
     signal_data_tapered = np.array(window) * (signal_data)
@@ -52,6 +53,10 @@ def smooth(x,window_len=5,window='flat'):
 def scale_pattern(s,window_size):
     """
     expose
+    This method is ONLY used for small segment to compare with the template.
+    Please change to use scipy.signal.resample function for the purpose of
+    resampling.
+
     :param s:
     :param window_size:
     :return:
