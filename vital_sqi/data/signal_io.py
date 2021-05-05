@@ -188,7 +188,9 @@ def ECG_writer(signal_sqi, file_name, file_type, info = None):
     signals = signal_sqi.signals
     sampling_rate = signal_sqi.sampling_rate
     start_datetime = signal_sqi.start_datetime
-    assert isinstance(sampling_rate, int), 'sampling rate is not integer'
+    assert isinstance(sampling_rate, int) or isinstance(sampling_rate,
+                                                        float), \
+        'sampling rate must be either int or float'
     if file_type == 'edf':
         signals = signals.transpose()
         if info is not None:
