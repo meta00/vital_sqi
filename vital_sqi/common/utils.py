@@ -60,7 +60,7 @@ def calculate_sampling_rate(timestamps):
             sampling_rate = None
             pass
     steps = np.diff(timestamps_second)
-    sampling_rate = round(1 / np.min(steps[steps != 0]), ndigits = 0)
+    sampling_rate = round(1 / np.min(steps[steps != 0]))
     return sampling_rate
 
 
