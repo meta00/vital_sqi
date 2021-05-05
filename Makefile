@@ -49,7 +49,8 @@ doc-style: $(filename) ## convert documentation style to numpy style
 test: ## run tests quickly with the default Python
 	pytest --cov- -report term --cov=vital_sqi tests/
 
-cov: ## run coverage report by file quickly in the terminal
+cov: ## run test and coverage report by file quickly in the terminal
+	pytest --cov-report term --cov=vital_sqi tests/
 	coverage report -m
 test-all: ## run tests on every Python version with tox
 	tox
