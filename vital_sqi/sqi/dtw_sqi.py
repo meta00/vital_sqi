@@ -1,5 +1,14 @@
 import numpy as np
-from dtw import dtw
+import sys, os
+if bool(getattr(sys, 'ps1', sys.flags.interactive)):
+    sys.stdout = open(os.devnull, 'w')
+    from dtw import dtw
+    sys.stdout = sys.__stdout__
+else:
+    from dtw import dtw
+
+import logging
+
 from vital_sqi.common.generate_template import (
         ppg_absolute_dual_skewness_template,
         ppg_dual_double_frequency_template,

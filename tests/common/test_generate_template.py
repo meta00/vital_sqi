@@ -2,7 +2,6 @@ import pytest
 import numpy as np
 
 from scipy.special import erf
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from scipy import signal
 import scipy
