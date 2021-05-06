@@ -1,5 +1,4 @@
 import numpy as np
-from hrvanalysis import remove_outliers,interpolate_nan_values
 
 def sdnn_sqi(nn_intervals):
     """
@@ -108,11 +107,6 @@ def cvsd_sqi(nn_intervals):
     cvsd = rmssd_sqi(nn_intervals) / mean_nn_sqi(nn_intervals)
     return cvsd
 
-def get_interpolate(intervals):
-    rr_intervals_cleaned = remove_outliers(intervals, low_rri=300, high_rri=2000)
-    interpolated_rr_intervals = interpolate_nan_values(rr_intervals_cleaned)
-    return interpolated_rr_intervals
-
 def cvnn_sqi(nn_intervals, compute_interpolation=False):
     """
     Function returning the covariance of the NN intervals
@@ -137,8 +131,6 @@ def cvnn_sqi(nn_intervals, compute_interpolation=False):
     obtained from the peak detection algorithm.
 
     """
-    if compute_interpolation:
-        nn_intervals = get_interpolate(nn_intervals)
     return sdsd_sqi(nn_intervals)/mean_nn_sqi(nn_intervals)
 
 def mean_nn_sqi(nn_intervals, compute_interpolation=False):
@@ -164,8 +156,6 @@ def mean_nn_sqi(nn_intervals, compute_interpolation=False):
     If the purpose is to compute SQI, input the raw RR intervals -
     obtained from the peak detection algorithm.
     """
-    if compute_interpolation:
-        nn_intervals = get_interpolate(nn_intervals)
     return np.mean(nn_intervals)
 
 def median_nn_sqi(nn_intervals, compute_interpolation=False):
@@ -191,8 +181,6 @@ def median_nn_sqi(nn_intervals, compute_interpolation=False):
     If the purpose is to compute SQI, input the raw RR intervals -
     obtained from the peak detection algorithm.
     """
-    if compute_interpolation:
-        nn_intervals = get_interpolate(nn_intervals)
     return np.median(nn_intervals)
 
 def pnn_50_sqi(nn_intervals, compute_interpolation=False):
@@ -219,8 +207,6 @@ def pnn_50_sqi(nn_intervals, compute_interpolation=False):
     If the purpose is to compute SQI, input the raw RR intervals -
     obtained from the peak detection algorithm.
     """
-    if compute_interpolation:
-        nn_intervals = get_interpolate(nn_intervals)
     sd = np.diff(nn_intervals)
     nn_50 = np.sum(np.abs(sd) > 50)
     pnn_50 = 100 * nn_50 / len(sd)
@@ -250,8 +236,6 @@ def pnn_20_sqi(nn_intervals, compute_interpolation=False):
     If the purpose is to compute SQI, input the raw RR intervals -
     obtained from the peak detection algorithm.
     """
-    if compute_interpolation:
-        nn_intervals = get_interpolate(nn_intervals)
     sd = np.diff(nn_intervals)
     nn_20 = np.sum(np.abs(sd) > 20)
     pnn_20 = 100 * nn_20 / len(sd)
@@ -370,7 +354,7 @@ def hr_std_sqi(nn_intervals):
     nn_bpm = np.divide(60000, nn_intervals)
     return np.std(nn_bpm)
 
-def peak_frequency_sqi(freqs,pows,fbands):
+def peak_frequency_sqi(freqs,pows,f_min=0.04,f_max=0.15):
     """
     The function mimics features obtaining from the frequency domain of HRV.
     Main inputs are frequencies and power density - compute by using
@@ -383,9 +367,12 @@ def peak_frequency_sqi(freqs,pows,fbands):
         The frequencies mapping with the power spectral
     pows : list
         The powers of the relevant frequencies
-    fbands : tuple
-        1st number is the lower bound of the band
-        2nd number is the upper bound of the band
+    f_min : float
+        The lower bound of the band .
+        Default value = 0.04 is the lower bound of heart rate low-band
+    f_max: float
+        The upper bound of the band
+        Default value = 0.15 is the upper bound of heart rate low-band
 
     Returns
     ---------
@@ -396,12 +383,11 @@ def peak_frequency_sqi(freqs,pows,fbands):
     ---------
     Compute the PSD before using this sqi
     """
-    fmin, fmax = fbands
-    f_power = (pows[freqs>=fmin & freqs<fmax])
+    f_power = (pows[freqs>=f_min & freqs<f_max])
     f_peak = f_power[np.argmax(f_pows)]
     return f_peak
 
-def absolute_power_sqi(freqs,pows,fbands):
+def absolute_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
     """
     Compute the cummulative power of the examined band.
     The function mimics features obtaining from the frequency domain of HRV.
@@ -415,9 +401,12 @@ def absolute_power_sqi(freqs,pows,fbands):
         The frequencies mapping with the power spectral
     pows : list
         The powers of the relevant frequencies
-    fbands : tuple
-        1st number is the lower bound of the band
-        2nd number is the upper bound of the band
+    f_min : float
+        The lower bound of the band .
+        Default value = 0.04 is the lower bound of heart rate low-band
+    f_max: float
+        The upper bound of the band
+        Default value = 0.15 is the upper bound of heart rate low-band
 
     Returns
     ---------
@@ -428,12 +417,11 @@ def absolute_power_sqi(freqs,pows,fbands):
     ---------
     Compute the PSD before using this sqi
     """
-    fmin, fmax = fbands
-    filtered_pows = pows[freqs >= fmin and freqs < fmax]
+    filtered_pows = pows[freqs >= f_min and freqs < f_max]
     abs_pow = np.sum(filtered_pows)
     return abs_pow
 
-def log_power_sqi(freqs,pows,fbands):
+def log_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
     """
     Compute the logarithm power of the examined band.
     The function mimics features obtaining from the frequency domain of HRV.
@@ -447,9 +435,12 @@ def log_power_sqi(freqs,pows,fbands):
         The frequencies mapping with the power spectral
     pows : list
         The powers of the relevant frequencies
-    fbands : tuple
-        1st number is the lower bound of the band
-        2nd number is the upper bound of the band
+    f_min : float
+        The lower bound of the band .
+        Default value = 0.04 is the lower bound of heart rate low-band
+    f_max: float
+        The upper bound of the band
+        Default value = 0.15 is the upper bound of heart rate low-band
 
     Returns
     ---------
@@ -460,12 +451,11 @@ def log_power_sqi(freqs,pows,fbands):
     ---------
     Compute the PSD before using this sqi
     """
-    fmin, fmax = fbands
-    filtered_pows = pows[freqs >= fmin and freqs < fmax]
+    filtered_pows = pows[freqs >= f_min and freqs < f_max]
     log_pow = np.sum(np.log(filtered_pows))
     return log_pow
 
-def relative_power_sqi(freqs,pows,fbands):
+def relative_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
     """
     Compute the relative power with respect to the total power of the examined band.
     The function mimics features obtaining from the frequency domain of HRV.
@@ -479,9 +469,12 @@ def relative_power_sqi(freqs,pows,fbands):
         The frequencies mapping with the power spectral
     pows : list
         The powers of the relevant frequencies
-    fbands : tuple
-        1st number is the lower bound of the band
-        2nd number is the upper bound of the band
+    f_min : float
+        The lower bound of the band .
+        Default value = 0.04 is the lower bound of heart rate low-band
+    f_max: float
+        The upper bound of the band
+        Default value = 0.15 is the upper bound of heart rate low-band
 
     Returns
     ---------
@@ -492,8 +485,7 @@ def relative_power_sqi(freqs,pows,fbands):
     ---------
     Compute the PSD before using this sqi
     """
-    fmin, fmax = fbands
-    filtered_pows = pows[freqs >= fmin and freqs < fmax]
+    filtered_pows = pows[freqs >= f_min and freqs < f_max]
     relative_pow = np.sum(np.log(filtered_pows))/np.sum(pows)
     return relative_pow
 
