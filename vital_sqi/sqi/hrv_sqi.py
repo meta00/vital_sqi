@@ -354,7 +354,8 @@ def hr_std_sqi(nn_intervals):
     nn_bpm = np.divide(60000, nn_intervals)
     return np.std(nn_bpm)
 
-def peak_frequency_sqi(freqs,pows,f_min=0.04,f_max=0.15):
+def peak_frequency_sqi(nn_intervals, freqs=None,pows=None
+                       ,f_min=0.04,f_max=0.15):
     """
     The function mimics features obtaining from the frequency domain of HRV.
     Main inputs are frequencies and power density - compute by using
@@ -363,8 +364,11 @@ def peak_frequency_sqi(freqs,pows,f_min=0.04,f_max=0.15):
 
     Parameters
     ---------
+    nn_intervals: list
+        Normal to Normal Interval
     freqs : list
-        The frequencies mapping with the power spectral
+        The frequencies mapping with the power spectral.
+        Default is None.
     pows : list
         The powers of the relevant frequencies
     f_min : float
@@ -381,13 +385,21 @@ def peak_frequency_sqi(freqs,pows,f_min=0.04,f_max=0.15):
 
     Notes
     ---------
-    Compute the PSD before using this sqi
+    If freqs and pows are assigned by computing the PSD before using this sqi,
+    freqs & pows is used directly instead of nn_intervals.
+    Otherwise, the frequencies and powers will be computed from nn intervals
+    using welch method as default
     """
+    if freqs == None or pows == None:
+        freqs,pows = calculate_psd(nn_intervals)
+    assert len(freqs) != len(pows),\
+            "Length of the frequencies and the relevant powers must be the same"
     f_power = (pows[freqs>=f_min & freqs<f_max])
     f_peak = f_power[np.argmax(f_pows)]
     return f_peak
 
-def absolute_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
+def absolute_power_sqi(nn_intervals,freqs=None,pows=None,
+                       f_min=0.04,f_max=0.15):
     """
     Compute the cummulative power of the examined band.
     The function mimics features obtaining from the frequency domain of HRV.
@@ -397,6 +409,8 @@ def absolute_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
 
     Parameters
     ---------
+    nn_intervals: list
+        Normal to Normal Interval
     freqs : list
         The frequencies mapping with the power spectral
     pows : list
@@ -415,13 +429,21 @@ def absolute_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
 
     Notes
     ---------
-    Compute the PSD before using this sqi
+    If freqs and pows are assigned by computing the PSD before using this sqi,
+    freqs & pows is used directly instead of nn_intervals.
+    Otherwise, the frequencies and powers will be computed from nn intervals
+    using welch method as default
     """
+    if freqs == None or pows == None:
+        freqs,pows = calculate_psd(nn_intervals)
+    assert len(freqs) != len(pows),\
+            "Length of the frequencies and the relevant powers must be the same"
     filtered_pows = pows[freqs >= f_min and freqs < f_max]
     abs_pow = np.sum(filtered_pows)
     return abs_pow
 
-def log_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
+def log_power_sqi(nn_intervals,freqs=None,pows=None,
+                  f_min=0.04,f_max=0.15):
     """
     Compute the logarithm power of the examined band.
     The function mimics features obtaining from the frequency domain of HRV.
@@ -431,6 +453,8 @@ def log_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
 
     Parameters
     ---------
+    nn_intervals: list
+        Normal to Normal Interval
     freqs : list
         The frequencies mapping with the power spectral
     pows : list
@@ -449,13 +473,20 @@ def log_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
 
     Notes
     ---------
-    Compute the PSD before using this sqi
+    If freqs and pows are assigned by computing the PSD before using this sqi,
+    freqs & pows is used directly instead of nn_intervals.
+    Otherwise, the frequencies and powers will be computed from nn intervals
+    using welch method as default
     """
+    if freqs == None or pows == None:
+        freqs,pows = calculate_psd(nn_intervals)
+    assert len(freqs) != len(pows),\
+            "Length of the frequencies and the relevant powers must be the same"
     filtered_pows = pows[freqs >= f_min and freqs < f_max]
     log_pow = np.sum(np.log(filtered_pows))
     return log_pow
 
-def relative_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
+def relative_power_sqi(nn_intervals,freqs=None,pows=None,f_min=0.04,f_max=0.15):
     """
     Compute the relative power with respect to the total power of the examined band.
     The function mimics features obtaining from the frequency domain of HRV.
@@ -465,6 +496,8 @@ def relative_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
 
     Parameters
     ---------
+    nn_intervals: list
+        Normal to Normal Interval
     freqs : list
         The frequencies mapping with the power spectral
     pows : list
@@ -483,13 +516,20 @@ def relative_power_sqi(freqs,pows,f_min=0.04,f_max=0.15):
 
     Notes
     ---------
-    Compute the PSD before using this sqi
+    If freqs and pows are assigned by computing the PSD before using this sqi,
+    freqs & pows is used directly instead of nn_intervals.
+    Otherwise, the frequencies and powers will be computed from nn intervals
+    using welch method as default
     """
+    if freqs == None or pows == None:
+        freqs,pows = calculate_psd(nn_intervals)
+    assert len(freqs) != len(pows),\
+            "Length of the frequencies and the relevant powers must be the same"
     filtered_pows = pows[freqs >= f_min and freqs < f_max]
     relative_pow = np.sum(np.log(filtered_pows))/np.sum(pows)
     return relative_pow
 
-def normalized_power_sqi(freqs,pows,
+def normalized_power_sqi(nn_intervals,freqs=None,pows=None,
                     lf_min=0.04,lf_max=0.15,
                     hf_min=0.15,hf_max=0.4):
     """
@@ -501,6 +541,8 @@ def normalized_power_sqi(freqs,pows,
 
     Parameters
     ---------
+    nn_intervals: list
+        Normal to Normal Interval
     freqs : list
         The frequencies mapping with the power spectral
     pows : list
@@ -521,15 +563,22 @@ def normalized_power_sqi(freqs,pows,
 
     Notes
     ---------
-    Compute the PSD before using this sqi
+    If freqs and pows are assigned by computing the PSD before using this sqi,
+    freqs & pows is used directly instead of nn_intervals.
+    Otherwise, the frequencies and powers will be computed from nn intervals
+    using welch method as default
     """
+    if freqs == None or pows == None:
+        freqs,pows = calculate_psd(nn_intervals)
+    assert len(freqs) != len(pows),\
+            "Length of the frequencies and the relevant powers must be the same"
     lf_filtered_pows = pows[freqs >= lf_min & freqs < lf_max]
     hf_filtered_pows = pows[freqs >= hf_min & freqs < hf_max]
     lf_power = np.sum(lf_filtered_pows)
     hf_power = np.sum(hf_filtered_pows)
     return np.linalg.norm(lf_power,hf_power)
 
-def lf_hf_ratio_sqi(freqs,pows,
+def lf_hf_ratio_sqi(nn_intervals,freqs=None,pows=None,
                     lf_min=0.04,lf_max=0.15,
                     hf_min=0.15,hf_max=0.4):
     """
@@ -541,6 +590,8 @@ def lf_hf_ratio_sqi(freqs,pows,
 
     Parameters
     ---------
+    nn_intervals: list
+        Normal to Normal Interval
     freqs : list
         The frequencies mapping with the power spectral
     pows : list
@@ -561,8 +612,15 @@ def lf_hf_ratio_sqi(freqs,pows,
 
     Notes
     ---------
-    Compute the PSD before using this sqi
+    If freqs and pows are assigned by computing the PSD before using this sqi,
+    freqs & pows is used directly instead of nn_intervals.
+    Otherwise, the frequencies and powers will be computed from nn intervals
+    using welch method as default
     """
+    if freqs == None or pows == None:
+        freqs,pows = calculate_psd(nn_intervals)
+    assert len(freqs) != len(pows),\
+            "Length of the frequencies and the relevant powers must be the same"
     lf_filtered_pows = pows[freqs >= lf_min & freqs < lf_max]
     hf_filtered_pows = pows[freqs >= hf_min & freqs < hf_max]
     ratio = np.sum(lf_filtered_pows)/np.sum(hf_filtered_pows)
