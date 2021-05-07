@@ -1,7 +1,7 @@
 """
 Class Rule contains thresholds and its corresponding labels of an SQI.
 """
-from vital_sqi.common.utils import *
+from vital_sqi.common.utils import parse_rule
 
 
 class Rule:
@@ -23,11 +23,34 @@ class Rule:
         super().__setattr__(name, value)
 
     def load_def(self, source=None):
+        """
+
+        Parameters
+        ----------
+        source :
+             (Default value = None)
+
+        Returns
+        -------
+
+        """
         self.rule_def = parse_rule(self.name, source)
+        return self
 
     def save_def(self):
+        """ """
         def_str = " ".join(self.rule_def)
         return def_str
 
+    def apply_rule(self, x):
+        """
 
-rule1 = Rule(name = 'a', rule_def= [1, 1])
+        Parameters
+        ----------
+        x :
+
+        Returns
+        -------
+
+        """
+        pass
