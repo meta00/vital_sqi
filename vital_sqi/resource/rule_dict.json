@@ -1,10 +1,19 @@
-{"SQIs": [
-  {"name": "test_sqi",
-    "rule": [
+{
+"test_sqi": {
+  "name": "test_sqi",
+  "rule": [
       {"op": ">", "value": "10", "label": "reject"},
       {"op": ">=", "value": "3", "label": "accept"},
       {"op": "<", "value": "3", "label": "reject"}],
-    "desc": "",
-    "ref": ""
+  "desc": "",
+  "ref": ""
   },
-]}
+"abc_sqi": {
+   "name": "abc_sqi",
+   "rule": [
+      {"op": ">", "value": "0", "label": "accept"},
+      {"op": "<=", "value": "0", "label": "reject"}],
+   "desc": "",
+   "ref": ""
+  }
+}
