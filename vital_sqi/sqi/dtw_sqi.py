@@ -1,9 +1,10 @@
 import numpy as np
 import sys, os
 if bool(getattr(sys, 'ps1', sys.flags.interactive)):
+    old_stdout = sys.stdout
     sys.stdout = open(os.devnull, 'w')
     from dtw import dtw
-    sys.stdout = sys.__stdout__
+    sys.stdout = old_stdout
 else:
     from dtw import dtw
 
