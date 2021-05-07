@@ -1,5 +1,6 @@
 import numpy as np
-import sys, os
+import sys
+import os
 if bool(getattr(sys, 'ps1', sys.flags.interactive)):
     old_stdout = sys.stdout
     sys.stdout = open(os.devnull, 'w')
@@ -7,8 +8,6 @@ if bool(getattr(sys, 'ps1', sys.flags.interactive)):
     sys.stdout = old_stdout
 else:
     from dtw import dtw
-
-import logging
 
 from vital_sqi.common.generate_template import (
         ppg_absolute_dual_skewness_template,
@@ -20,8 +19,7 @@ from vital_sqi.common.utils import check_valid_signal
 
 
 def dtw_sqi(x, template_type=0):
-    """
-    Using DTW to get the mapping point distance between a signal and its
+    """Using DTW to get the mapping point distance between a signal and its
     template. The DTW SQI is the ratio of the distance sum to
     the trace of cost matrix. The closer to 1 the better SQI.
 
@@ -39,8 +37,6 @@ def dtw_sqi(x, template_type=0):
 
     Returns
     -------
-    type
-        float, the matching score with the chosen template
 
     """
     check_valid_signal(x)
