@@ -138,7 +138,7 @@ class PeakDetector:
             elif detector_type == DEFAULT_SCIPY:
                 peak_finalist, trough_finalist = \
                     self.detect_peak_trough_default_scipy(s)
-            elif detector_type = BILLAUER_METHOD:
+            elif detector_type == BILLAUER_METHOD:
                 peak_finalist, trough_finalist = \
                     self.detect_peak_trough_billauer(s)
             else:
