@@ -16,6 +16,6 @@ coverage:
         threshold: 0.002
     patch:
       default:
-        target: 0%  # new contributions should have a coverage at least equal to targetcomment:
+        target: 0%  # new contributions should have a coverage at least equal to target:
  comment:
   after_n_builds: 3
