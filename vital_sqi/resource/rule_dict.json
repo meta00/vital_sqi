@@ -1,7 +1,7 @@
 {
 "test_sqi": {
   "name": "test_sqi",
-  "rule": [
+  "def": [
       {"op": ">", "value": "10", "label": "reject"},
       {"op": ">=", "value": "3", "label": "accept"},
       {"op": "<", "value": "3", "label": "reject"}],
@@ -10,7 +10,7 @@
   },
 "abc_sqi": {
    "name": "abc_sqi",
-   "rule": [
+   "def": [
       {"op": ">", "value": "0", "label": "accept"},
       {"op": "<=", "value": "0", "label": "reject"}],
    "desc": "",
