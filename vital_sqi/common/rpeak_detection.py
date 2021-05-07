@@ -14,13 +14,7 @@ CLUSTERER_METHOD = 3
 SLOPE_SUM_METHOD = 4
 MOVING_AVERAGE_METHOD = 5
 DEFAULT_SCIPY = 6
-
-ADAPTIVE_THRESHOLD = 1
-COUNT_ORIG_METHOD = 2
-CLUSTERER_METHOD = 3
-SLOPE_SUM_METHOD = 4
-MOVING_AVERAGE_METHOD = 5
-DEFAULT_SCIPY = 6
+BILLAUER_METHOD = 7
 
 class PeakDetector:
     """Various peak detection approaches getting from the paper
@@ -104,7 +98,7 @@ class PeakDetector:
         return np.array(res)
 
     def ppg_detector(self, s, detector_type=ADAPTIVE_THRESHOLD,
-                     clusterer="kmean", preprocess=True, cubing=False):
+                     clusterer="kmean", preprocess=False, cubing=False):
         """
         Expose
 
@@ -119,7 +113,7 @@ class PeakDetector:
         """
 
         if preprocess:
-            filter = BandpassFilter()
+            filter = BandpassFilter(fs=self.fs)
             s = filter.signal_highpass_filter(s, cutoff=1, order=2)
             s = filter.signal_lowpass_filter(s, cutoff=12, order=2)
         if cubing:
@@ -144,6 +138,9 @@ class PeakDetector:
             elif detector_type == DEFAULT_SCIPY:
                 peak_finalist, trough_finalist = \
                     self.detect_peak_trough_default_scipy(s)
+            elif detector_type = BILLAUER_METHOD:
+                peak_finalist, trough_finalist = \
+                    self.detect_peak_trough_billauer(s)
             else:
                 peak_finalist, trough_finalist = \
                     self.detect_peak_trough_adaptive_threshold(s)
@@ -473,9 +470,9 @@ class PeakDetector:
         through_finalist = []
 
         # Bandpass filter
-        filter = BandpassFilter()
-        S = filter.signal_highpass_filter(s, 0.5, fs=100)
-        # S = butter_lowpass_filter(S,8,fs=100)
+        #filter = BandpassFilter()
+        #S = filter.signal_highpass_filter(s, 0.5, fs=100)
+        # S = butter_lowpass_filter(S,8,fs=100) 
         # S = s
         # Clipping the output by keeping the signal
         # above zero will produce signal Z
@@ -548,3 +545,80 @@ class PeakDetector:
         q_padded = np.pad(q, (w // 2, w - 1 - w // 2), mode='edge')
         convole = np.convolve(q_padded, np.ones(w) / w, 'valid')
         return convole
+
+    def detect_peak_trough_billauer(self, s, delta=0.1):
+        """
+        Converted from MATLAB script at http://billauer.co.il/peakdet.html
+        
+        Returns two arrays
+        
+        function [maxtab, mintab]=peakdet(v, delta, x)
+        billauer_peakdet Detect peaks in a vector
+                [MAXTAB, MINTAB] = PEAKDET(V, DELTA) finds the local
+                maxima and minima ("peaks") in the vector V.
+                MAXTAB and MINTAB consists of two columns. Column 1
+                contains indices in V, and column 2 the found values.
+            
+                With [MAXTAB, MINTAB] = PEAKDET(V, DELTA, X) the indices
+                in MAXTAB and MINTAB are replaced with the corresponding
+                X-values.
+        
+                A point is considered a maximum peak if it has the maximal
+                value, and was preceded (to the left) by a value lower by
+                DELTA.
+        
+        Eli Billauer, 3.4.05 (Explicitly not copyrighted).
+        This function is released to the public domain; Any use is allowed.
+
+        Parameters
+        ----------
+        v :
+            Vector of input signal to detect peaks
+        delta : 
+            Parameter for determining peaks and valleys. A point is considered a maximum peak if 
+            it has the maximal value, and was preceded (to the left) by a value lower by delta.
+        x :
+            (Optional) Replace the indices of the resulting max and min vectors with corresponding x-values
+
+        Returns
+        -------
+        max : array
+            Array containing the maxima points (peaks)
+        min : array
+            Array containing the minima points (valleys)
+    
+        """
+        maxtab = []
+        mintab = []
+        
+        x = np.arange(len(s))
+        v = np.asarray(s)
+        if not isscalar(delta):
+            sys.exit('Input argument delta must be a scalar')
+        if delta <= 0:
+            sys.exit('Input argument delta must be positive')
+        
+        mn, mx = Inf, -Inf
+        mnpos, mxpos = NaN, NaN
+        lookformax = True
+        for i in np.arange(len(v)):
+            this = v[i]
+            if this > mx:
+                mx = this
+                mxpos = x[i]
+            if this < mn:
+                mn = this
+                mnpos = x[i]   
+            if lookformax:
+                if this < mx-delta:
+                    maxtab.append(mxpos)
+                    mn = this
+                    mnpos = x[i]
+                    lookformax = False
+            else:
+                if this > mn+delta:
+                    mintab.append(mnpos)
+                    mx = this
+                    mxpos = x[i]
+                    lookformax = True
+        return array(maxtab) , array(mintab)

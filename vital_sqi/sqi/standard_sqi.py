@@ -248,3 +248,34 @@ def mean_crossing_rate_sqi(y, threshold=1e-10, ref_magnitude=None,
     """
     return zero_crossings_rate_sqi(y-np.mean(y), threshold, ref_magnitude,
                                    pad, zero_pos, axis)
+
+
+def msq_sqi(y, peak_detect1=7, peak_detect2=6):
+    """
+    MSQ SQI as defined in Elgendi et al "Optimal Signal Quality Index for Photoplethysmogram Signals" 
+    with modification of the second algorithm used. Instead of Bing's, a SciPy built-in implementation is used. 
+    The SQI tracks the agreement between two peak detectors to evaluate quality of the signal.
+
+    Parameters
+    ----------
+    x : sequence
+        A signal with peaks.
+
+    peak_detect1 : int  
+        Type of the first peak detection algorithm, default = Billauer
+
+    peak_detect2 : int
+        Type of the second peak detection algorithm, default = Scipy
+
+    Returns
+    -------
+    msq_sqi : number
+        MSQ SQI value for the given signal
+
+    """
+    detector = PeakDetector(wave_type='ppg')
+    peaks_1,_ = detector.ppg_detector(y, detector_type=peak_detect1, preprocess=False)
+    peaks_2,_ = detector.ppg_detector(y, detector_type=peak_detect2, preprocess=False)
+    if len(peaks_1)==0:
+        return 0.0
+    return len(np.intersect1d(peaks_1,peaks_2))/len(peaks_1)
