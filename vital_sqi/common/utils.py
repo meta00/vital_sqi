@@ -145,3 +145,6 @@ def parse_datetime(string, type='datetime'):
         raise ValueError('Datetime string must be of standard Python format '
                          '(https://docs.python.org/3/library/time.html), '
                          'e.g., `%d-%m-%Y`, eg. `24-01-2020`')
+
+def parse_rule(name, source):
+    pass

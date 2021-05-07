@@ -1,0 +1,15 @@
+{"SQIs": [
+  {"name": "test_sqi",
+    "rule": [
+      {"op": ">", "value": "10", "label": "reject"},
+      {"op": ">=", "value": "3", "label": "accept"},
+      {"op": "<", "value": "3", "label": "reject"}],
+    "desc": "",
+    "ref": ""
+  },
+  {"name": "test1_sqi",
+    "rule": [
+      {"op": }
+    ]
+  }
+]}
