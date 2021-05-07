@@ -208,7 +208,7 @@ def pnn_50_sqi(nn_intervals, compute_interpolation=False):
     obtained from the peak detection algorithm.
     """
     sd = np.diff(nn_intervals)
-    nn_50 = np.sum(np.abs(sd) > 50)
+    nn_50 = np.sum(np.abs(sd) >= 50)
     pnn_50 = 100 * nn_50 / len(sd)
     return pnn_50
 
@@ -237,7 +237,7 @@ def pnn_20_sqi(nn_intervals, compute_interpolation=False):
     obtained from the peak detection algorithm.
     """
     sd = np.diff(nn_intervals)
-    nn_20 = np.sum(np.abs(sd) > 20)
+    nn_20 = np.sum(np.abs(sd) >= 20)
     pnn_20 = 100 * nn_20 / len(sd)
     return pnn_20
 
@@ -267,7 +267,7 @@ def hr_mean_sqi(nn_intervals):
     obtained from the peak detection algorithm.
     """
     nn_bpm = np.divide(60000,nn_intervals)
-    return np.mean(nn_bpm)
+    return int(np.round(np.mean(nn_bpm)))
 
 def hr_min_sqi(nn_intervals):
     """
@@ -296,7 +296,7 @@ def hr_min_sqi(nn_intervals):
     """
 
     nn_bpm = np.divide(60000, nn_intervals)
-    return np.min(nn_bpm)
+    return int(np.round(np.min(nn_bpm)))
 
 def hr_max_sqi(nn_intervals):
     """
@@ -324,7 +324,7 @@ def hr_max_sqi(nn_intervals):
     obtained from the peak detection algorithm.
     """
     nn_bpm = np.divide(60000, nn_intervals)
-    return np.max(nn_bpm)
+    return int(np.round(np.max(nn_bpm)))
 
 def hr_std_sqi(nn_intervals):
     """
