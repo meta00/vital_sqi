@@ -17,3 +17,4 @@ wfdb>=3.3.0
 datetimerange>=1.0.0
 dateparser>=1.0.0
 openpyxl>=3.0.7
+dash>=1.20.0
