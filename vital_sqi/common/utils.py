@@ -1,5 +1,7 @@
 import numpy as np
 import datetime as dt
+import os
+import json
 from datetimerange import DateTimeRange
 import dateparser
 def check_valid_signal(x):
@@ -147,4 +149,11 @@ def parse_datetime(string, type='datetime'):
                          'e.g., `%d-%m-%Y`, eg. `24-01-2020`')
 
 def parse_rule(name, source):
+    assert os.path.isfile(source) is True
+    with open(source) as json_file:
+        sqi = json.load(json_file)[name]
+    return sqi['def']
+
+def write_rule(name, file_name):
     pass
+
