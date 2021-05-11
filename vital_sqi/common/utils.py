@@ -162,10 +162,14 @@ def parse_datetime(string, type='datetime'):
                          'e.g., `%d-%m-%Y`, eg. `24-01-2020`')
 
 def parse_rule(name, source):
-    assert os.path.isfile(source) is True
+    assert os.path.isfile(source) is True, 'Source file not found'
     with open(source) as json_file:
-        sqi = json.load(json_file)[name]
-    return sqi['def']
+        all = json.load(json_file)
+        try:
+            sqi = all[name]
+        except:
+            raise KeyError("SQI {0} not found".format(name))
+    return sqi
 
 def write_rule(name, rule_def):
     rule_dict = {}

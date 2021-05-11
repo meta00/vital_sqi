@@ -6,7 +6,9 @@ import pandas as pd
 from vital_sqi.common.utils import parse_rule,write_rule,\
     converted_rule,update_rule
 import bisect
+import re
 import numpy as np
+
 
 class Rule:
     """ """
@@ -17,10 +19,10 @@ class Rule:
 
     def __setattr__(self, name, value):
         if name == 'name':
-            if not isinstance(value, str):
+            if not isinstance(value, str) or re.match("^[A-Za-z0-9_-]*$", value):
                 raise AttributeError('Name of SQI rule must be a string '
                                      'containing only letter, number, '
-                                     'and hyphens')
+                                     'hyphens and underscores')
         if name == 'rule_def':
             if not (isinstance(value, list) or value is None):
                 raise AttributeError('Rule definition must be a list or None')
