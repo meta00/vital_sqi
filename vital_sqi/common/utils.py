@@ -179,17 +179,6 @@ def write_rule(name, rule_def, file_path):
         json.dump(rule_dict, write_file)
     return
 
-
-#=============================================================
-# def update_rule(rule):
-#     try:
-#         converted_rule_dict = converted_rule(rule.rule_def)
-#         rule.boundaries = converted_rule_dict["boundaries"]
-#         rule.labels = converted_rule_dict["label_list"]
-#     except Exception as err:
-#         warnings.warn(err)
-#     return rule
-
 def converted_rule(rule_def, thresholder_list=[]):
     all_rules = list(np.copy(rule_def))
     for thresholder in thresholder_list:

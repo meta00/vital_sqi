@@ -113,37 +113,3 @@ class Rule:
                 if i % 2 == 0:
                     new_labels.append(labels[i])
             return new_labels[bisect.bisect_left(boundaries, x)]
-
-if __name__ == "__main__":
-    rule = Rule("test_sqi")
-    rule.load_def("../resource/rule_dict.json")
-    def_str = rule.save_def('/home/khoa/Workspace/save_dict.json')
-    print(rule.apply_rule(2))
-    print(rule.apply_rule(6))
-    print(rule.apply_rule(3))
-    print(rule.apply_rule(11))
-
-
-    thresholder = {}
-    thresholder["op"] = "<="
-    thresholder["value"] = 5
-    thresholder["label"] = "accept"
-    thresholder_1 = {}
-
-    thresholder_1["op"] = ">"
-    thresholder_1["value"] = 5
-    thresholder_1["label"] = "reject"
-
-    #
-    # converted_rule(rule.rule_def)
-    #
-    # converted_rule(rule.rule_def, [thresholder,thresholder_1])
-    #
-    # converted_rule([thresholder,thresholder_1])
-
-    # rule.update_def(op_list=["<=", ">"],
-    #                 value_list=[5, 5],
-    #                 label_list=["accept", "reject"])
-    # print(rule.boundaries)
-    # print(rule.labels)
-
