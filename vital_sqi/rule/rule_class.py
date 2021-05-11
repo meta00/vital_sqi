@@ -2,12 +2,11 @@
 Class Rule contains thresholds and its corresponding labels of an SQI.
 """
 import warnings
-
-import numpy as np
 import pandas as pd
 from vital_sqi.common.utils import parse_rule,write_rule,\
-    reorganize_rule
-
+    converted_rule,update_rule
+import bisect
+import numpy as np
 
 class Rule:
     """ """
@@ -40,6 +39,8 @@ class Rule:
 
         """
         self.rule_def = parse_rule(self.name, source)
+        update_rule(self)
+
         return self
 
     def update_def(self,op_list,value_list,label_list):
@@ -61,11 +62,12 @@ class Rule:
                 raise ValueError("Invalid operand: Expect string operands, "
                                  "instead found {0}".op+" type {1}".format(op))
         for value in value_list:
-            if np.isnumeric(value):
+            if not np.isscalar(value):
                 raise ValueError("Invalid threshold: Expect numeric type threshold, "
                                  "instead found {0}".value+" type {1}".format(value))
         for label in label_list:
-            assert label is str, "Label must be 'accept' or 'reject' string"
+            assert (type(label) is str) or (label is None), \
+                "Label must be 'accept' or 'reject' string"
             if label != "reject" or label != "accept":
                 label = None
 
@@ -79,16 +81,13 @@ class Rule:
 
         if self.rule_def is None:
             self.rule_def = []
-
-        try:
-            self.reorganize_rule(self.rule_def, thresholder)
-        except Exception as err:
-            warnings.warn(err)
+        converted_rule(self.rule_def,thresholder_list)
+        update_rule(self)
         return
 
-    def save_def(self,file_type="json"):
+    def save_def(self,file_path,file_type="json"):
         """ """
-        write_rule(self.name,self.rule_def)
+        write_rule(self.name,self.rule_def,file_path)
         return
 
     def apply_rule(self, x):
@@ -102,13 +101,27 @@ class Rule:
         -------
 
         """
-        pass
+        boundaries = self.boundaries
+        labels = self.labels
+        if np.any(boundaries == x):
+            return labels[(np.where(boundaries == x)[0][0])*2+1]
+        else:
+            new_labels = []
+            for i in range(len(labels)):
+                if i % 2 == 0:
+                    new_labels.append(labels[i])
+            return new_labels[bisect.bisect_left(boundaries, x)]
 
 if __name__ == "__main__":
     rule = Rule("test_sqi")
     rule.load_def("../resource/rule_dict.json")
     def_str = rule.save_def()
-    # conflicted_rule(rule.rule_def)
+    print(rule.apply_rule(2))
+    print(rule.apply_rule(6))
+    print(rule.apply_rule(3))
+    print(rule.apply_rule(11))
+
+
     thresholder = {}
     thresholder["op"] = "<="
     thresholder["value"] = 5
@@ -119,8 +132,16 @@ if __name__ == "__main__":
     thresholder_1["value"] = 5
     thresholder_1["label"] = "reject"
 
-    reorganize_rule(rule.rule_def)
+    #
+    # converted_rule(rule.rule_def)
+    #
+    # converted_rule(rule.rule_def, [thresholder,thresholder_1])
+    #
+    # converted_rule([thresholder,thresholder_1])
 
-    reorganize_rule(rule.rule_def, [thresholder,thresholder_1])
+    # rule.update_def(op_list=["<=", ">"],
+    #                 value_list=[5, 5],
+    #                 label_list=["accept", "reject"])
+    # print(rule.boundaries)
+    # print(rule.labels)
 
-    reorganize_rule([thresholder,thresholder_1])

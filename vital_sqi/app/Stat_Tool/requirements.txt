@@ -1,9 +1,0 @@
-dtw-python==1.1.6
-numpy==1.19.5
-openpyxl==3.0.6
-pandas==1.2.1
-paramiko==2.7.2
-pysftp==0.2.9
-scipy==1.6.0
-sklearn==0.0
-tqdm==4.56.0
