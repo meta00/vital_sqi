@@ -169,24 +169,26 @@ def parse_rule(name, source):
             sqi = all[name]
         except:
             raise KeyError("SQI {0} not found".format(name))
-    return sqi
+    return sqi['def']
 
-def write_rule(name, rule_def):
+def write_rule(name, rule_def, file_path):
     rule_dict = {}
     rule_dict['name'] = name
     rule_dict['def'] = rule_def
-    rule_str = json.dumps(rule_dict)
+    with open(file_path, "w") as write_file:
+        json.dump(rule_dict, write_file)
+    return
 
 
 #=============================================================
-def update_rule(rule):
-    try:
-        converted_rule_dict = converted_rule(rule.rule_def)
-        rule.boundaries = converted_rule_dict["boundaries"]
-        rule.labels = converted_rule_dict["label_list"]
-    except Exception as err:
-        warnings.warn(err)
-    return rule
+# def update_rule(rule):
+#     try:
+#         converted_rule_dict = converted_rule(rule.rule_def)
+#         rule.boundaries = converted_rule_dict["boundaries"]
+#         rule.labels = converted_rule_dict["label_list"]
+#     except Exception as err:
+#         warnings.warn(err)
+#     return rule
 
 def converted_rule(rule_def, thresholder_list=[]):
     all_rules = list(np.copy(rule_def))

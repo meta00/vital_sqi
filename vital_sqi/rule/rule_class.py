@@ -4,7 +4,7 @@ Class Rule contains thresholds and its corresponding labels of an SQI.
 import warnings
 import pandas as pd
 from vital_sqi.common.utils import parse_rule,write_rule,\
-    converted_rule,update_rule
+    converted_rule
 import bisect
 import re
 import numpy as np
@@ -19,7 +19,7 @@ class Rule:
 
     def __setattr__(self, name, value):
         if name == 'name':
-            if not isinstance(value, str) or re.match("^[A-Za-z0-9_-]*$", value):
+            if not isinstance(value, str) or not bool(re.match("^[A-Za-z0-9_-]*$", value)):
                 raise AttributeError('Name of SQI rule must be a string '
                                      'containing only letter, number, '
                                      'hyphens and underscores')
@@ -41,7 +41,6 @@ class Rule:
 
         """
         self.rule_def = parse_rule(self.name, source)
-        update_rule(self)
 
         return self
 
@@ -103,8 +102,9 @@ class Rule:
         -------
 
         """
-        boundaries = self.boundaries
-        labels = self.labels
+        converted_rule_dict = converted_rule(self.rule_def)
+        boundaries = converted_rule_dict['boundaries']
+        labels = converted_rule_dict['label_list']
         if np.any(boundaries == x):
             return labels[(np.where(boundaries == x)[0][0])*2+1]
         else:
@@ -117,7 +117,7 @@ class Rule:
 if __name__ == "__main__":
     rule = Rule("test_sqi")
     rule.load_def("../resource/rule_dict.json")
-    def_str = rule.save_def()
+    def_str = rule.save_def('/home/khoa/Workspace/save_dict.json')
     print(rule.apply_rule(2))
     print(rule.apply_rule(6))
     print(rule.apply_rule(3))
