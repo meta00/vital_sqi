@@ -2,7 +2,8 @@
 Class Rule contains thresholds and its corresponding labels of an SQI.
 """
 from vital_sqi.common.utils import parse_rule
-
+import bisect
+import numpy as np
 
 class Rule:
     """ """
@@ -53,4 +54,13 @@ class Rule:
         -------
 
         """
-        pass
+        boundaries = self.rule_def['boundaries']
+        labels = self.rule_def['labels']
+        if np.any(boundaries == x):
+            return labels[np.where(boundaries == x)]
+        else:
+            new_labels = []
+            for i in range(len(labels)):
+                if i % 2 == 0:
+                    new_labels.append(labels[i])
+            return new_labels[bisect.bisect_left(boundaries, x)]
