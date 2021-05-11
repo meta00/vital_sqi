@@ -44,48 +44,6 @@ class Rule:
 
         return self
 
-    def update_def(self,op_list,value_list,label_list):
-        """
-
-        Parameters
-        ----------
-        op
-        value
-        label
-
-        Returns
-        -------
-
-        """
-
-        for op in op_list:
-            if op not in ["<","<=",">",">=","="]:
-                raise ValueError("Invalid operand: Expect string operands, "
-                                 "instead found {0}".op+" type {1}".format(op))
-        for value in value_list:
-            if not np.isscalar(value):
-                raise ValueError("Invalid threshold: Expect numeric type threshold, "
-                                 "instead found {0}".value+" type {1}".format(value))
-        for label in label_list:
-            assert (type(label) is str) or (label is None), \
-                "Label must be 'accept' or 'reject' string"
-            if label != "reject" or label != "accept":
-                label = None
-
-        thresholder_list = []
-        for idx in range(len(label_list)):
-            thresholder = {}
-            thresholder["op"] = op
-            thresholder["value"] = value
-            thresholder["label"] = label
-            thresholder_list.append(thresholder)
-
-        if self.rule_def is None:
-            self.rule_def = []
-        converted_rule(self.rule_def,thresholder_list)
-        update_rule(self)
-        return
-
     def save_def(self,file_path,file_type="json"):
         """ """
         write_rule(self.name,self.rule_def,file_path)
