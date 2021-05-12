@@ -169,22 +169,27 @@ def parse_rule(name, source):
             sqi = all[name]
         except:
             raise KeyError("SQI {0} not found".format(name))
-        # sort the rule in ascending order -> value -> operand "<","=",">"
-        df = sort_rule(list(np.copy(sqi['def'])))
-        df = decompose_operand(df.to_dict('records'))
-        boundaries = np.sort(df["value"].unique())
-        inteveral_label_list = get_inteveral_label_list(df, boundaries)
-        value_label_list = get_value_label_list(df, boundaries, inteveral_label_list)
-
-        label_list = []
-        for i in range(len(value_label_list)):
-            label_list.append(inteveral_label_list[i])
-            label_list.append(value_label_list[i])
-        label_list.append(inteveral_label_list[-1])
-
-    return sqi['def'], \
+        rule_list, boundaries, label_list = update_rule(sqi['def'])
+    return rule_list, \
            boundaries, \
            label_list
+
+def update_rule(rule_def,thresholder_list=[]):
+    all_rules = list(np.copy(rule_def))
+    for thresholder in thresholder_list:
+        all_rules.append(thresholder)
+    df = sort_rule(all_rules)
+    df = decompose_operand(df.to_dict('records'))
+    boundaries = np.sort(df["value"].unique())
+    inteveral_label_list = get_inteveral_label_list(df, boundaries)
+    value_label_list = get_value_label_list(df, boundaries, inteveral_label_list)
+
+    label_list = []
+    for i in range(len(value_label_list)):
+        label_list.append(inteveral_label_list[i])
+        label_list.append(value_label_list[i])
+    label_list.append(inteveral_label_list[-1])
+    return all_rules,boundaries,label_list
 
 def write_rule(name, rule_def, file_path):
     rule_dict = {}
@@ -230,8 +235,7 @@ def decompose_operand(rule_dict):
     return df_all_operand
 
 def check_unique_pair(pair):
-    assert len(pair) <= 1, "Duplicated decision at '"\
-                           +str(pair["value"])+" "+pair["op"]+"'"
+    assert len(pair) <= 1, "Duplicated decision at '"+str(pair["value"])+" "+pair["op"]+"'"
     return True
 
 def check_conflict(decision_lt,decision_gt):
