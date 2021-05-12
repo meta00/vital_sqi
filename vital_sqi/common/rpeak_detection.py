@@ -593,11 +593,9 @@ class PeakDetector:
         
         x = np.arange(len(s))
         v = np.asarray(s)
-        if not isscalar(delta):
-            sys.exit('Input argument delta must be a scalar')
-        if delta <= 0:
-            sys.exit('Input argument delta must be positive')
-        
+        assert isscalar(delta), 'Input argument delta must be a scalar'
+        assert delta > 0, 'Input argument delta must be positive'
+
         mn, mx = Inf, -Inf
         mnpos, mxpos = NaN, NaN
         lookformax = True
