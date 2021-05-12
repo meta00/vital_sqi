@@ -169,7 +169,22 @@ def parse_rule(name, source):
             sqi = all[name]
         except:
             raise KeyError("SQI {0} not found".format(name))
-    return sqi['def']
+        # sort the rule in ascending order -> value -> operand "<","=",">"
+        df = sort_rule(list(np.copy(sqi['def'])))
+        df = decompose_operand(df.to_dict('records'))
+        boundaries = np.sort(df["value"].unique())
+        inteveral_label_list = get_inteveral_label_list(df, boundaries)
+        value_label_list = get_value_label_list(df, boundaries, inteveral_label_list)
+
+        label_list = []
+        for i in range(len(value_label_list)):
+            label_list.append(inteveral_label_list[i])
+            label_list.append(value_label_list[i])
+        label_list.append(inteveral_label_list[-1])
+
+    return sqi['def'], \
+           boundaries, \
+           label_list
 
 def write_rule(name, rule_def, file_path):
     rule_dict = {}
@@ -178,15 +193,6 @@ def write_rule(name, rule_def, file_path):
     with open(file_path, "w") as write_file:
         json.dump(rule_dict, write_file)
     return
-
-def converted_rule(rule_def, thresholder_list=[]):
-    all_rules = list(np.copy(rule_def))
-    for thresholder in thresholder_list:
-        all_rules.append(thresholder)
-    df = sort_rule(all_rules)
-    rule_dict = df.to_dict('records')
-    converted_rule_dict = to_boundary_labels(rule_dict)
-    return converted_rule_dict
 
 def sort_rule(rule_def):
     df = pd.DataFrame(rule_def)
@@ -198,11 +204,6 @@ def sort_rule(rule_def):
                    ignore_index=True)
 
     return df
-
-def check_unique_pair(pair):
-    assert len(pair) <= 1, "Duplicated decision at '"\
-                           +str(pair["value"])+" "+pair["op"]+"'"
-    return True
 
 def decompose_operand(rule_dict):
     df = pd.DataFrame(rule_dict)
@@ -228,6 +229,11 @@ def decompose_operand(rule_dict):
 
     return df_all_operand
 
+def check_unique_pair(pair):
+    assert len(pair) <= 1, "Duplicated decision at '"\
+                           +str(pair["value"])+" "+pair["op"]+"'"
+    return True
+
 def check_conflict(decision_lt,decision_gt):
     if len(decision_lt) == 0:
         label_lt = None
@@ -249,48 +255,6 @@ def check_conflict(decision_lt,decision_gt):
                          +", but x "+decision_gt.iloc[0]["op"]+" "+
                          str(decision_gt.iloc[0]["value"])+" is "+decision_gt.iloc[0]["label"])
     return label_gt
-
-def to_boundary_labels(rule_dict):
-    """
-    Parameters
-    ----------
-    rule_dict
-
-    Returns
-    -------
-
-    """
-
-    df = decompose_operand(rule_dict)
-
-    boundaries = np.sort(df["value"].unique())
-
-    inteveral_label_list = get_inteveral_label_list(df,boundaries)
-    value_label_list = get_value_label_list(df,boundaries,inteveral_label_list)
-
-    label_list = []
-    for i in range(len(value_label_list)):
-        label_list.append(inteveral_label_list[i])
-        label_list.append(value_label_list[i])
-    label_list.append(inteveral_label_list[-1])
-    converted_rule_dict = {'boundaries':boundaries,
-                           'label_list':label_list
-                           }
-
-    return converted_rule_dict
-
-def get_value_label_list(df,boundaries,inteveral_label_list):
-    value_label_list = np.array([None] * (len(boundaries)))
-    for idx in range(len(boundaries)-1):
-        decision = df[(df["value"] == boundaries[idx]) &
-                               (df["op"] == "==")]
-        check_unique_pair(decision)
-        if len(decision)==0:
-            value_label_list[idx] = inteveral_label_list[idx+1]
-        else:
-            value_label_list[idx] = decision.iloc[0]["label"]
-    value_label_list[-1] = inteveral_label_list[-2]
-    return value_label_list
 
 def get_decision(df,boundaries,idx):
     start_value = boundaries[idx]
@@ -322,3 +286,16 @@ def get_inteveral_label_list(df,boundaries):
         "The rule is missing a decision from "+str(df["value"].iloc[-1])+" to inf"
     inteveral_label_list[-1] = df.iloc[-1]["label"]
     return inteveral_label_list
+
+def get_value_label_list(df,boundaries,inteveral_label_list):
+    value_label_list = np.array([None] * (len(boundaries)))
+    for idx in range(len(boundaries)-1):
+        decision = df[(df["value"] == boundaries[idx]) &
+                               (df["op"] == "==")]
+        check_unique_pair(decision)
+        if len(decision)==0:
+            value_label_list[idx] = inteveral_label_list[idx+1]
+        else:
+            value_label_list[idx] = decision.iloc[0]["label"]
+    value_label_list[-1] = inteveral_label_list[-2]
+    return value_label_list
