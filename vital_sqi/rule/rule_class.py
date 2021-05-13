@@ -5,6 +5,7 @@ import json
 from vital_sqi.common.utils import parse_rule, update_rule
 import bisect
 import re
+import os
 import numpy as np
 
 
@@ -38,6 +39,7 @@ class Rule:
         Returns
         -------
 
+        
         """
         rule_def, boundaries, labels = parse_rule(self.name, source)
         self.rule = {'def': rule_def,
@@ -51,8 +53,11 @@ class Rule:
         Parameters
         ----------
         op_list :
+            
         value_list :
+            
         label_list :
+            
 
         Returns
         -------
@@ -99,21 +104,43 @@ class Rule:
             'labels'] = update_rule(self.rule['def'], threshold_list)
         return
 
-    def save_def(self, file_path, file_type="json"):
+    def save_def(self, file_path, file_type="json", overwrite=False):
         """
 
         Parameters
         ----------
         file_path :
+            
         file_type :
-             (Default value = "json")
+            (Default value = "json")
+        overwrite :
+             (Default value = False)
 
         Returns
         -------
 
+        
         """
-        with open(file_path, "w") as write_file:
-            json.dump(self.rule['def'], write_file)
+        assert isinstance(file_path, str) and len(file_path) > 0, \
+            "Invalid output file path"
+        if overwrite:
+            assert os.path.isfile(file_path), "Overwritten file doesn't exist"
+            with open(file_path) as file_in:
+                all_rules = json.load(file_in)
+                assert isinstance(all_rules, dict), "Invalid file format."
+            if np.any(np.array(list(all_rules.keys())) == self.name):
+                all_rules[self.name]['def'] = self.rule['def']
+            else:
+                all_rules[self.name] = {'name': self.name,
+                                        'def': self.rule['def']}
+            with open(file_path, 'w') as file_out:
+                json.dump(all_rules, file_out)
+        else:
+            with open(file_path, "w") as file_out:
+                name = self.name
+                rule = self.rule['def']
+                rule_def = {name: {'name': name, 'def': rule}}
+                json.dump(rule_def, file_out)
         return
 
     def apply_rule(self, x):
@@ -122,10 +149,12 @@ class Rule:
         Parameters
         ----------
         x :
+            
 
         Returns
         -------
 
+        
         """
         boundaries = self.rule['boundaries']
         labels = self.rule['labels']

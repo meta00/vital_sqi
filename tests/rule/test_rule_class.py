@@ -78,6 +78,7 @@ class TestRuleClass(object):
                        label_list = ["reject", "accept", "accept", "reject"])
         assert out.apply_rule(11) == 'reject'
         assert out.apply_rule(10) == 'reject'
+        assert out.apply_rule(3) == 'reject'
 
     def test_on_save(self):
         rule_obj = Rule('test_sqi')
@@ -85,3 +86,15 @@ class TestRuleClass(object):
         rule_obj.load_def(source)
         file_out = tempfile.gettempdir() + '/rule_dict.json'
         rule_obj.save_def(file_out)
+        assert os.path.isfile(file_out)
+        rule_obj.update_def(op_list = ["<=", ">", '<', ">="],
+                       value_list = [3, 3, 10, 10],
+                       label_list = ["reject", "accept", "accept", "reject"])
+        rule_obj.save_def(file_out, overwrite=True)
+        assert os.path.isfile(file_out)
+        rule_obj = Rule('new_test_sqi')
+        rule_obj.update_def(op_list = ["<=", ">", '<', ">="],
+                            value_list = [3, 3, 10, 10],
+                            label_list = ["reject", "accept", "accept",
+                                          "reject"])
+        rule_obj.save_def(file_out, overwrite=True)
