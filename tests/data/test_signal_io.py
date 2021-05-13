@@ -1,7 +1,6 @@
-import pytest
-import os
 import tempfile
-import datetime as dt
+import pytest
+
 from vital_sqi.data.signal_io import *
 
 
@@ -127,14 +126,3 @@ class TestPPGWriter(object):
         assert PPG_writer(out, file_out, 'csv') is True
         file_out = tempfile.gettempdir() + '/ppg_test_write.xlsx'
         assert PPG_writer(out, file_out, 'xlsx') is True
-
-# ECG_writer(out, '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
-#             '/test_data/ecg_test_w.csv', 'csv')
-
-# out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
-#             '/test_data/ppg_smartcare.csv', timestamp_idx = [
-#     'TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
-#                                                          'SPO2_PCT','PERFUSION_INDEX'],
-#                  start_datetime = '2020-04-12 10:00:00')
-# PPG_writer(out, '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
-#             '/test_data/ppg_smartcare_w.csv')

@@ -168,16 +168,20 @@ def parse_rule(name, source):
         try:
             sqi = all[name]
         except:
-            raise KeyError("SQI {0} not found".format(name))
-        rule_list, boundaries, label_list = update_rule(sqi['def'])
-    return rule_list, \
+            raise Exception("SQI {0} not found".format(name))
+        rule_def, boundaries, label_list = update_rule(sqi['def'],
+                                                       is_update = False)
+    return rule_def, \
            boundaries, \
            label_list
 
-def update_rule(rule_def,thresholder_list=[]):
-    all_rules = list(np.copy(rule_def))
-    for thresholder in thresholder_list:
-        all_rules.append(thresholder)
+def update_rule(rule_def, threshold_list=[], is_update=True):
+    if rule_def is None or is_update:
+        all_rules = []
+    else:
+        all_rules = list(np.copy(rule_def))
+    for threshold in threshold_list:
+        all_rules.append(threshold)
     df = sort_rule(all_rules)
     df = decompose_operand(df.to_dict('records'))
     boundaries = np.sort(df["value"].unique())
@@ -189,7 +193,7 @@ def update_rule(rule_def,thresholder_list=[]):
         label_list.append(inteveral_label_list[i])
         label_list.append(value_label_list[i])
     label_list.append(inteveral_label_list[-1])
-    return all_rules,boundaries,label_list
+    return all_rules, boundaries, label_list
 
 def sort_rule(rule_def):
     df = pd.DataFrame(rule_def)
@@ -283,15 +287,15 @@ def get_inteveral_label_list(df,boundaries):
     inteveral_label_list[-1] = df.iloc[-1]["label"]
     return inteveral_label_list
 
-def get_value_label_list(df,boundaries,inteveral_label_list):
+def get_value_label_list(df, boundaries, interval_label_list):
     value_label_list = np.array([None] * (len(boundaries)))
     for idx in range(len(boundaries)-1):
         decision = df[(df["value"] == boundaries[idx]) &
                                (df["op"] == "==")]
         check_unique_pair(decision)
         if len(decision)==0:
-            value_label_list[idx] = inteveral_label_list[idx+1]
+            value_label_list[idx] = interval_label_list[idx+1]
         else:
             value_label_list[idx] = decision.iloc[0]["label"]
-    value_label_list[-1] = inteveral_label_list[-2]
+    value_label_list[-1] = interval_label_list[-2]
     return value_label_list
