@@ -289,13 +289,12 @@ def get_inteveral_label_list(df,boundaries):
 
 def get_value_label_list(df, boundaries, interval_label_list):
     value_label_list = np.array([None] * (len(boundaries)))
-    for idx in range(len(boundaries)-1):
+    for idx in range(len(boundaries)):
         decision = df[(df["value"] == boundaries[idx]) &
-                               (df["op"] == "==")]
+                               (df["op"] == "=")]
         check_unique_pair(decision)
         if len(decision)==0:
             value_label_list[idx] = interval_label_list[idx+1]
         else:
             value_label_list[idx] = decision.iloc[0]["label"]
-    value_label_list[-1] = interval_label_list[-2]
     return value_label_list
