@@ -2,7 +2,7 @@
 "test_sqi": {
   "name": "test_sqi",
   "def": [
-      {"op": ">", "value": "10", "label": "reject"},
+      {"op": ">=", "value": "10", "label": "reject"},
       {"op": ">=", "value": "3", "label": "accept"},
       {"op": "<", "value": "3", "label": "reject"}],
   "desc": "",
