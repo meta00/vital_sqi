@@ -191,14 +191,6 @@ def update_rule(rule_def,thresholder_list=[]):
     label_list.append(inteveral_label_list[-1])
     return all_rules,boundaries,label_list
 
-def write_rule(name, rule_def, file_path):
-    rule_dict = {}
-    rule_dict['name'] = name
-    rule_dict['def'] = rule_def
-    with open(file_path, "w") as write_file:
-        json.dump(rule_dict, write_file)
-    return
-
 def sort_rule(rule_def):
     df = pd.DataFrame(rule_def)
     df["value"] = pd.to_numeric(df["value"])

@@ -1,6 +1,7 @@
 """
 Class Rule contains thresholds and its corresponding labels of an SQI.
 """
+import json
 import warnings
 import pandas as pd
 from vital_sqi.common.utils import parse_rule,write_rule,update_rule
@@ -44,6 +45,32 @@ class Rule:
         return self
 
     def update_def(self,op_list,value_list,label_list):
+        """
+
+        Parameters
+        ----------
+        op_list
+        value_list
+        label_list
+
+        Returns
+        -------
+
+        Examples
+        --------
+        >>> rule = Rule("test_sqi")
+        >>> rule.load_def("../resource/rule_dict.json")
+        >>> rule.update_def(op_list=["<=", ">"],
+                        value_list=[5, 5],
+                        label_list=["accept", "reject"])
+        >>> print(rule.rule_def)
+        [{'op': '>', 'value': '10', 'label': 'reject'},
+        {'op': '>=', 'value': '3', 'label': 'accept'},
+        {'op': '<', 'value': '3', 'label': 'reject'},
+        {'op': '<=', 'value': 5, 'label': 'accept'},
+        {'op': '>', 'value': 5, 'label': 'reject'}]
+
+        """
         for op in op_list:
             if op not in ["<", "<=", ">", ">=", "="]:
                 raise ValueError("Invalid operand: Expect string operands, "
@@ -72,8 +99,19 @@ class Rule:
         return
 
     def save_def(self,file_path,file_type="json"):
-        """ """
-        write_rule(self.name,self.rule_def,file_path)
+        """
+        
+        Parameters
+        ----------
+        file_path
+        file_type
+
+        Returns
+        -------
+
+        """
+        with open(file_path,"w") as write_file:
+            json.dump(self.rule_def,write_file)
         return
 
     def apply_rule(self, x):
@@ -86,19 +124,6 @@ class Rule:
         Returns
         -------
 
-        Examples
-        --------
-        >>> rule = Rule("test_sqi")
-        >>> rule.load_def("../resource/rule_dict.json")
-        >>> rule.update_def(op_list=["<=", ">"],
-                        value_list=[5, 5],
-                        label_list=["accept", "reject"])
-        >>> print(rule.rule_def)
-        [{'op': '>', 'value': '10', 'label': 'reject'},
-        {'op': '>=', 'value': '3', 'label': 'accept'},
-        {'op': '<', 'value': '3', 'label': 'reject'},
-        {'op': '<=', 'value': 5, 'label': 'accept'},
-        {'op': '>', 'value': 5, 'label': 'reject'}]
         """
         boundaries = self.boundaries
         labels = self.labels
