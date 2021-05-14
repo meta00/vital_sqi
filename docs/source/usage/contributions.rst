@@ -174,7 +174,7 @@ when using github pages it is useful to have an instruction to create the html
 with sphinx and then another instruction to copy the generated htmls into the
 gh-pages branch to be available online. As a shortcut, you can use
 
-.. code-bloc:: console
+.. code-block:: console
 
   make github
 
