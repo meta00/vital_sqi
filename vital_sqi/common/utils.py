@@ -73,7 +73,7 @@ def calculate_sampling_rate(timestamps):
                 i - 1]).total_seconds())
         except Exception:
             sampling_rate = None
-            pass
+            return sampling_rate
     steps = np.diff(timestamps_second)
     sampling_rate = round(1 / np.min(steps[steps != 0]))
     return sampling_rate
@@ -103,9 +103,6 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
     timestamps = []
     for value in time_range.range(dt.timedelta(seconds=1/sampling_rate)):
         timestamps.append(value)
-    if len(timestamps) != signal_length:
-        raise Exception("Timestamp series generated is not valid, please "
-                        "check sampling rate.")
     return timestamps
 
 def parse_datetime(string, type='datetime'):
