@@ -3,9 +3,14 @@ import dash
 import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
-df = pd.read_csv('./data-analysis.csv')
-app = dash.Dash(__name__)
-app.layout = html.Div([
+
+#TODO change to send from HOME
+import os
+df = pd.read_csv(os.path.join(os.getcwd(),"temp","data-analysis.csv"))
+# app = dash.Dash(__name__)
+# app.layout = html.Div([
+
+layout = html.Div([
     html.Div([
         dcc.Input(
             id='editing-columns-name',
@@ -27,5 +32,3 @@ app.layout = html.Div([
         sort_mode="single",
     ),
 ])
-if __name__ == '__main__':
-    app.run_server(debug=True);
