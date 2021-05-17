@@ -53,7 +53,7 @@ class TestECGReader(object):
         file_name = os.path.abspath('tests/test_data/ecg_test2.csv')
         with pytest.raises(Exception) as exc_info:
             out = ECG_reader(file_name, 'csv', channel_name = ['Time', '1'])
-        assert exc_info.match("Sampling rate can't not be inferred")
+        assert exc_info.match("Sampling rate not found nor inferred")
 
 
 class TestECGWriter(object):
@@ -64,7 +64,7 @@ class TestECGWriter(object):
         file_out = tempfile.gettempdir() + '/out.edf'
         assert ECG_writer(out, file_out, file_type='edf', info=out.info) is \
                True
-        assert ECG_writer(out, file_out, file_type = 'edf', info = None)\
+        assert ECG_writer(out, file_out, file_type='edf', info=None)\
                is True
 
     def test_on_valid_mit(self):
