@@ -1,5 +1,6 @@
 """
-Class Rule contains thresholds and its corresponding labels of an SQI.
+aClass Rule contains thresholds and its corresponding labels of an SQI. Labels
+are either 'accept' or 'reject'
 """
 import json
 from vital_sqi.common.utils import parse_rule, update_rule
