@@ -3,12 +3,9 @@ import dash
 import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
-
-#TODO change to send from HOME
-import os
-df = pd.read_csv(os.path.join(os.getcwd(),"temp","data-analysis.csv"))
-# app = dash.Dash(__name__)
-# app.layout = html.Div([
+from dash.dependencies import Input, Output, State
+from app import app
+import pathlib
 
 layout = html.Div([
     html.Div([
@@ -21,7 +18,16 @@ layout = html.Div([
         html.Button('Add Column', id='editing-columns-button', n_clicks=0)
     ], style={'height': 50}),
 
-    dash_table.DataTable(
+    html.Div(id='data-table')
+])
+
+@app.callback(Output('data-table', 'children'),
+              Input('dataframe', 'data'))
+def on_data_set_table(data):
+    if data is None:
+        raise PreventUpdate
+    df = pd.DataFrame(data)
+    children = dash_table.DataTable(
         id='editing-columns',
         columns=[{"name": i, "id": i, 'deletable': True} for i in df.columns],
         data=df.to_dict('records'),
@@ -30,5 +36,5 @@ layout = html.Div([
         filter_action="native",
         sort_action="native",
         sort_mode="single",
-    ),
-])
+    )
+    return children
