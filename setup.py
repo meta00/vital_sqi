@@ -36,7 +36,7 @@ setup(
                         'datetimerange>=1.0.0',
                         'dateparser>=1.0.0',
                         'openpyxl>=3.0.7',
-                        'pyflowchart>=1.0.3'],
+                        'pyflowchart>=0.1.3'],
     python_requires = '>=3.7',
     zip_safe = False,
     url = 'https://github.com/meta00/vital_sqi',
