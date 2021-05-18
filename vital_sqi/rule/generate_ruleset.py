@@ -56,7 +56,7 @@ class RuleSet:
         assert isinstance(value_df, pd.DataFrame), \
             'Expected data frame, found {0}'.format(type(value_df))
         assert len(value_df) == 1, 'Expected data frame of 1 row but got {0}' \
-                                   'instead'.format(len(value_df))
+                                   ' instead'.format(len(value_df))
         rules = self.rules
         rules = rules.items()
         rules = sorted(rules)
@@ -66,7 +66,8 @@ class RuleSet:
             try:
                 value = value_df.iloc[0][rule.name]
             except:
-                raise KeyError('SQI {0} not found in rule set'.format(value))
+                raise KeyError('SQI {0} not found in input data frame'.format(
+                        rule.name))
             decision = rule.apply_rule(value)
             if decision == 'reject':
                 break
