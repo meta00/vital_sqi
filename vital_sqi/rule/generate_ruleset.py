@@ -32,6 +32,7 @@ class RuleSet:
         super().__setattr__(name, value)
 
     def export_rules(self):
+        """ """
         rules = self.rules
         st = StartNode('')
         e = EndNode('')
@@ -53,6 +54,17 @@ class RuleSet:
         return True
 
     def execute(self, value_df):
+        """
+
+        Parameters
+        ----------
+        value_df :
+            
+
+        Returns
+        -------
+
+        """
         assert isinstance(value_df, pd.DataFrame), \
             'Expected data frame, found {0}'.format(type(value_df))
         assert len(value_df) == 1, 'Expected data frame of 1 row but got {0}' \
@@ -71,7 +83,6 @@ class RuleSet:
             decision = rule.apply_rule(value)
             if decision == 'reject':
                 break
-        print(decision)
         return decision
 
 # r1 = Rule("sqi1")
