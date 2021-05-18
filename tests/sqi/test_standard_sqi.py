@@ -28,3 +28,7 @@ class TestMeanCrossingRateSqi(object):
 class TestMSQSqi(object):
     def test_on_msq_sqi(self):
          pass
+
+class TestperBeatSqi(object):
+    def test_on_per_beat_msq(self):
+         pass
