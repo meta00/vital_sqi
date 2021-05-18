@@ -17,6 +17,6 @@ wfdb>=3.3.0
 datetimerange>=1.0.0
 dateparser>=1.0.0
 openpyxl>=3.0.7
-
+pyflowchart>=1.0.3
 pytest~=6.2.3
 setuptools~=52.0.0
