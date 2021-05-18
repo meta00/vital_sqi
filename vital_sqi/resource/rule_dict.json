@@ -1,19 +1,83 @@
 {
-"test_sqi": {
-  "name": "test_sqi",
+"perfusion_sqi": {
+  "name": "Perfusion",
   "def": [
-      {"op": ">", "value": "10", "label": "reject"},
-      {"op": ">=", "value": "3", "label": "accept"},
-      {"op": "<", "value": "3", "label": "reject"}],
-  "desc": "",
-  "ref": ""
+    {"op": ">", "value": " ", "label": "accept"},
+    {"op": "<=", "value": " ", "label": "reject"}],
+  "desc": "The gold standard for assessment of PPG signal quality in industrial pulse oximeters. Defined as the ratio of the pulsatile (AC) part of the waveform to the static (DC) part of the waveform",
+  "ref": "Elgendi2016"
   },
-"abc_sqi": {
-   "name": "abc_sqi",
+"skewness_base_sqi": {
+   "name": "Skewness",
    "def": [
-      {"op": ">", "value": "0", "label": "accept"},
-      {"op": "<=", "value": "0", "label": "reject"}],
-   "desc": "",
-   "ref": ""
+      {"op": ">", "value": " ", "label": "accept"},
+      {"op": "<=", "value": " ", "label": "reject"}],
+   "desc": "A statistical measure of the symmetry (or the lack of it) in the analysed signal",
+   "ref": "Krishnan2010"
+  },
+"kurtosis_base_sqi": {
+  "name": "Kurtosis",
+  "def": [
+      {"op": ">", "value": " ", "label": "accept"},
+      {"op": "<=", "value": " ", "label": "reject"}],
+  "desc": "A statistical measure of the analysed signal around mean compared to normal distribution",
+  "ref": "Selvaraj2011"
+  },
+"entropy_base_sqi": {
+  "name": "Entropy",
+  "def": [
+    {"op": ">", "value": " ", "label": "accept"},
+    {"op": "<=", "value": " ", "label": "reject"}],
+  "desc": "A staistical measure that quantifies the different between probability density functions of analysed signal and uniform distribution.",
+  "ref": "Selvaraj2011"
+  },
+"zero_crossings_sqi": {
+  "name": "Zero crossing rate",
+  "def": [
+      {"op": ">", "value": " ", "label": "accept"},
+      {"op": "<=", "value": " ", "label": "reject"}],
+  "desc": "A rate of how often the signal crosses the zero (switches between positive and negative value)",
+  "ref": "Elgendi2016"
+  },
+"snr_sqi": {
+  "name": "Signal-to-noise ratio",
+  "def": [
+    {"op": ">", "value": " ", "label": "accept"},
+    {"op": "<=", "value": " ", "label": "reject"}],
+  "desc": "In this case, SNR is defined as the ratio between the analysed signal variance and its noise variance",
+  "ref": "Elgendi2016"
+  },
+"msq_sqi": {
+  "name": "Matching of multiple systolic wave detection algorithms",
+  "def": [
+      {"op": ">", "value": " ", "label": "accept"},
+      {"op": "<=", "value": " ", "label": "reject"}],
+  "desc": "A measure of agreement between two different peak detection algorithms used on the analysed signal",
+  "ref": "Elgendi2016"
+  },
+"relative_power_sqi": {
+  "name": "Relative power",
+  "def": [
+    {"op": ">", "value": " ", "label": "accept"},
+    {"op": "<=", "value": " ", "label": "reject"}],
+  "desc": "The ratio between power spectral density within the frequency band of interest (1-2.25Hz) and the whole signal (0-8Hz)",
+  "ref": "Selvaraj2011"
+  },
+"acf_sqi": {
+  "name": "Auto-correlation based signal quality indices",
+  "def": [
+      {"op": ">", "value": " ", "label": "accept"},
+      {"op": "<=", "value": " ", "label": "reject"}],
+  "desc": "Signal quality indices extracted from the correlogram computed by autcorrelation of the analysed signal ",
+  "ref": "Pradhan2019"
+  },
+"dtw_sqi": {
+  "name": "Dynamic time warping",
+  "def": [
+      {"op": ">", "value": " ", "label": "accept"},
+      {"op": "<=", "value": " ", "label": "reject"}],
+  "desc": "Compute correlation between a template signal and the analysed signal using dynamic type warping",
+  "ref": "Li2012"
   }
+
 }

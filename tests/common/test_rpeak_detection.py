@@ -51,3 +51,7 @@ class TestPPGDetector(object):
     def test_on_get_moving_average(self):
         detector = PeakDetector()
         pass
+
+    def test_on_detect_peak_trough_billauer(self):
+        detector = PeakDetector()
+        pass
