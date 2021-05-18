@@ -47,7 +47,7 @@ doc-style: $(filename) ## convert documentation style to numpy style
 	pyment -o numpydoc -w $(filename)
 
 test: ## run tests quickly with the default Python
-	pytest --cov- -report term --cov=vital_sqi tests/
+	pytest --cov--report term --cov=vital_sqi tests/
 
 cov: ## run test and coverage report by file quickly in the terminal
 	pytest --cov-report term --cov=vital_sqi tests/

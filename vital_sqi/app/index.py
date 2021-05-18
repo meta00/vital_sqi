@@ -2,9 +2,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
-from util.parsing import parse_data
-from app import app
-from views import dashboard1,dashboard2
+from vital_sqi.app.util.parsing import parse_data
+from vital_sqi.app.app import app
+from vital_sqi.app.views import dashboard1,dashboard2
 # the style arguments for the sidebar. We use position:fixed and a fixed width
 SIDEBAR_STYLE = {
     "position": "fixed",
@@ -26,7 +26,7 @@ CONTENT_STYLE = {
 
 sidebar = html.Div(
     [
-        html.H2("Sidebar", className="display-4"),
+        html.H2("Menu", className="display-4"),
         html.Hr(),
         dbc.Nav(
             [
@@ -34,7 +34,7 @@ sidebar = html.Div(
                 dbc.NavLink("Dashboard 1",id='dashboard_1_link', disabled=True,
                             href="/views/dashboard1", active="exact"),
                 dbc.NavLink("Dashboard 2", id='dashboard_2_link',disabled=True,
-                            href="/views/dashboard-2", active="exact"),
+                            href="/views/dashboard2", active="exact"),
             ],
             vertical=True,
             pills=True,
@@ -47,7 +47,7 @@ content = html.Div(id="page-content", style=CONTENT_STYLE)
 
 app.layout = html.Div([
     # Store dataframe
-    dcc.Store(id='dataframe', storage_type='session'),
+    dcc.Store(id='dataframe', storage_type='local'),
     dcc.Location(id='url', refresh=False),
     sidebar,
     content
@@ -72,7 +72,8 @@ home_content = html.Div([
             },
             # Allow multiple files to be uploaded
             multiple=False
-        )
+        ),
+    dbc.Progress(id='upload-progress',striped= True,animated= True)
 ])
 
 @app.callback(Output('page-content', 'children'),
@@ -80,7 +81,7 @@ home_content = html.Div([
 def display_page(pathname):
     if pathname == '/views/dashboard1':
          return dashboard1.layout
-    elif pathname == '/views/dashboard-2':
+    elif pathname == '/views/dashboard2':
          return dashboard2.layout
     else:
         return home_content

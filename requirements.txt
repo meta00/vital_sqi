@@ -18,3 +18,5 @@ datetimerange>=1.0.0
 dateparser>=1.0.0
 openpyxl>=3.0.7
 dash>=1.20.0
+pytest~=6.2.3
+setuptools~=52.0.0
