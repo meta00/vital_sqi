@@ -31,14 +31,14 @@ class SignalSQI:
         if name == 'start_datetime':
             assert isinstance(value, str) or \
                    isinstance(value, dt.datetime) or \
-                   isinstance(value, dt.date), 'Expected str or datetime ' \
-                                               'object'
+                   isinstance(value, dt.date) or value is None, \
+                'Expected str or datetime object, or None'
         if name == 'sqis':
             assert isinstance(value, np.ndarray) or \
-                   isinstance(value,pd.DataFrame), 'Expected SQI table as ' \
-                                                   'array or data frame'
+                   isinstance(value,pd.DataFrame) or value is None, \
+                'Expected SQI table as array or data frame or None'
         if name == 'segments':
-            assert isinstance(value, list), 'Expected a list of signal ' \
-                                            'segments'
+            assert isinstance(value, list) or \
+                   value is None, 'Expected a list of signal segments or None'
 
         super().__setattr__(name, value)
