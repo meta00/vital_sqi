@@ -10,7 +10,7 @@ class SignalSQI:
     """ """
     def __init__(self, wave_type=None, signals=None, sampling_rate=None,
                  start_datetime=None, info=None, sqis=None, segments=None,
-                 rules=None, rule_set=None):
+                 rules=None, ruleset=None):
         self.signals = signals
         self.sampling_rate = sampling_rate
         self.start_datetime = start_datetime
@@ -18,6 +18,8 @@ class SignalSQI:
         self.info = info
         self.sqis = sqis
         self.segments = segments
+        self.rules = rules
+        self.ruleset = ruleset
 
     def __setattr__(self, name, value):
         if name == 'wave_type':
@@ -42,5 +44,12 @@ class SignalSQI:
         if name == 'segments':
             assert isinstance(value, list) or \
                    value is None, 'Expected a list of signal segments or None'
-
+        if name == 'rules':
+            assert isinstance(value, list) or \
+                   value is None, 'Expected a list of Rule objects.'
+        if name == 'ruleset':
+            assert isinstance(value, dict) or \
+                   value is None, 'Expected an object of RuleSet'
         super().__setattr__(name, value)
+        return
+
