@@ -48,6 +48,7 @@ content = html.Div(id="page-content", style=CONTENT_STYLE)
 app.layout = html.Div([
     # Store dataframe
     dcc.Store(id='dataframe', storage_type='local'),
+    dcc.Store(id='rule_dataframe', storage_type='local'),
     dcc.Location(id='url', refresh=False),
     sidebar,
     content
