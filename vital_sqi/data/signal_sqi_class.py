@@ -9,7 +9,8 @@ import datetime as dt
 class SignalSQI:
     """ """
     def __init__(self, wave_type=None, signals=None, sampling_rate=None,
-                 start_datetime=None, info=None, sqis=None, segments=None):
+                 start_datetime=None, info=None, sqis=None, segments=None,
+                 rules=None, rule_set=None):
         self.signals = signals
         self.sampling_rate = sampling_rate
         self.start_datetime = start_datetime
@@ -27,7 +28,8 @@ class SignalSQI:
                                                   'numpy array, with one ' \
                                                   'channel per column.'
         if name == 'sampling_rate':
-            assert isinstance(value, int), 'Expected int'
+            assert np.isreal(value), 'Expected a numeric value. Sampling ' \
+                                     'rate is round up to the nearest integer.'
         if name == 'start_datetime':
             assert isinstance(value, str) or \
                    isinstance(value, dt.datetime) or \
