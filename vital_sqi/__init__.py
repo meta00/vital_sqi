@@ -10,8 +10,7 @@ from vital_sqi import (
 	data,
 	preprocess,
 	sqi,
-	rule,
-	highlevel
+	rule
 )
 
 from vital_sqi.rule.rule_class import Rule
