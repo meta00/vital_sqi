@@ -9,6 +9,7 @@ from vital_sqi import (
 	common,
 	data,
 	preprocess,
-	sqi
+	sqi,
+	rule
 )
 __version__ = '0.1.0'
