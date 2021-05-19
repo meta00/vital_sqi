@@ -9,7 +9,7 @@ import datetime as dt
 class SignalSQI:
     """ """
     def __init__(self, wave_type=None, signals=None, sampling_rate=None,
-                 start_datetime=None, info=None, sqis=None, segments=None,
+                 start_datetime=None, info=None, segments=None, sqis=None,
                  rules=None, ruleset=None):
         self.signals = signals
         self.sampling_rate = sampling_rate
