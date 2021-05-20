@@ -1,6 +1,8 @@
 .idea/
 .coverage
 
+**/subsegments_frequency/*
+**/subsegments_time/*
 
 # -------------------------------------------------
 
