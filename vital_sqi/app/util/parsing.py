@@ -65,3 +65,15 @@ def parse_rule_list(rule_def):
         }
         rule_dict_list.append(rule_dict)
     return rule_dict_list
+
+def generate_boundaries(boundaries):
+    bound_list = []
+    for idx in range(len(boundaries)):
+        if idx == 0:
+            bound_list.append("[-inf, "+str(boundaries[idx])+"]")
+            bound_list.append(str(boundaries[idx]))
+        else:
+            bound_list.append("[" + str(boundaries[idx-1])+", "+ str(boundaries[idx]) + "]")
+            bound_list.append(str(boundaries[idx]))
+    bound_list.append("[" + str(boundaries[idx-1])+", inf]")
+    return bound_list

@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from vital_sqi.app.util.parsing import parse_data
 from vital_sqi.app.app import app
-from vital_sqi.app.views import dashboard1,dashboard2
+from vital_sqi.app.views import dashboard1,dashboard2, dashboard3
 # the style arguments for the sidebar. We use position:fixed and a fixed width
 SIDEBAR_STYLE = {
     "position": "fixed",
@@ -35,6 +35,8 @@ sidebar = html.Div(
                             href="/views/dashboard1", active="exact"),
                 dbc.NavLink("Dashboard 2", id='dashboard_2_link',disabled=True,
                             href="/views/dashboard2", active="exact"),
+                dbc.NavLink("Dashboard 3", id='dashboard_3_link',disabled=True,
+                            href="/views/dashboard3", active="exact"),
             ],
             vertical=True,
             pills=True,
@@ -106,6 +108,8 @@ def display_page(pathname):
          return dashboard1.layout
     elif pathname == '/views/dashboard2':
          return dashboard2.layout
+    elif pathname == '/views/dashboard3':
+        return dashboard3.layout
     else:
         return home_content
 
@@ -113,6 +117,7 @@ def display_page(pathname):
               Output('dataframe','data'),
               Output('dashboard_1_link','disabled'),
               Output('dashboard_2_link','disabled'),
+              Output('dashboard_3_link','disabled'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'),
@@ -121,10 +126,10 @@ def display_page(pathname):
 def update_output(content, filename, last_modified,state_data):
     if content is not None:
         df = parse_data(content,filename)
-        return [df,False,False]
+        return [df,False,False,False]
     elif state_data is not None:
-        return [state_data,False,False]
-    return [None,True,True]
+        return [state_data,False,False,False]
+    return [None,True,True,True]
 
 #Load rule set
 @app.callback(
