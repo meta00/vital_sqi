@@ -304,9 +304,7 @@ plt.tight_layout()
 plt.show()
 
 
-#################################################################
-# Useful comments and data
-# ------------------------
+
 #
 #.. warning:: Should we use TimeInterval indexes for windows?
 #
