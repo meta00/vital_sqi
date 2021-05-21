@@ -18,8 +18,16 @@ layout = html.Div([
         html.Button('Add Column', id='editing-columns-button', n_clicks=0)
     ], style={'height': 50}),
 
-    html.Div(id='data-table')
+    html.Div(id='data-table'),
+    # html.Div(id='summary-table')
 ])
+
+# @app.callback(
+#     Output('summary-table', 'children'),
+#     Input('dataframe', 'data')
+# )
+# def on_summary_table():
+#     return
 
 @app.callback(Output('data-table', 'children'),
               Input('dataframe', 'data'))
@@ -31,10 +39,12 @@ def on_data_set_table(data):
         id='editing-columns',
         columns=[{"name": i, "id": i, 'deletable': True} for i in df.columns],
         data=df.to_dict('records'),
+        style_table={'overflowX': 'auto'},
         editable=True,
         style_cell={'textAlign': 'left'},
         filter_action="native",
         sort_action="native",
         sort_mode="single",
+        page_size=20
     )
     return children
