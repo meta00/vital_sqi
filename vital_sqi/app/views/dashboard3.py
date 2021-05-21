@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import dash
 import dash_table
@@ -9,6 +11,8 @@ from vital_sqi.app.app import app
 from dash.exceptions import PreventUpdate
 from vital_sqi.app.util.parsing import generate_rule_set,generate_boundaries
 import pathlib
+import uuid
+import flask
 
 layout = html.Div([
     # html.Div([
@@ -22,6 +26,7 @@ layout = html.Div([
     # ], style={'height': 50}),
 
     html.Div(id='confirmed-rule-table'),
+    html.Div(id='export-message'),
     dbc.Button(
             "Export",
             # color="link",
@@ -31,6 +36,7 @@ layout = html.Div([
                 'display':'inline-block'
             }
         ),
+    dcc.Download(id='download-content'),
     dbc.Button(
             "Apply",
             # color="link",
@@ -40,17 +46,47 @@ layout = html.Div([
                 'display': 'inline-block'
             }
         ),
-    html.Div(id="applied-rule-table")
+    html.Div(id="applied-rule-table"),
 ])
 
 @app.callback(
-    Output('applied-rule-table', 'children'),
-    Input('apply-button', 'n_clicks'),
+    Output('download-content', 'data'),
+    Output('export-message','children'),
+    Input('export-button', 'n_clicks'),
     Input('rule-dataframe', 'data'),
+    prevent_initial_call=True
 )
 def export_rule_set(n_clicks,rule_set_dict):
-    save_file(name, file_content)
-    return
+    ctx = dash.callback_context
+    change_id = [p['prop_id'] for p in ctx.triggered][0]
+    if rule_set_dict is None:
+        raise PreventUpdate
+    if 'export-button' in change_id:
+        rule_set = generate_rule_set(rule_set_dict)
+        file_content = rule_set.export_rules()
+        # filename = f"{uuid.uuid1()}.txt"
+        filename = "exported_rule.txt"
+        msg="Please copy the exported content and " \
+            "paste it in the following website to visualize " \
+            "https://flowchart.js.org/"
+        return [dict(content=file_content,filename=filename),msg]
+
+    return [None,None]
+
+def save_file(filename, content):
+    """Decode and store a file uploaded with Plotly Dash."""
+    data = (content.encode("utf8").split(b";base64,"))[0]
+    path = os.path.join(os.getcwd(),filename)
+    with open(path, "wb") as fp:
+        fp.write(data)
+    return path
+
+@app.server.route('/downloadable/<path:path>')
+def serve_static(path):
+    root_dir = os.getcwd()
+    return flask.send_from_directory(
+        os.path.join(root_dir,'downloadable'),path
+    )
 
 @app.callback(
     Output('applied-rule-table','children'),
