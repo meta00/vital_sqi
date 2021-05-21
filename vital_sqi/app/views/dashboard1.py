@@ -35,16 +35,40 @@ def on_data_set_table(data):
     if data is None:
         raise PreventUpdate
     df = pd.DataFrame(data)
+    df_2 = pd.DataFrame(data)
+    for e in df.columns[2:]:
+        df_2 = df_2.append({e: df[e].mean()}, ignore_index=True)
+
+    dash_table.DataTable(
+        id='summary table',
+        columns=[{"name": j, "id": j, 'deletable': True} for j in df_2.columns],
+        data=df_2.to_dict('records'),
+    ),
+
     children = dash_table.DataTable(
         id='editing-columns',
         columns=[{"name": i, "id": i, 'deletable': True} for i in df.columns],
         data=df.to_dict('records'),
         style_table={'overflowX': 'auto'},
         editable=True,
-        style_cell={'textAlign': 'left'},
+        style_cell={
+            # all three widths are needed
+            'textAlign': 'left',
+            'minWidth': '110px', 'width': '110px', 'maxWidth': '110px',
+            'overflow': 'hidden',
+            'textOverflow': 'ellipsis',
+        },
+        tooltip_data=[
+            {
+                column: {'value': str(value), 'type': 'markdown'}
+                for column, value in row.items()
+            } for row in df.to_dict('records')
+        ],
+        tooltip_duration=None,
         filter_action="native",
         sort_action="native",
         sort_mode="single",
-        page_size=20
+        page_action="native",
+        page_size=30,
     )
     return children
