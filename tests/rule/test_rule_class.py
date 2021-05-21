@@ -30,7 +30,7 @@ class TestRuleClass(object):
         assert exc_info.match('containing only letter, number')
 
     def test_on_load(self):
-        out = Rule('test_sqi')
+        out = Rule('sqi1')
         source = os.path.abspath('tests/test_data/rule_dict_test.json')
         out.load_def(source)
         assert isinstance(out.rule['def'], list) is True
@@ -81,7 +81,7 @@ class TestRuleClass(object):
         assert out.apply_rule(3) == 'reject'
 
     def test_on_save(self):
-        rule_obj = Rule('test_sqi')
+        rule_obj = Rule('sqi1')
         source = os.path.abspath('tests/test_data/rule_dict_test.json')
         rule_obj.load_def(source)
         file_out = tempfile.gettempdir() + '/rule_dict.json'

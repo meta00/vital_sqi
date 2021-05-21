@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from vital_sqi.app.util.parsing import parse_data
 from vital_sqi.app.app import app
-from vital_sqi.app.views import dashboard1,dashboard2
+from vital_sqi.app.views import dashboard1,dashboard2, dashboard3
 # the style arguments for the sidebar. We use position:fixed and a fixed width
 SIDEBAR_STYLE = {
     "position": "fixed",
@@ -35,6 +35,8 @@ sidebar = html.Div(
                             href="/views/dashboard1", active="exact"),
                 dbc.NavLink("Dashboard 2", id='dashboard_2_link',disabled=True,
                             href="/views/dashboard2", active="exact"),
+                dbc.NavLink("Dashboard 3", id='dashboard_3_link',disabled=True,
+                            href="/views/dashboard3", active="exact"),
             ],
             vertical=True,
             pills=True,
@@ -48,12 +50,15 @@ content = html.Div(id="page-content", style=CONTENT_STYLE)
 app.layout = html.Div([
     # Store dataframe
     dcc.Store(id='dataframe', storage_type='local'),
+    dcc.Store(id='rule-set-store', storage_type='local'),
+    dcc.Store(id='rule-dataframe', storage_type='local'),
     dcc.Location(id='url', refresh=False),
     sidebar,
     content
 ])
 
 home_content = html.Div([
+    html.H2("SQIs Table"),
     dcc.Upload(
             id='upload-data',
             children=html.Div([
@@ -73,7 +78,27 @@ home_content = html.Div([
             # Allow multiple files to be uploaded
             multiple=False
         ),
-    dbc.Progress(id='upload-progress',striped= True,animated= True)
+    html.H2("Rule Table (Optional)"),
+    dcc.Upload(
+            id='upload-rule',
+            children=html.Div([
+                'Drag and Drop or ',
+                html.A('Select Files')
+            ]),
+            style={
+                'width': '100%',
+                'height': '50px',
+                'lineHeight': '60px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '2px',
+                'textAlign': 'center',
+                'margin': '2px'
+            },
+            # Allow multiple files to be uploaded
+            multiple=False
+        ),
+    # dbc.Progress(id='upload-progress',striped= True,animated= True)
 ])
 
 @app.callback(Output('page-content', 'children'),
@@ -83,6 +108,8 @@ def display_page(pathname):
          return dashboard1.layout
     elif pathname == '/views/dashboard2':
          return dashboard2.layout
+    elif pathname == '/views/dashboard3':
+        return dashboard3.layout
     else:
         return home_content
 
@@ -90,6 +117,7 @@ def display_page(pathname):
               Output('dataframe','data'),
               Output('dashboard_1_link','disabled'),
               Output('dashboard_2_link','disabled'),
+              Output('dashboard_3_link','disabled'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'),
@@ -98,10 +126,27 @@ def display_page(pathname):
 def update_output(content, filename, last_modified,state_data):
     if content is not None:
         df = parse_data(content,filename)
-        return [df,False,False]
+        return [df,False,False,False]
     elif state_data is not None:
-        return [state_data,False,False]
-    return [None,True,True]
+        return [state_data,False,False,False]
+    return [None,True,True,True]
+
+#Load rule set
+@app.callback(
+              Output('rule-set-store','data'),
+              Input('upload-rule', 'contents'),
+              State('upload-rule', 'filename'),
+              State('upload-rule', 'last_modified'),
+              State('rule-set-store', 'data')
+)
+def upload_rule(content, filename, last_modified,state_data):
+    if content is not None:
+        df = parse_data(content,filename)
+        return df
+    elif state_data is not None:
+        return state_data
+    return None
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)

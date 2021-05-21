@@ -9,9 +9,9 @@ from vital_sqi.common import generate_timestamp, utils
 from vital_sqi.data.signal_sqi_class import SignalSQI
 
 
-def ECG_reader (file_name, file_type = None, channel_num = None,
-                channel_name = None, sampling_rate = None,
-                start_datetime = None):
+def ECG_reader(file_name, file_type = None, channel_num = None,
+               channel_name = None, sampling_rate = None,
+               start_datetime = None):
     """
 
     Parameters
@@ -355,11 +355,13 @@ def PPG_writer(signal_sqi, file_name, file_type = 'csv'):
 #     'TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
 #                                                          'SPO2_PCT','PERFUSION_INDEX'],
 #                  start_datetime = '2020-04-12 10:00:00')
+# out.sampling_rate = 2
 # PPG_writer(out, '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
 #             '/test_data/ppg_smartcare_w.csv')
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/test_data/ecg_test1.csv')
+#                           '/vital_sqi/tests/test_data/ecg_test2.csv')
 # out = ECG_reader(file_in, 'csv', channel_name = ['Time', '1'])
 # file_out = '/Users/haihb/Documents/Work/Oucru/innovation ' \
 #            '/vital_sqi/tests/test_data/ecg_test_write.csv'
 # ECG_writer(out, file_out, file_type = 'csv')
+

@@ -46,6 +46,15 @@ class TestECGReader(object):
         assert isinstance(ECG_reader(file_name, 'csv',
                                      channel_num = [0, 1]), SignalSQI)
 
+    def test_on_csv_infer_sampling_rate(self):
+        file_name = os.path.abspath('tests/test_data/ecg_test_w.csv')
+        out = ECG_reader(file_name, 'csv', channel_name = ['Time', '1'])
+        assert out.sampling_rate == 256
+        file_name = os.path.abspath('tests/test_data/ecg_test2.csv')
+        with pytest.raises(Exception) as exc_info:
+            out = ECG_reader(file_name, 'csv', channel_name = ['Time', '1'])
+        assert exc_info.match("Sampling rate not found nor inferred")
+
 
 class TestECGWriter(object):
 
@@ -55,7 +64,7 @@ class TestECGWriter(object):
         file_out = tempfile.gettempdir() + '/out.edf'
         assert ECG_writer(out, file_out, file_type='edf', info=out.info) is \
                True
-        assert ECG_writer(out, file_out, file_type = 'edf', info = None)\
+        assert ECG_writer(out, file_out, file_type='edf', info=None)\
                is True
 
     def test_on_valid_mit(self):
