@@ -588,14 +588,9 @@ class PeakDetector:
         convole = np.convolve(q_padded, np.ones(w) / w, 'valid')
         return convole
 
-<<<<<<< HEAD
-    def detect_peak_trough_billauer(self, s, delta=0.1):
-        """Converted from MATLAB script at http://billauer.co.il/peakdet.html
-=======
     def detect_peak_trough_billauer(self, s, delta=1000):
         """
         Converted from MATLAB script at http://billauer.co.il/peakdet.html
->>>>>>> 85e887a (Initial proposal of the SQI pipeline)
         
         Returns two arrays
         
