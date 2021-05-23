@@ -1,11 +1,7 @@
 dtw-python>=1.1.6
 heartpy>=1.2.6
 hrv-analysis>=1.0.3
-<<<<<<< HEAD
 matplotlib==3.3.4
-=======
-matplotlib>=3.3.4
->>>>>>> 85e887a (Initial proposal of the SQI pipeline)
 numpy>=1.20.2
 pandas>=1.2.1
 plotly>=4.14.3
