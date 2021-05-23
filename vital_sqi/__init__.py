@@ -11,7 +11,7 @@ from vital_sqi import (
 	preprocess,
 	sqi,
 	rule,
-	highlevel
+	highlevel_functions
 )
 
 from vital_sqi.rule.rule_class import Rule
