@@ -293,7 +293,7 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
             raise Exception("Timestamp unit must be either second (s) or "
                             "millisecond (ms)")
         sampling_rate = utils.calculate_sampling_rate(timestamps.to_numpy())
-    signals = tmp[signal_idx[0]].to_numpy()
+    signals = tmp[signal_idx].to_numpy().T
     info = tmp[info_idx].to_dict('list')
     out = SignalSQI(signals = signals, wave_type = 'ppg',
                     sampling_rate = sampling_rate,

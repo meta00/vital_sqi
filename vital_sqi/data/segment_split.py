@@ -9,9 +9,7 @@ import os
 from vital_sqi.data.removal_utilities import remove_invalid,trim_data
 from vital_sqi.common.rpeak_detection import PeakDetector
 
-
-def save_segment_image(segment, saved_filename, save_img_folder,
-                       display_trough_peak):
+def save_segment_image(segment,saved_filename,save_img_folder,display_trough_peak):
     """
     handy
     :param segment:
@@ -35,9 +33,8 @@ def save_segment_image(segment, saved_filename, save_img_folder,
     )
     fig.write_image(os.path.join(save_img_folder, saved_filename + '.png'))
 
-
-def save_segment(filename, segment_list, save_file_folder,
-                 save_image, save_img_folder, display_trough_peak):
+def save_each_segment(filename,segment_list,save_file_folder,
+                      save_image,save_img_folder,display_trough_peak):
     """
     Save each n-second segment into csv and the relevant image
     :param filename: str, the origin file name
@@ -58,15 +55,13 @@ def save_segment(filename, segment_list, save_file_folder,
             np.savetxt(os.path.join(save_file_folder, saved_filename + '.csv'), segment, delimiter=',')  # as an array
         except Exception as e:
             warnings.warn(e)
-        i = i+1
+        i=i+1
 
-
-def split_to_segments(signal_data, filename=None, sampling_rate=100.0,
-                      segment_length_second=30.0, minute_remove=5.0,
-                      wave_type="ecg", split_type="time",
-                      is_trim=False, save_file_folder=None,
-                      save_image=False, save_img_folder=None,
-                      display_trough_peak=True):
+def split_to_subsegments(signal_data,filename=None,sampling_rate=100.0,
+                         segment_length_second=30.0,minute_remove=5.0,
+                         wave_type="ecg",split_type="time",
+                         is_trim=False,save_file_folder=None,
+                         save_image=False,save_img_folder=None,display_trough_peak=True):
     """
     Expose
     Split the data after applying bandpass filter and removing the first and last n-minutes
@@ -78,16 +73,16 @@ def split_to_segments(signal_data, filename=None, sampling_rate=100.0,
     :param minute_remove: float, default = 5.0. The first and last of n-minutes to be removed
     :return:
     """
-    if filename is None:
+    if filename == None:
         filename = 'segment'
-    if save_file_folder is None:
+    if save_file_folder == None:
         save_file_folder = '.'
     save_file_folder = os.path.join(save_file_folder, wave_type)
     if not os.path.exists(save_file_folder):
         os.makedirs(save_file_folder)
 
-    if save_image is True:
-        if save_img_folder is None:
+    if  save_image == True:
+        if save_img_folder == None:
             save_img_folder = '.'
         save_img_folder = os.path.join(save_img_folder, "img")
         if not os.path.exists(save_img_folder):
@@ -109,11 +104,18 @@ def split_to_segments(signal_data, filename=None, sampling_rate=100.0,
         segments = segments + [sub_signal_data[chunk_indices[i]:chunk_indices[i+1]]
                                for i in range(len(chunk_indices)-1)]
 
-    save_segment(filename, np.array(segments), save_file_folder,
-                 save_image, save_img_folder, display_trough_peak)
+    save_each_segment(filename, np.array(segments),save_file_folder,
+                      save_image,save_img_folder,display_trough_peak)
+
+def generate_segment_idx(segment_length, sampling_rate, signal_array):
+    segments = []
+    for channel in signal_array:
+        segments.append(np.arange(0,len(channel),segment_length*sampling_rate))
+    return np.asarray(segments)
 
 
-def get_split_time_index(segment_seconds, sequence):
+
+def get_split_time_index(segment_seconds,sequence):
     """
     handy
     Return the index of splitting points
@@ -125,12 +127,12 @@ def get_split_time_index(segment_seconds, sequence):
                for i in range(0, int(np.ceil(len(sequence) / segment_seconds)))]
     return indices
 
-
-def get_split_rr_index(segment_seconds, sequence):
+def get_split_rr_index(segment_seconds,sequence):
     """
     handy
     Return the index of the splitting points
-    :param segment_seconds: the length of each cut split (in seconds)
+    :param segmen
+    t_seconds: the length of each cut split (in seconds)
     :param sequence:
     :return:
     """
