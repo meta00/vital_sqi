@@ -11,8 +11,6 @@ from vital_sqi.app.app import app
 from dash.exceptions import PreventUpdate
 from vital_sqi.app.util.parsing import generate_rule_set,generate_boundaries
 import pathlib
-import uuid
-import flask
 
 layout = html.Div([
     # html.Div([
@@ -37,6 +35,12 @@ layout = html.Div([
             }
         ),
     dcc.Download(id='download-content'),
+    dcc.Download(id='download-decision-dataframe'),
+    # dbc.Button(
+    #         'Save',
+    #         id='save-decision-button',
+    #         color="primary"
+    #     ),
     dbc.Button(
             "Apply",
             # color="link",
@@ -81,15 +85,9 @@ def save_file(filename, content):
         fp.write(data)
     return path
 
-@app.server.route('/downloadable/<path:path>')
-def serve_static(path):
-    root_dir = os.getcwd()
-    return flask.send_from_directory(
-        os.path.join(root_dir,'downloadable'),path
-    )
-
 @app.callback(
     Output('applied-rule-table','children'),
+    Output('download-decision-dataframe','data'),
     Input('apply-button','n_clicks'),
     Input('rule-dataframe', 'data'),
     Input('dataframe', 'data')
@@ -110,7 +108,7 @@ def apply_rule_set(n_clicks,rule_set_dict, sqi_table):
         # dat =
         df['output_decision'] = output_label
         output_columns = ['file_name']+sqi_columns+['output_decision']
-        children = dash_table.DataTable(
+        decision_table = dash_table.DataTable(
             id='decision-table',
             columns=[{"name": i, "id": i, 'deletable': True} for i in output_columns],
             data=df[output_columns].to_dict('records'),
@@ -122,8 +120,30 @@ def apply_rule_set(n_clicks,rule_set_dict, sqi_table):
             sort_mode="single",
             page_size=15,
         )
-        return children
-    return None
+        children = html.Div([
+            decision_table,
+        ])
+        fname = "decision_table.csv"
+        decision_content = dict(
+            content=df.to_csv(index=False),
+            filename=fname
+        )
+        return [children,decision_content]
+    return [None,None]
+
+# @app.callback(
+#     Output('download-decision-dataframe','data'),
+#     Input('save-decision-button','n_clicks'),
+#     Input('dataframe', 'data')
+# )
+# def save_decision_table(n_clicks,sqi_table):
+#     ctx = dash.callback_context
+#     change_id = [p['prop_id'] for p in ctx.triggered][0]
+#     if 'save-decision-button' in change_id:
+#         df = pd.DataFrame(sqi_table)
+#         fname = "decision_table.csv"
+#         return dict(content=df.to_csv(index=False),filename=fname)
+#     return None
 
 @app.callback(Output('confirmed-rule-table', 'children'),
               Input('rule-dataframe', 'data'))
@@ -163,4 +183,5 @@ def on_data_set_table(data):
                               )
         )
     children = tables
+
     return children
