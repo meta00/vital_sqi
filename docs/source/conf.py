@@ -30,7 +30,7 @@ release = '1.0.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
+    #'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',        # source source link next to docs
     'sphinx.ext.githubpages',     # gh-pages needs a .nojekyll file
@@ -108,12 +108,18 @@ sphinx_gallery_conf = {
     # path to your example scripts
     'examples_dirs': [
         '../../examples/tutorials',
+        '../../examples/preprocess',
+        '../../examples/others',
         '../../examples/sqi',
+        '../../examples/raw'
     ],
     # path to save gallery generated output
     'gallery_dirs': [
         '../source/_examples/tutorials',
-        '../source/_examples/sqi'],
+        '../source/_examples/preprocess',
+        '../source/_examples/others',
+        '../source/_examples/sqi',
+        '../source/_examples/raw'],
     # Other
     'line_numbers': True,
     'download_all_examples': False,

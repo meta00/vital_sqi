@@ -83,26 +83,3 @@ import pandas as pd
 #######################################
 # Visualization
 # -------------
-
-
-#######################################
-# Final notes
-# -----------
-# Initially, it might have a lot of code. If the library
-# grows, as Stefan mentioned it might be possible to
-# create a generalised pipeline from sub-methods or
-# classes. Or allow the user to configure the process
-# and then automate all the run.
-
-# Create steps
-#step1 = Trim(start=5, end=5)
-#step2 = Unchanged(param1=x, param2=y)
-#step3 = LostConnection(param1=20, param2=30)
-
-# Create pipeline
-#pipe = Pipeline(steps=[('step1', step1),
-#                       ('step2', step2),
-#                       ('step3', step3))
-
-# Data
-#data = pipe.fit_transform(data)

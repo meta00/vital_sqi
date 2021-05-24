@@ -52,7 +52,7 @@ Acronym                        Domain                                      Statu
 
     Brief description
 
-    See: :py:mod:`vital_sqi.sqi.standard_sqi.perfusion_sqi`
+    See: :py:func:`vital_sqi.sqi.standard_sqi.perfusion_sqi`
 
     Examples: XXX | XXX | XXX
 
@@ -60,7 +60,7 @@ Acronym                        Domain                                      Statu
 
     Brief description or link to scipy function.
 
-    See: :py:mod:`vital_sqi.sqi.standard_sqi.kurtosis_sqi`
+    See: :py:func:`vital_sqi.sqi.standard_sqi.kurtosis_sqi`
 
     Examples: XXX | XXX | XXX
 
@@ -68,7 +68,7 @@ Acronym                        Domain                                      Statu
 
     Brief description or link to scipy function.
 
-    See: :py:mod:`vital_sqi.sqi.standard_sqi.skewness_sqi`
+    See: :py:func:`vital_sqi.sqi.standard_sqi.skewness_sqi`
 
     Examples: XXX | XXX | XXX
 
@@ -76,7 +76,7 @@ Acronym                        Domain                                      Statu
 
     Brief description
 
-    See: :py:mod:`vital_sqi.sqi.standard_sqi.signal_to_noise_sqi`
+    See: :py:func:`vital_sqi.sqi.standard_sqi.signal_to_noise_sqi`
 
     Examples: XXX | XXX | XXX
 
@@ -84,7 +84,7 @@ Acronym                        Domain                                      Statu
 
     Brief description
 
-    See: :py:mod:`vital_sqi.sqi.standard_sqi.zero_crossings_rate_sqi`
+    See: :py:func:`vital_sqi.sqi.standard_sqi.zero_crossings_rate_sqi`
 
     Examples: XXX | XXX | XXX
 
@@ -92,7 +92,7 @@ Acronym                        Domain                                      Statu
 
     Brief description
 
-    See: :py:mod:`vital_sqi.sqi.standard_sqi.mean_crossing_rate_sqi`
+    See: :py:func:`vital_sqi.sqi.standard_sqi.mean_crossing_rate_sqi`
 
     Examples: XXX | XXX | XXX
 
@@ -100,6 +100,6 @@ Acronym                        Domain                                      Statu
 
     Brief description
 
-    See: :py:mod:`vital_sqi.sqi.dtw_sqi.dtw_sqi`
+    See: :py:func:`vital_sqi.sqi.dtw_sqi.dtw_sqi`
 
     Examples: XXX | XXX | XXX

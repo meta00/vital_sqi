@@ -37,7 +37,10 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
    :hidden:
 
    _examples/tutorials/index
+   _examples/preprocess/index
    _examples/sqi/index
+   _examples/raw/index
+   _examples/others/index
 
 
 Indices and tables

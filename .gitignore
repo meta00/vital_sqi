@@ -1,6 +1,9 @@
 .idea/
 .coverage
+environment.yml
 
+**/subsegments_frequency/*
+**/subsegments_time/*
 
 # -------------------------------------------------
 

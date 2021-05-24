@@ -10,8 +10,8 @@ class TestSaveSegmentImage(object):
 class TestSaveEachSegment(object):
     def test_on_save_each_segment(self):
         pass
-class TestSplitToSubsegments(object):
-    def test_on_split_to_subsegments(self):
+class TestSplitToSegments(object):
+    def test_on_split_to_segments(self):
         pass
 class TestGetSplitTimeIndex(object):
     def test_on_get_split_time_index(self):
