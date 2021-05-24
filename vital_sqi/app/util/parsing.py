@@ -4,7 +4,7 @@ import io
 import dash_html_components as html
 import pathlib
 from vital_sqi.rule.rule_class import Rule
-from vital_sqi.rule.generate_ruleset import RuleSet
+from vital_sqi.rule.ruleset_class import RuleSet
 from vital_sqi.common.utils import update_rule
 import json
 # get relative data folder
