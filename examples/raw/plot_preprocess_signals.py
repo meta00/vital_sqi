@@ -17,10 +17,11 @@ import os
 
 #%%
 
-file_name = "example_edf.edf"
-file_name = "../../tests/test_data/example.edf"
-ecg_data = ECG_reader(file_name,'edf')
-
+# file_name = "example_edf.edf"
+# file_name = "../../tests/test_data/example.edf"
+# ecg_data = ECG_reader(file_name,'edf')
+from vital_sqi.dataset import load_ecg,load_ppg
+ecg_data = load_ecg()
 #%%
 
 ecg_data.info
@@ -71,11 +72,12 @@ fig
 
 #%%
 
-file_name = "ppg_smartcare.csv"
-ppg_data = PPG_reader(os.path.join("../../tests/test_data",file_name),
-                      signal_idx=['PLETH'],
-                      timestamp_idx= ['TIMESTAMP_MS'],
-                      info_idx=['SPO2_PCT','PULSE_BPM','PERFUSION_INDEX'])
+# file_name = "ppg_smartcare.csv"
+# ppg_data = PPG_reader(os.path.join("../../tests/test_data",file_name),
+#                       signal_idx=['PLETH'],
+#                       timestamp_idx= ['TIMESTAMP_MS'],
+#                       info_idx=['SPO2_PCT','PULSE_BPM','PERFUSION_INDEX'])
+ppg_data = load_ppg()
 
 #%%
 
@@ -88,8 +90,8 @@ ppg_sample_idx = int(len(ppg_data.signals)/2)
 #%%
 
 ppg_sample_complex_for_tapering = \
-    ppg_data.signals[ppg_sample_idx+185:ppg_sample_idx+225]
-ppg_sample_complex = ppg_data.signals[ppg_sample_idx+195:ppg_sample_idx+267]
+    ppg_data.signals[0][ppg_sample_idx+185:ppg_sample_idx+225]
+ppg_sample_complex = ppg_data.signals[0][ppg_sample_idx+195:ppg_sample_idx+267]
 
 #%% md
 
