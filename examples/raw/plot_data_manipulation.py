@@ -273,7 +273,7 @@ plt.show()
 
 #%%
 
-trimmed_data_ppg = trim_data(ppg_data.signals,minute_remove=1)
+trimmed_data_ppg = trim_data(ppg_data.signals[0],minute_remove=1)
 
 #%%
 
@@ -290,8 +290,8 @@ trimmed_data_ppg = trim_data(ppg_data.signals,minute_remove=1)
 # fig.show()
 
 fig = plt.Figure()
-plt.plot(np.arange(len(ppg_data.signals)),
-         ppg_data.signals)
+plt.plot(np.arange(len(ppg_data.signals[0])),
+         ppg_data.signals[0])
 plt.show()
 plt.plot(np.arange(len(trimmed_data_ppg)),
          trimmed_data_ppg,
@@ -455,8 +455,8 @@ start_list, end_list = \
 #                              name='trimmed data'))
 # fig.show()
 fig = plt.Figure()
-plt.plot(np.arange(len(ppg_data.signals)),
-         ppg_data.signals)
+plt.plot(np.arange(len(ppg_data.signals[0])),
+         ppg_data.signals[0])
 plt.show()
 
 # .. note gives an error
