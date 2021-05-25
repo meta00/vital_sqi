@@ -33,7 +33,7 @@ def perfusion_sqi(x, y):
     -------
 
     """
-    return (np.max(y)-np.min(y))/np.abs(x)*100
+    return (np.max(y)-np.min(y))/np.abs(np.mean(x))*100
 
 
 def kurtosis_sqi(x, axis=0, fisher=True, bias=True,
