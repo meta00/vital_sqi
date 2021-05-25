@@ -293,7 +293,7 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
             raise Exception("Timestamp unit must be either second (s) or "
                             "millisecond (ms)")
         sampling_rate = utils.calculate_sampling_rate(timestamps.to_numpy())
-    signals = tmp[signal_idx[0]].to_numpy()
+    signals = tmp[signal_idx].to_numpy().T
     info = tmp[info_idx].to_dict('list')
     out = SignalSQI(signals = signals, wave_type = 'ppg',
                     sampling_rate = sampling_rate,
@@ -321,8 +321,8 @@ def PPG_writer(signal_sqi, file_name, file_type = 'csv'):
     timestamps = utils.generate_timestamp(
             start_datetime = signal_sqi.start_datetime,
             sampling_rate = signal_sqi.sampling_rate,
-            signal_length = len(signal_sqi.signals))
-    signals = signal_sqi.signals
+            signal_length = len(signal_sqi.signals[0]))
+    signals = signal_sqi.signals[0]
     timestamps = np.array(timestamps)
     out_df = pd.DataFrame({'time': timestamps, 'pleth': signals})
     if file_type == 'csv':
