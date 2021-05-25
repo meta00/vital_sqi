@@ -41,7 +41,7 @@ print(data.signals)
 print(data.sampling_rate)
 print(data.start_datetime)
 print(data.wave_type)
-print(data.sqi_indexes)
+print(data.sqis)
 print(data.info)
 
 

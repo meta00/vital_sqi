@@ -49,13 +49,13 @@ print(len(channel_1))
 
 #%%
 
-from vital_sqi.data import split_to_subsegments
+from vital_sqi.data.segment_split import split_to_segments
 
 #%%
 
 save_file_name = file_name.split(".")[-1]
 save_file_folder = "subsegments_time"
-split_to_subsegments(channel_1,filename=None,
+split_to_segments(channel_1,filename=None,
                      sampling_rate=256,
                      segment_length_second=10.0,
                      wave_type=ecg_data.wave_type,
@@ -107,21 +107,23 @@ plt.show()
 
 save_file_name = file_name.split(".")[-1]
 save_file_folder = "subsegments_time"
-split_to_subsegments(ppg_data.signals,filename=None,
-                     sampling_rate=256,
+if not os.path.exists(save_file_folder):
+    os.makedirs(save_file_folder)
+split_to_segments(ppg_data.signals[0],filename=None,
+                     sampling_rate=100,
                      segment_length_second=10.0,
                      wave_type=ppg_data.wave_type,
                      split_type="time",
                      save_file_folder=save_file_folder)
 
 #%%
-
-print(os.listdir("subsegments_time/ppg/"))
+ppg_folder = os.path.join(save_file_folder,"ppg")
+file_list = os.listdir(ppg_folder)
+print(file_list)
 
 #%%
-
-segment_1 = np.loadtxt("subsegments_time/ppg/segment-1.csv")
-segment_2 = np.loadtxt("subsegments_time/ppg/segment-2.csv")
+segment_1 = np.loadtxt(os.path.join(ppg_folder,file_list[0]))
+segment_2 = np.loadtxt(os.path.join(ppg_folder,file_list[0]))
 
 #%%
 
@@ -153,7 +155,7 @@ plt.show()
 
 save_file_name = file_name.split(".")[-1]
 save_file_folder = "subsegments_frequency"
-split_to_subsegments(channel_1,filename=None,
+split_to_segments(channel_1,filename=None,
                      sampling_rate=256,
                      segment_length_second=10.0,
                      split_type="peak_interval",
@@ -192,7 +194,7 @@ plt.show()
 
 save_file_name = file_name.split(".")[-1]
 save_file_folder = "subsegments_frequency"
-split_to_subsegments(ppg_data.signals,filename=None,
+split_to_segments(ppg_data.signals[0],filename=None,
                      sampling_rate=256,
                      segment_length_second=10.0,
                      wave_type=ppg_data.wave_type,
