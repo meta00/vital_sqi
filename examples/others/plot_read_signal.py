@@ -23,17 +23,18 @@ from scipy.stats import kurtosis
 
 # vitalSQI
 from vital_sqi.data.signal_io import ECG_reader
-
+from vital_sqi.dataset import load_ppg,load_ecg
 
 # ----------------------------
 # Load data
 # ----------------------------
 # Filepath
-filepath = '../../tests/test_data'
-filename = 'example.edf'
+# filepath = '../../tests/test_data'
+# filename = 'example.edf'
 
 # Load
-data = ECG_reader(os.path.join(filepath, filename), 'edf')
+# data = ECG_reader(os.path.join(filepath, filename), 'edf')
+data = load_ecg()
 
 # The attributes!
 print(data)

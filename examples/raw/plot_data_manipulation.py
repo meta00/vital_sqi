@@ -13,16 +13,19 @@ Data manipulation
 
 import vital_sqi
 from vital_sqi.data.signal_io import ECG_reader,PPG_reader
+from vital_sqi.dataset import load_ppg,load_ecg
 import os
 
-file_name = "example.edf"
-ecg_data = ECG_reader(os.path.join("../../tests/test_data",file_name),'edf')
+# file_name = "example.edf"
+# ecg_data = ECG_reader(os.path.join("../../tests/test_data",file_name),'edf')
+ecg_data = load_ecg()
 
-file_name = "ppg_smartcare.csv"
-ppg_data = PPG_reader(os.path.join("../../tests/test_data",file_name),
-                      signal_idx=['PLETH'],
-                      timestamp_idx= ['TIMESTAMP_MS'],
-                      info_idx=['SPO2_PCT','PULSE_BPM','PERFUSION_INDEX'])
+# file_name = "ppg_smartcare.csv"
+# ppg_data = PPG_reader(os.path.join("../../tests/test_data",file_name),
+#                       signal_idx=['PLETH'],
+#                       timestamp_idx= ['TIMESTAMP_MS'],
+#                       info_idx=['SPO2_PCT','PULSE_BPM','PERFUSION_INDEX'])
+ppg_data = load_ppg()
 
 #%%
 
@@ -53,7 +56,7 @@ from vital_sqi.data.segment_split import split_to_segments
 
 #%%
 
-save_file_name = file_name.split(".")[-1]
+save_file_name = "example_file"
 save_file_folder = "subsegments_time"
 split_to_segments(channel_1,filename=None,
                      sampling_rate=256,
@@ -105,7 +108,7 @@ plt.show()
 
 #%%
 
-save_file_name = file_name.split(".")[-1]
+save_file_name = "example_file"
 save_file_folder = "subsegments_time"
 if not os.path.exists(save_file_folder):
     os.makedirs(save_file_folder)
@@ -153,7 +156,7 @@ plt.show()
 
 #%%
 
-save_file_name = file_name.split(".")[-1]
+save_file_name = "example_file"
 save_file_folder = "subsegments_frequency"
 split_to_segments(channel_1,filename=None,
                      sampling_rate=256,
@@ -192,7 +195,7 @@ plt.show()
 
 #%%
 
-save_file_name = file_name.split(".")[-1]
+save_file_name = "example_file"
 save_file_folder = "subsegments_frequency"
 split_to_segments(ppg_data.signals[0],filename=None,
                      sampling_rate=256,
@@ -438,7 +441,7 @@ out = PPG_reader(os.path.join(os.getcwd(),'../../', 'tests/test_data/ppg_smartca
 #%%
 
 start_list, end_list = \
-    cut_by_frequency_partition(ppg_data.signals,
+    cut_by_frequency_partition(ppg_data.signals[0],
                               window_size=30000,
                               peak_threshold_ratio=2,
                               lower_bound_threshold=2)
