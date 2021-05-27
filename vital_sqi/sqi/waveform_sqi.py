@@ -3,6 +3,7 @@ Implementation of SQIs for ECG raw signals based on DiMarco2012.
 """
 import scipy.signal as sn
 import numpy as np
+from vital_sqi.common.rpeak_detection import *
 
 
 def band_energy_sqi(signal, sampling_rate, band=None):
@@ -11,9 +12,7 @@ def band_energy_sqi(signal, sampling_rate, band=None):
     Parameters
     ----------
     signal :
-        
     sampling_rate :
-        
     band :
          (Default value = None)
 
@@ -21,13 +20,13 @@ def band_energy_sqi(signal, sampling_rate, band=None):
     -------
 
     """
-    f, t, spec = sn.stft(signal, fs = sampling_rate,
-                         window = 'hann', nperseg = 2048, noverlap = 1838,
-                         detrend = False, return_onesided = False,
-                         boundary = 'zeros',
-                         padded = True)
+    f, t, spec = sn.stft(signal, fs=sampling_rate,
+                         window='hann', nperseg=2048, noverlap=1838,
+                         detrend=False, return_onesided=False,
+                         boundary='zeros',
+                         padded=True)
     idx = np.where(np.logical_and(f > band[0], f <= band[1]))
-    max_time_marginal = max(np.sum(spec[idx, :], axis = 1)[0, :]).real
+    max_time_marginal = max(np.sum(spec[idx, :], axis=1)[0, :]).real
     return max_time_marginal
 
 
@@ -37,13 +36,10 @@ def lf_energy_sqi(signal, sampling_rate, band=[0, 0.5]):
     Parameters
     ----------
     signal :
-        
     sampling_rate :
-        
     band :
          (Default value = [0)
     0.5] :
-        
 
     Returns
     -------
@@ -58,12 +54,9 @@ def qrs_energy_sqi(signal, sampling_rate, band=[5, 25]):
     Parameters
     ----------
     signal :
-        
     sampling_rate :
-        
     band :
          (Default value = [5, 25] :
-        
 
     Returns
     -------
@@ -78,13 +71,9 @@ def hf_energy_sqi(signal, sampling_rate, band=[100, np.Inf]):
     Parameters
     ----------
     signal :
-        
     sampling_rate :
-        
     band :
          (Default value = [100, np.Inf] :
-        
-
     Returns
     -------
 
@@ -92,37 +81,46 @@ def hf_energy_sqi(signal, sampling_rate, band=[100, np.Inf]):
     return band_energy_sqi(signal, sampling_rate, band)
 
 
-def vhf_norm_power_sqi(signal, sampling_rate, band =[150, np.Inf]):
+def vhf_norm_power_sqi(signal, sampling_rate, band=[150, np.Inf]):
     """
 
     Parameters
     ----------
     signal :
-        
     sampling_rate :
-        
     band :
          (Default value = [150, np.Inf] :
-        
-
     Returns
     -------
 
     """
-    f, t, spec = sn.stft(signal, fs = sampling_rate,
-                         window = 'hann', nperseg = 2048, noverlap = 1838,
-                         detrend = False, return_onesided = False,
-                         boundary = 'zeros',
-                         padded = True)
+    f, t, spec = sn.stft(signal, fs=sampling_rate,
+                         window='hann', nperseg=2048, noverlap=1838,
+                         detrend=False, return_onesided=False,
+                         boundary='zeros',
+                         padded=True)
     idx = np.where(np.logical_and(spec > band[0], spec <= band[1]))
-    freq_marginal = np.sum(spec[idx, :], axis = 0)[0, :]
+    freq_marginal = np.sum(spec[idx, :], axis=0)[0, :]
     np_vhf = (np.median(freq_marginal)/max(freq_marginal)).real
     return np_vhf
 
 
-def qrs_amplitude_sqi():
-    """ """
-    return
+def qrs_a_sqi(signal, sampling_rate):
+    """
+    QRS_A or qrs amplitude is defined as the median value of the
+    peak-to-nadir amplitude difference of the QRS complexes detected,
+    in a segment of 10s. Beat detection is done by Pan and Tompkins's
+    algorithm. A threshold of 5 mV is set for the peak-to-nadir amplitude
+    difference. For each beat, the fiducial point is set to the dominant peak
+    of the QRS complex.
+    """
+    detector = PeakDetector(wave_type='ecg', fs=sampling_rate)
+    peaks, troughs, nadirs = detector.ecg_detector(signal,
+                                            detector_type="pan_tompkins")
+    peak_to_nadir = np.array(peaks) - np.array(nadirs)
+    peak_to_nadir = np.delete(peak_to_nadir, np.where(peak_to_nadir > 5))
+    qrs_a = np.median(peak_to_nadir)
+    return qrs_a
 
 
 # import os, tempfile
