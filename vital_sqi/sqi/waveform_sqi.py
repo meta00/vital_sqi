@@ -125,10 +125,10 @@ def qrs_amplitude_sqi():
     return
 
 
-import os, tempfile
-from vital_sqi.data.signal_io import *
-
-file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-                          '/vital_sqi/tests/test_data/example.edf')
-out = ECG_reader(file_in, 'edf')
-vhf = vhf_norm_power_sqi(out.signals[:, 0], out.sampling_rate)
+# import os, tempfile
+# from vital_sqi.data.signal_io import *
+#
+# file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
+#                           '/vital_sqi/tests/test_data/example.edf')
+# out = ECG_reader(file_in, 'edf')
+# vhf = vhf_norm_power_sqi(out.signals[:, 0], out.sampling_rate)
