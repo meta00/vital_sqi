@@ -588,7 +588,7 @@ class PeakDetector:
         convole = np.convolve(q_padded, np.ones(w) / w, 'valid')
         return convole
 
-    def detect_peak_trough_billauer(self, s, delta=1000):
+    def detect_peak_trough_billauer(self, s):
         """
         Converted from MATLAB script at http://billauer.co.il/peakdet.html
         
@@ -629,6 +629,12 @@ class PeakDetector:
 
         
         """
+        #Scale data
+        s_min = np.min(s)
+        s_max = np.max(s)
+        s = np.interp(s, (s_min, s_max), (-1, +1))
+
+        delta = 0.8
         maxtab = []
         mintab = []
         
