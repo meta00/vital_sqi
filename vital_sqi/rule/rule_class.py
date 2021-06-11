@@ -172,6 +172,6 @@ class Rule:
         rules = self.rule['def']
         r_strs = []
         for r in rules:
-            r_str = "x" + " " + r['op'] + r['value'] + ": " + r['label']
+            r_str = "x" + " " + r['op'] + str(r['value']) + ": " + r['label']
             r_strs.append(r_str)
         return "\n".join(r_strs)

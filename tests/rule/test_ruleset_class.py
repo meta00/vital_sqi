@@ -39,7 +39,7 @@ class TestRuleSet(object):
         assert exc_info.match('Order must start with 1')
 
     def test_on_export(self):
-        assert self.s.export_rules() == True
+        assert isinstance(self.s.export_rules(),str)
 
     def test_on_execute(self):
         dat = pd.DataFrame([[6, 100, 0]], columns = ['sqi1', 'sqi2', 'sqi3'])

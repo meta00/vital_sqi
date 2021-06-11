@@ -50,8 +50,7 @@ class RuleSet:
                 conds[i].connect_yes(ops[i+1])
         conds[-1].connect_yes(e)
         fc = Flowchart(st)
-        print(fc.flowchart())
-        return True
+        return fc.flowchart()
 
     def execute(self, value_df):
         """
