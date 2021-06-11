@@ -43,6 +43,13 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
    _examples/others/index
 
 
+.. toctree::
+   :maxdepth: 2
+   :caption: API
+   :hidden:
+
+   _apidoc/modules
+
 Indices and tables
 ==================
 
