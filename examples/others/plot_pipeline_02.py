@@ -370,7 +370,7 @@ def dtw(x):
             np.std(dtw_list)]
 
 
-def all(x):
+def sqi_all(x):
     """Compute all SQIs.
 
     .. note: If some variables are required for different
@@ -452,7 +452,7 @@ if TERMINAL:
 # Group by 30s windows/apply
 sqis2 = signals \
     .groupby(pd.Grouper(freq='30s')) \
-    .apply(all)
+    .apply(sqi_all)
 
 # Show
 print("\nSQIs (apply):")
