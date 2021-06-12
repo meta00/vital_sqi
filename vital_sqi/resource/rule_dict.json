@@ -1,83 +1,167 @@
 {
-"perfusion_sqi": {
-  "name": "Perfusion",
+"perfusion": {
+  "name": "perfusion",
   "def": [
     {"op": ">", "value": " ", "label": "accept"},
     {"op": "<=", "value": " ", "label": "reject"}],
+  "unit": "cycle",
   "desc": "The gold standard for assessment of PPG signal quality in industrial pulse oximeters. Defined as the ratio of the pulsatile (AC) part of the waveform to the static (DC) part of the waveform",
-  "ref": "Elgendi2016"
+  "ref": "Elgendi2016",
+  "type": ["ECG", "PPG"],
+  "category": "waveform"
   },
-"skewness_base_sqi": {
-   "name": "Skewness",
+"skewness": {
+   "name": "skewness",
    "def": [
       {"op": ">", "value": " ", "label": "accept"},
       {"op": "<=", "value": " ", "label": "reject"}],
-   "desc": "A statistical measure of the symmetry (or the lack of it) in the analysed signal",
-   "ref": "Krishnan2010"
+  "unit": "cycle",
+  "desc": "A statistical measure of the symmetry (or the lack of it) in the analysed signal",
+   "ref": "Krishnan2010",
+   "type": ["ECG", "PPG"],
+   "category": "statistical"
   },
-"kurtosis_base_sqi": {
-  "name": "Kurtosis",
+"kurtosis": {
+  "name": "kurtosis",
   "def": [
       {"op": ">", "value": " ", "label": "accept"},
       {"op": "<=", "value": " ", "label": "reject"}],
+  "unit": "",
   "desc": "A statistical measure of the analysed signal around mean compared to normal distribution",
-  "ref": "Selvaraj2011"
+  "ref": "Selvaraj2011",
+  "type": ["ECG", "PPG"],
+  "category": "statistical"
   },
-"entropy_base_sqi": {
-  "name": "Entropy",
+"entropy": {
+  "name": "entropy",
   "def": [
     {"op": ">", "value": " ", "label": "accept"},
     {"op": "<=", "value": " ", "label": "reject"}],
-  "desc": "A staistical measure that quantifies the different between probability density functions of analysed signal and uniform distribution.",
-  "ref": "Selvaraj2011"
+  "unit": "",
+  "desc": "Entropy: A statistical measure that quantifies the different between probability density functions of analysed signal and uniform distribution.",
+  "ref": "Selvaraj2011",
+  "type": ["ECG", "PPG"],
+  "category": "statistical"
   },
-"zero_crossings_sqi": {
-  "name": "Zero crossing rate",
+"zero_crossing_rate": {
+  "name": "zero_crossing_rate",
   "def": [
       {"op": ">", "value": " ", "label": "accept"},
       {"op": "<=", "value": " ", "label": "reject"}],
+  "unit": "",
   "desc": "A rate of how often the signal crosses the zero (switches between positive and negative value)",
-  "ref": "Elgendi2016"
+  "ref": "Elgendi2016",
+  "type": ["ECG", "PPG"],
+  "category": "waveform"
   },
-"snr_sqi": {
-  "name": "Signal-to-noise ratio",
+"snr": {
+  "name": "snr",
   "def": [
     {"op": ">", "value": " ", "label": "accept"},
     {"op": "<=", "value": " ", "label": "reject"}],
-  "desc": "In this case, SNR is defined as the ratio between the analysed signal variance and its noise variance",
-  "ref": "Elgendi2016"
+  "unit": "",
+  "desc": "Signal-to-noise ratio: In this case, SNR is defined as the ratio between the analysed signal variance and its noise variance",
+  "ref": "Elgendi2016",
+  "type": ["ECG", "PPG"],
+  "category": "waveform"
   },
-"msq_sqi": {
-  "name": "Matching of multiple systolic wave detection algorithms",
+"msq": {
+  "name": "msq",
   "def": [
       {"op": ">", "value": " ", "label": "accept"},
       {"op": "<=", "value": " ", "label": "reject"}],
-  "desc": "A measure of agreement between two different peak detection algorithms used on the analysed signal",
-  "ref": "Elgendi2016"
+  "unit":"",
+  "desc": "Matching of multiple systolic wave detection or R peak algorithms: A measure of agreement between multiple different peak detection algorithms used on the analysed signal",
+  "ref": "Elgendi2016",
+  "type": ["ECG", "PPG"],
+  "category": "waveform"
   },
-"relative_power_sqi": {
-  "name": "Relative power",
+"relative_power": {
+  "name": "relative_power",
   "def": [
     {"op": ">", "value": " ", "label": "accept"},
     {"op": "<=", "value": " ", "label": "reject"}],
-  "desc": "The ratio between power spectral density within the frequency band of interest (1-2.25Hz) and the whole signal (0-8Hz)",
-  "ref": "Selvaraj2011"
+  "unit": "",
+  "desc": "Relative power: The ratio between power spectral density within the frequency band of interest (1-2.25Hz) and the whole signal (0-8Hz)",
+  "ref": "Selvaraj2011",
+  "type": ["ECG", "PPG"],
+  "category": "waveform"
   },
-"acf_sqi": {
-  "name": "Auto-correlation based signal quality indices",
+"acf": {
+  "name": "acf",
   "def": [
       {"op": ">", "value": " ", "label": "accept"},
       {"op": "<=", "value": " ", "label": "reject"}],
-  "desc": "Signal quality indices extracted from the correlogram computed by autcorrelation of the analysed signal ",
-  "ref": "Pradhan2019"
+  "unit": "",
+  "desc": "Auto-correlation based signal quality indices: Signal quality indices extracted from the correlogram computed by autcorrelation of the analysed signal",
+  "ref": "Pradhan2019",
+  "type": ["ECG", "PPG"],
+  "category": "waveform"
   },
-"dtw_sqi": {
-  "name": "Dynamic time warping",
+"dtw": {
+  "name": "dtw",
   "def": [
       {"op": ">", "value": " ", "label": "accept"},
       {"op": "<=", "value": " ", "label": "reject"}],
-  "desc": "Compute correlation between a template signal and the analysed signal using dynamic type warping",
-  "ref": "Li2012"
+  "unit": "cycle",
+  "desc": "Dynamic time warping: Compute correlation between a template signal and the analysed signal using dynamic type warping",
+  "ref": "Li2012",
+  "type": ["ECG", "PPG"],
+  "category": "waveform"
+  },
+"lf_energy": {
+  "name": "lf_energy",
+  "def": [
+      {"op": ">", "value": "0.5", "label": "accept"},
+      {"op": "<=", "value": "0.5", "label": "reject"}],
+  "unit": "10",
+  "desc": "Low-frequency time marginal energy: Peak value in the low frequency band (0-0.5 Hz). High value of lf_energy indicates baseline drift or flat line (constant amplitude)",
+  "ref": "DiMarco2012",
+  "type": ["ECG"],
+  "category": "waveform"
+  },
+"qrs_energy": {
+  "name": "qrs_energy",
+  "def": [
+      {"op": ">", "value": "0.5", "label": "accept"},
+      {"op": "<=", "value": "0.5", "label": "reject"}],
+  "unit": "10",
+  "desc": "Peak value in the QRS frequency band (5-25 Hz). High value of qrs_energy indicates",
+  "ref": "DiMarco2012",
+  "type": ["ECG"],
+  "category": "waveform"
+  },
+"hf_energy": {
+  "name": "hf_energy",
+  "def": [
+      {"op": ">", "value": "0.5", "label": "accept"},
+      {"op": "<=", "value": "0.5", "label": "reject"}],
+  "unit": "10",
+  "desc": "High frequency time marginal energy: Peak frequency in band over 100 Hz",
+  "ref": "DiMarco2012",
+  "type": ["ECG"],
+  "category": "waveform"
+  },
+"vhf_energy": {
+  "name": "qrs_energy",
+  "def": [
+      {"op": ">", "value": "0.5", "label": "accept"},
+      {"op": "<=", "value": "0.5", "label": "reject"}],
+  "unit": "10",
+  "desc": "Very high frequency band frequency marginal: Normalised median value in the frequency band above 150 Hz over 10s recording",
+  "ref": "DiMarco2012",
+  "type": ["ECG"],
+  "category": "waveform"
+  },
+"qrs_amplitude": {
+  "name": "qrs_amplitude",
+  "def": [
+      {"op": ">", "value": "0.5", "label": "accept"},
+      {"op": "<=", "value": "0.5", "label": "reject"}],
+  "unit": "10",
+  "desc": "Median value of the peak-to-nadia amplitude difference of the QRS complexes detected",
+  "ref": "DiMarco2012",
+  "type": ["ECG"],
+  "category": "waveform"
   }
-
 }
