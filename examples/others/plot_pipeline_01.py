@@ -1,24 +1,16 @@
 """
-Pipeline - PPG (Smartcare)
-==========================
+Pipeline - ECG (sample)
+=======================
 
 This example shows the whole structure to compute the
-signal quality indexes (SQI) given a .csv file with
+signal qality indexes (SQI) given a .csv file with
 the PPG/ECG data.
 
-It works with full patient .csv file. The dtw function
-is very slow and therefore it has not been included in
-the example (improve).
-
-.. warning:: The user needs to configure the path to
-             load the Smartcare.csv file (see example
-             below). This is because the data has not
-             been included in the repository.
-
+See more notes at the end.
 """
 
 #################################################################
-# Libraries
+# Load data
 # ----------
 
 # Generic
@@ -35,13 +27,8 @@ from scipy.stats import entropy
 # Heartpy
 import heartpy as hp
 
-# Plotly
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-
 # vitalSQI
 from vital_sqi.data.signal_io import ECG_reader
-from vital_sqi.data.signal_io import PPG_reader
 from vital_sqi.dataset import load_ppg, load_ecg
 
 
@@ -54,48 +41,39 @@ from vital_sqi.dataset import load_ppg, load_ecg
 TERMINAL = True
 
 
-#################################################################
-# Load data (smartcare)
-# ---------------------
-#
-# First, lets load the data from the smartcare csv file.
-#
-# Questions:
-#    - Why COUNTER starts in 9?
-#
-
 # ----------------------------
 # Load data
 # ----------------------------
 # Filepath
-filepath = './data/'
-filename = '01NVa-003-2001 Smartcare.csv'
+# filepath = '../../tests/test_data'
+# filename = 'example.edf'
 
-# Load patient data
-# .. note: To speed up the run for trial/error yuu
-#          can include the number of rows to load
-#          from the file as a parameter to the
-#          read_csv function (e.g. nrows=100000)
-signals = pd.read_csv(os.path.join(filepath, filename),
-    nrows=200000)
+# Load patiet data
+# data = ECG_reader(os.path.join(filepath, filename), 'edf')
 
-# Calculate sampling rate
-fs = 1 / (signals.TIMESTAMP_MS.diff().median() * 0.001)
+# Load sample dataset
+data = load_ecg()
 
-# Datetime start
-start_datetime = '2021-01-01 17:00:00'
+# .. note: Loading the data using load_ppg() does not work.
+#          It might be because the methods are returning
+#          the data in different formats.
+# data = load_ppg()
 
-# Show
-print("\nLoaded signals:")
-signals
+# The attributes!
+print(data)
+print(data.signals)
+print(data.sampling_rate)
+print(data.start_datetime)
+print(data.wave_type)
+print(data.sqis)
+print(data.info)
 
-if TERMINAL:
-    print(signals)
-
+# Set sample frequency
+fs = data.sampling_rate
 
 #################################################################
-# Format the data
-# ---------------
+# Formatting
+# ----------
 #
 # In this step, we format the signal so that the index is represented
 # by timedelta (increment in time between consecutive samples) and in
@@ -112,26 +90,21 @@ pd.Timedelta.__str__ = lambda x: x._repr_base('all')
 # ----------------------
 # Format data
 # ----------------------
+# Load DataFrame
+signals = pd.DataFrame(data.signals)
+
 # Include column with index
 signals = signals.reset_index()
 
 # .. note: We are assuming that the data signals index has been
 #          recorded every fs no matter whether the patient moved,
 #          the device was disconnected and connected again, ...
-#
-# .. note: In this particular example in which we have the
-#          timestamps, the timedelta could be also created
-#          directly from the time stamp (hence no need to
-#          use signal.index / fs
 # Create timedelta
-#signals['timedelta'] = \
-#    pd.to_timedelta(signals.index / fs, unit='s')
-
 signals['timedelta'] = \
-    pd.to_timedelta(signals.TIMESTAMP_MS, unit='ms')
+    pd.to_timedelta(signals.index / fs, unit='s')
 
 # Create datetimes (if needed)
-signals['date'] = pd.to_datetime(start_datetime)
+signals['date'] = pd.to_datetime(data.start_datetime)
 signals['date']+= pd.to_timedelta(signals.timedelta)
 
 # Set the timedelta index (keep numeric index too)
@@ -141,7 +114,7 @@ signals = signals.set_index('timedelta')
 signals = signals.rename(columns={'index': 'idx'})
 
 ###############################################
-# Lets see the dataframe
+# Lets see the display and plot the raw signals
 
 # Show
 print("\nSignals:")
@@ -150,34 +123,18 @@ signals
 if TERMINAL:
     print(signals)
 
-###############################################
-# Lets plot one signal. Note that you can use the slider
-# (below the main series) to select a smaller section of the
-# series to improve the visualization.
+# Plot
+fig, axes = plt.subplots(nrows=2, ncols=1)
+axes = axes.flatten()
+signals[0].plot(ax=axes[0])
+signals[1].plot(ax=axes[1])
 
-# Plot (matplotlib)
-#fig, axes = plt.subplots(nrows=2, ncols=1)
-#axes = axes.flatten()
-#signals.set_index('date').PLETH.plot(ax=axes[0])
-#signals.set_index('date').IR_ADC.plot(ax=axes[1])
 
-# Plot (plotly)
-# .. note: displaying all the data in an interactive
-#          HTML might be a bit expensive. If running
-#          locally you might want to use just
-#          matplotlib.
 
-# Create figure
-fig = go.Figure(go.Scatter(
-    x=signals.date,
-    y=signals.IR_ADC,
-    name='IR_ADC'))
-fig.update_xaxes(rangeslider_visible=True)
-# fig.show() # Uncomment if running locally
 
 #################################################################
-# Basic preprocessing
-# -------------------
+# Preprocessing
+# -------------
 # This is more about the general preprocessing of the signal,
 # if there are specific preprocessing steps to generate
 # specific vital signals (e.g. hr) they will be implemented on
@@ -233,6 +190,23 @@ if TERMINAL:
 # such as the hear rate (hr) computed by detecting the peaks on
 # ecg signals. Thus, their own methods can be specified to generate
 # the signal from the raw data.
+
+def hr(s):
+    """Heart rate signal (random int)"""
+    return np.random.randint(low=40, high=150, size=s.shape)
+
+def rr(s):
+    """Respiratory rate signal (random int)"""
+    return np.random.randint(low=15, high=25, size=s.shape)
+
+def bbpf(s):
+    """Butter Band Pass Filter from vital_sqi"""
+    from vital_sqi.preprocess.band_filter import BandpassFilter
+    f = BandpassFilter(band_type='butter', fs=fs)
+    aux = f.signal_highpass_filter(s, cutoff=1, order=1)
+    aux = f.signal_lowpass_filter(aux, cutoff=20, order=4)
+    return aux
+
 def bbpf_rep(s):
     """Butter Band Pass Filter Scipy
 
@@ -262,7 +236,10 @@ def bbpf_rep(s):
 
 
 # Add vital signals
-signals['PLETH_BPF'] = bbpf_rep(signals.PLETH)
+signals['0_hr'] = hr(signals[0])
+signals['0_rr'] = rr(signals[0])
+signals['0_bbpf'] = bbpf(signals[0])
+signals['0_bbpf_rep'] = bbpf_rep(signals[0])
 
 # Show
 print("\nSignals (all):")
@@ -276,8 +253,6 @@ if TERMINAL:
 #################################################################
 # Compute SQIs
 # ------------
-#
-# .. warning:: The method dtw is too slow.
 
 ##########################################
 # Lets define our own SQI functions.
@@ -300,6 +275,13 @@ if TERMINAL:
 # Library
 import vital_sqi.sqi as sq
 
+def own(x):
+    """Own defined SQI (randint)"""
+    return np.random.randint(100)
+
+def own2(x):
+    """Own defined SQI (fixed array)"""
+    return [1,2]
 
 def snr(x, axis=0, ddof=0):
     """Signal to noise ratio"""
@@ -307,14 +289,17 @@ def snr(x, axis=0, ddof=0):
     m = a.mean(axis)
     sd = a.std(axis=axis, ddof=ddof)
     return np.where(sd == 0, 0, m/sd)
+    #return np.mean(sq.standard_sqi.signal_to_noise_sqi(x))
 
 def zcr(x):
     """Zero crossing rate"""
     return 0.5 * np.mean(np.abs(np.diff(np.sign(x))))
+    #return sq.standard_sqi.zero_crossings_rate_sqi(x)
 
 def mcr(x):
     """Mean crossing rate"""
     return zcr(x - np.mean(x))
+    #return sq.standard_sqi.mean_crossing_rate_sqi(x)
 
 def perfusion(x, y):
     """Perfusion
@@ -325,6 +310,7 @@ def perfusion(x, y):
     y: filtered signal
     """
     return (np.max(y) - np.min(y)) / np.abs(np.mean(x)) * 100
+    #sq.standard_sqi.perfusion_sqi(y=x['0_bbpf'], x=x[0])
 
 def correlogram(x):
     """Correlogram"""
@@ -386,14 +372,15 @@ def all(x):
     dinfo = {
         'first': x.idx.iloc[0],
         'last': x.idx.iloc[-1],
-        'skew': skew(x['PLETH']),
-        'kurtosis': kurtosis(x['PLETH']),
-        'snr': snr(x['PLETH']),
-        'mcr': mcr(x['PLETH']),
-        'zcr': zcr(x['PLETH_BPF']),
-        'msq': msq(x['PLETH_BPF']),
-        'perfusion': perfusion(x['PLETH'], x['PLETH_BPF']),
-        'correlogram': correlogram(x['PLETH_BPF']),
+        'skew': skew(x[0]),
+        'kurtosis': kurtosis(x[0]),
+        'snr': snr(x[0]),
+        'mcr': mcr(x[0]),
+        'own': own(x[0]),
+        'zcr': zcr(x['0_bbpf']),
+        'msq': msq(x['0_bbpf']),
+        'perfusion': perfusion(x[0], x['0_bbpf']),
+        'correlogram': correlogram(x['0_bbpf']),
         #'dtw': dtw(x['0_bbpf'])
     }
 
@@ -417,9 +404,6 @@ def all(x):
 #           to the raw signals whereas others have to be applied
 #           to the filtered data.
 
-#########################################
-# First lets use the method agg
-
 # ---------------------
 # Compute SQIs
 # ---------------------
@@ -427,10 +411,29 @@ def all(x):
 sqis = signals \
     .groupby(pd.Grouper(freq='30s')) \
     .agg({'idx': ['first', 'last'],
-          'PLETH': [skew, kurtosis, snr, mcr],
-          'IR_ADC': [skew, kurtosis, snr, mcr],
-          'PLETH_BPF': [zcr, msq, correlogram] #dtw]
+          0: [skew, kurtosis, snr, mcr, own, own2],
+          1: [skew, kurtosis, snr, mcr],
+          '0_bbpf': [zcr, msq, correlogram] #dtw]
           })
+
+# Group by 30s windows/apply
+sqis2 = signals \
+    .groupby(pd.Grouper(freq='30s')) \
+    .apply(all)
+
+# Flatten correlogram vector to columns
+sqis2[['corr_peak_%s'%i for i in range(6)]] = \
+    sqis2.correlogram.tolist()
+
+# Flatten dtw vector to columns
+#sqis2[['dtw_mean', 'dtw_std']] = \
+#    sqis2.dtw.tolist()
+
+# Remove columns
+# .. note: There is no need to remove the columns with
+#          the vectors now that we now how easy it is
+#          to 'expand' them.
+#sqis2 = sqis2.drop(columns=['correlogram', 'dtw'])
 
 # .. note: We are assuming that the whole signal has been
 #          read in one chunk. This will not work if using
@@ -445,15 +448,6 @@ sqis
 if TERMINAL:
     print(sqis)
 
-
-#########################################
-# Now lets use apply to compare
-
-# Group by 30s windows/apply
-sqis2 = signals \
-    .groupby(pd.Grouper(freq='30s')) \
-    .apply(all)
-
 # Show
 print("\nSQIs (apply):")
 sqis2
@@ -465,12 +459,7 @@ if TERMINAL:
 
 
 ##########################################
-# Select HQ windows
-# -----------------------------
-#
-# Lets apply some signal quality rules. The
-# aim of this part is to select those windows
-# that are of good quality for further analysis.
+# Lets apply some signal quality rules
 
 # ---------------------
 # Apply SQI Rules
@@ -481,8 +470,8 @@ sqis['keep'] = np.random.choice(a=[False, True], size=(sqis.shape[0],))
 
 # Create basic rule
 criteria = list(zip(*[
-    (sqis['PLETH']['skew'].between(-2, -1), True),
-    (sqis['PLETH']['skew'].between(0, 1), True)
+    (sqis[0]['skew'].between(-2.9, -2.6), True),
+    (sqis[0]['skew'].between(4, 5), True)
 ]))
 
 # Apply rule (default False)
@@ -511,8 +500,7 @@ if TERMINAL:
 #
 
 #########################################################
-# Lets extract the original signal only for those windows
-# that are of good quality.
+# Lets extract the valid windows from the original signal
 
 # -------------------------------------
 # Extract windows from original signals
@@ -542,26 +530,59 @@ print("\nSignals (for valid sqis)")
 result
 
 if TERMINAL:
-    print(result)
-
+    print(sqis)
 
 
 #########################################################
 # Lets plot the result
+
+# Create figure
+fig, axes = plt.subplots(nrows=2, ncols=1)
+axes = axes.flatten()
+
+# Plot
+result.set_index('date')[0].plot(ax=axes[0])
+result.set_index('date')[1].plot(ax=axes[1])
+# Adjust layout
+plt.tight_layout()
+
+
+
+
+#################################################################
+# Further analysis (other tutorial)
+# ---------------------------------
+#
+# Now that we have selected those sections in which the signal
+# quality is appropriate. We can do further analysis, we can
+# find the peaks to identify the heart rate, we can describe
+# the windows statistically, ....
+#
+#
 #
 
-# Plot (matplotlib)
-#fig, axes = plt.subplots(nrows=2, ncols=1)
-#axes = axes.flatten()
-#signals.set_index('date').PLETH.plot(ax=axes[0])
-#signals.set_index('date').IR_ADC.plot(ax=axes[1])
-#plt.show()
+# Show
+plt.show()
 
-# Plot (plotly)
-# Create figure
-fig = go.Figure(go.Scatter(
-    x=result.date,
-    y=result.IR_ADC,
-    name='IR_ADC'))
-fig.update_xaxes(rangeslider_visible=True)
-#fig.show() # Uncomment if running locally
+
+
+#
+#.. warning:: Should we use TimeInterval indexes for windows?
+#
+#.. warning:: Generalising rules:
+#
+#             https://stackoverflow.com/questions/50098025/mapping-ranges-of-values-in-pandas-dataframe
+#
+#.. warning:: This is a very basic example and might fail when using
+#             the reading in batches function from pandas. In such
+#             scenario, consider using a map reduce approach, which
+#             should not require many changes anyways.#
+#
+#             https://pythonspeed.com/articles/chunking-pandas/
+#
+#.. warning:: Useful to filter periods in which value is constant,
+#             maybe due to lost of connection or something similar.#
+#
+#             https://stackoverflow.com/questions/55271735/pandas-finding-start-end-values-of-consecutive-indexes-in-a-pandas-dataframe
+#             https://stackoverflow.com/questions/62361446/python-dataframe-get-index-start-and-end-of-successive-values
+#
