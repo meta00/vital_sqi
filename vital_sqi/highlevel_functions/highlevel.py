@@ -81,7 +81,6 @@ def compute_SQI(signal, primary_peakdet=7, secondary_peakdet=6, wave_type='ppg',
 def segment_PPG_SQI_extraction(signal_segment, sampling_rate=100, primary_peakdet=7, secondary_peakdet=6, hp_cutoff_order=(1, 1), lp_cutoff_order=(20, 4), template_type=1):
     raw_segment = signal_segment[signal_segment.columns[1]].to_numpy()
     #Prepare final dictonary that will be converted to dataFrame at the end
-    print(signal_segment.columns[0])
     SQI_dict = {'first': signal_segment['idx'][0], 'last': signal_segment['idx'][-1]}
     #Prepare filter and filter signal
     filt = BandpassFilter(band_type='butter', fs=sampling_rate)
@@ -102,7 +101,6 @@ def segment_PPG_SQI_extraction(signal_segment, sampling_rate=100, primary_peakde
     SQI_dict['zero_cross'] = sq.standard_sqi.zero_crossings_rate_sqi(filtered_segment)
     SQI_dict['msq'] = sq.standard_sqi.msq_sqi(y=filtered_segment, peaks_1=peak_list, peak_detect2=secondary_peakdet)
     correlogram_list = sq.rpeaks_sqi.correlogram_sqi(filtered_segment)
-    print(correlogram_list)
     for idx, variations in enumerate(variations_acf):
         SQI_dict['correlogram'+variations] = correlogram_list[idx]
     #Per beat SQI calculation
@@ -116,10 +114,7 @@ def segment_PPG_SQI_extraction(signal_segment, sampling_rate=100, primary_peakde
         SQI_dict[funcion[0]+variations_stats[2]] = np.median(statSQI_list)
         SQI_dict[funcion[0]+variations_stats[3]] = np.std(statSQI_list)
     #
-    #return list(SQI_dict.values())
-    print(SQI_dict)
-    #return pd.DataFrame.from_dict(SQI_dict)
-    return SQI_dict
+    return pd.Series(SQI_dict)
 
 def compute_multiple_SQIs():
     """
