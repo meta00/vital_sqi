@@ -36,7 +36,8 @@ class SignalSQI:
             assert value == 'ecg' or value == 'ppg', \
                 'Expected either ecg or ppg.'
         if name == 'signals':
-            assert isinstance(value, pd.DataFrame), 'Expected signals to be ' \
+            assert isinstance(value, np.ndarray) or \
+                   isinstance(value, pd.DataFrame), 'Expected signals to be ' \
                                                   'numpy array, with one ' \
                                                   'channel per column.'
         if name == 'sampling_rate':

@@ -4,81 +4,80 @@ from scipy.sparse import coo
 from vital_sqi.preprocess.band_filter import BandpassFilter
 from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
-
-def signal_preprocess(signal_channel=None, hp_cutoff_order=(1, 1), lp_cutoff_order=(20, 4), trim_amount=20, filter_type='butter', sampling_rate=100):
-    """
-    This function takes input signal, conducts standard preprocessing steps
-    for ppg, and outputs modified signals.
-    and ecg
-    signals.
-    """
-    if signal_channel is None:
-        raise Exception("No signal provided")
-    else:   
-        filter = BandpassFilter(band_type=filter_type, fs=sampling_rate)
-        #Trim the amount of seconds from start and end of the signal
-        signal_channel = signal_channel.T[trim_amount*sampling_rate:-trim_amount*sampling_rate].T
-        for idx, channel in enumerate(signal_channel):
-            signal_channel[idx] = filter.signal_highpass_filter(channel, cutoff=hp_cutoff_order[0], order=hp_cutoff_order[1])
-            signal_channel[idx] = filter.signal_lowpass_filter(channel, cutoff=lp_cutoff_order[0], order=lp_cutoff_order[1])
-    
-    return signal_channel
-
-def compute_all_SQI(signal=None, segments=None, raw_signal=None, primary_peakdet=7, secondary_peakdet=6, template_type=0):
-        """
-
-        Parameters
-        ----------
-        primary_peakdet : int
-        Selects one of the peakdetectors from the PeakDetector class. The primary one is used to segment the waveform
-
-        secondary_peakdet : int
-        Selects one of the peakdetectors from the PeakDetector class. The secondary peakdetector is used to compute MSQ SQI
-
-        template_type : int
-        Selects which template from the dtw SQI should be used       
-
-        Returns
-        -------
-        object of SignalSQI class
-        
-        """
-        variations = ['', '_per_beat','_mean', '_median', '_std']
-        stats_functions = [('skewness', sq.standard_sqi.skewness_sqi), ('kurtosis', sq.standard_sqi.kurtosis_sqi), ('entropy', sq.standard_sqi.entropy_sqi)]
-        SQI_list = []
-        if (signal is None) or (segments is None) or (raw_signal is None):
-            raise Exception("Signal or segments not provided, can't extract all SQI's")
-        else:
-            for idx, segment_boundary in enumerate(segments[:-1]):
-                #Prepare signal segments
-                detector = PeakDetector()
-                signal_segment = signal[segment_boundary:segments[idx+1]]
-                raw_segment = raw_signal[segment_boundary:segments[idx+1]]
-                peak_list, trough_list = detector.ppg_detector(signal_segment, primary_peakdet)
-                SQI_dict = {'peaks':peak_list, 'troughs':trough_list}
-                SQI_dict['perfusion'] = sq.standard_sqi.perfusion_sqi(y=signal_segment, x=raw_segment)
-                SQI_dict['snr'] = sq.standard_sqi.signal_to_noise_sqi(signal_segment)
-                SQI_dict['zero_cross'] = sq.standard_sqi.zero_crossings_rate_sqi(signal_segment)
-                SQI_dict['msq'] = sq.standard_sqi.msq_sqi(y=signal_segment, peaks_1=peak_list, peak_detect2=secondary_peakdet)
-                SQI_dict['correlogram'] = sq.rpeaks_sqi.correlogram_sqi(signal_segment)
-                SQI_dict['dtw'] = sq.standard_sqi.per_beat_sqi(sqi_func=sq.dtw_sqi, troughs=trough_list, signal=signal_segment, taper=True, template_type=template_type)
-                for funcion in stats_functions:
-                    SQI_dict[funcion[0]+variations[0]] = funcion[1](signal_segment)
-                    SQI_dict[funcion[0]+variations[1]] = sq.standard_sqi.per_beat_sqi(sqi_func=funcion[1], troughs=trough_list, signal=signal_segment, taper=True)
-                    SQI_dict[funcion[0]+variations[2]] = np.mean(SQI_dict[funcion[0]+variations[1]])
-                    SQI_dict[funcion[0]+variations[3]] = np.median(SQI_dict[funcion[0]+variations[1]])
-                    SQI_dict[funcion[0]+variations[4]] = np.std(SQI_dict[funcion[0]+variations[1]])
-                     
-                SQI_list.append(SQI_dict)
-        
-        return SQI_list
             
-def compute_SQI(signal, primary_peakdet=7, secondary_peakdet=6, wave_type='ppg', sampling_rate=100):
+def compute_SQI(signal, segment_length='30s', primary_peakdet=7, secondary_peakdet=6, wave_type='ppg', sampling_rate=100, template_type=1):
+    """
+    Run the segment SQI computation using pandas groupby().apply() on the whole dataset.
+
+    Parameters
+    ----------
+    signal : dataframe
+    Whole raw signal in dataframe format as constructed from the source file after the reader function 
+
+    segment_length : string
+    Defines the length of each segment based on the "timedelta" column of the dataframe
+
+
+    primary_peakdet : int
+    Selects one of the peakdetectors from the PeakDetector class. The primary one is used to segment the waveform
+
+    secondary_peakdet : int
+    Selects one of the peakdetectors from the PeakDetector class. The secondary peakdetector is used to compute MSQ SQI
+
+    wave_type : string
+    Defines the type of signal, only 'ppg' or 'ecg' allowed
+    
+    sampling_rate : int
+    Sampling rate of the signal
+    
+    template_type : int
+    Selects which template from the dtw SQI should be used       
+
+    Returns
+    -------
+    Dataframe with column correspoding to each SQI
+
+    """
     if wave_type == 'ppg':
-        sqis = signal.groupby(pd.Grouper(freq='30s')).apply(segment_PPG_SQI_extraction, sampling_rate, primary_peakdet, secondary_peakdet, (1, 1), (20, 4), 1)
+        sqis = signal.groupby(pd.Grouper(freq=segment_length)).apply(segment_PPG_SQI_extraction, sampling_rate, primary_peakdet, secondary_peakdet, (1, 1), (20, 4), template_type)
+    elif wave_type == 'ecg':
+        sqis = signal.groupby(pd.Grouper(freq=segment_length)).apply(segment_ECG_SQI_extraction, sampling_rate, primary_peakdet, secondary_peakdet, (1, 1), (20, 4), template_type)
+    else:
+        raise Exception("Wrong type of waveform supplied. Only accepts 'ppg' or 'ecg'.")
     return sqis     
 
 def segment_PPG_SQI_extraction(signal_segment, sampling_rate=100, primary_peakdet=7, secondary_peakdet=6, hp_cutoff_order=(1, 1), lp_cutoff_order=(20, 4), template_type=1):
+    """
+    Extract all package available SQIs from a single segment of PPG waveform. Return a dataframe with all SQIs and cut points for each segment.
+
+    Parameters
+    ----------
+    signal_segment : array-like
+    A segment of raw signal. The length is user defined in compute_SQI() function
+
+    sampling_rate : int
+    Sampling rate of the signal
+
+    primary_peakdet : int
+    Selects one of the peakdetectors from the PeakDetector class. The primary one is used to segment the waveform
+
+    secondary_peakdet : int
+    Selects one of the peakdetectors from the PeakDetector class. The secondary peakdetector is used to compute MSQ SQI
+
+    hp_cutoff_order : touple (int, int)
+    A high pass filter parameters, cutoff frequency and order
+
+    Lp_cutoff_order : touple (int, int)
+    A low pass filter parameters, cutoff frequency and order
+    
+    template_type : int
+    Selects which template from the dtw SQI should be used       
+
+    Returns
+    -------
+    Pandas series object with all SQIs for the given segment
+
+    """
     raw_segment = signal_segment[signal_segment.columns[1]].to_numpy()
     #Prepare final dictonary that will be converted to dataFrame at the end
     SQI_dict = {'first': signal_segment['idx'][0], 'last': signal_segment['idx'][-1]}
@@ -114,6 +113,12 @@ def segment_PPG_SQI_extraction(signal_segment, sampling_rate=100, primary_peakde
         SQI_dict[funcion[0]+variations_stats[2]] = np.median(statSQI_list)
         SQI_dict[funcion[0]+variations_stats[3]] = np.std(statSQI_list)
     #
+    return pd.Series(SQI_dict)
+
+def segment_ECG_SQI_extraction(signal_segment, sampling_rate=100, primary_peakdet=7, secondary_peakdet=6, hp_cutoff_order=(1, 1), lp_cutoff_order=(20, 4), template_type=1):
+    raw_segment = signal_segment[signal_segment.columns[1]].to_numpy()
+    SQI_dict = {'first': signal_segment['idx'][0], 'last': signal_segment['idx'][-1]}
+    #TODO ECG highlevel SQI extraction
     return pd.Series(SQI_dict)
 
 def compute_multiple_SQIs():
