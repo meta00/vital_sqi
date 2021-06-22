@@ -57,7 +57,7 @@ def save_each_segment(filename,segment_list,save_file_folder,
             warnings.warn(e)
         i=i+1
 
-def split_to_subsegments(signal_data,filename=None,sampling_rate=100.0,
+def split_to_segments(signal_data,filename=None,sampling_rate=100.0,
                          segment_length_second=30.0,minute_remove=5.0,
                          wave_type="ecg",split_type="time",
                          is_trim=False,save_file_folder=None,

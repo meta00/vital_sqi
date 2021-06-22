@@ -44,7 +44,7 @@ def kurtosis_sqi(x, axis=0, fisher=True, bias=True,
     high kurtosis tend to have heavy tails, or outliers.
     Data sets with low kurtosis tend to have light tails, or lack of outliers.
     A uniform distribution would be the extreme case.
-    
+
     Kurtosis is a statistical measure used to describe the distribution of
     observed data around the mean. It represents a heavy tail and peakedness
     or a light tail and flatness of a distribution relative to the normal
@@ -67,7 +67,7 @@ def kurtosis_sqi(x, axis=0, fisher=True, bias=True,
     -------
 
     """
-    
+
     return kurtosis(x, axis, fisher, bias, nan_policy)
 
 
@@ -76,7 +76,7 @@ def skewness_sqi(x, axis=0, bias=True, nan_policy='propagate'):
     Skewness is a measure of symmetry, or more precisely, the lack of
     symmetry. A distribution, or data set, is symmetric if it looks the same
     to the left and right of the center point.
-    
+
     Skewness is a measure of the symmetry (or the lack of it) of a
     probability distribution, which is defined as:
     SSQI=1/N∑i=1N[xi−μˆx/σ]3
@@ -112,7 +112,8 @@ def entropy_sqi(x, qk=None, base=None, axis=0):
     x :
         list the input signal
     qk :
-        list, array against which the relative entropy is computed (Default value = None)
+        list, array against which the relative entropy
+        is computed (Default value = None)
     base :
         float, (Default value = None)
     axis :
@@ -165,7 +166,8 @@ def zero_crossings_rate_sqi(y, threshold=1e-10, ref_magnitude=None,
         -threshold <= y <= threshold are clipped to 0.
     ref_magnitude :
         float >0 If numeric, the threshold is scaled
-        relative to ref_magnitude. If callable, the threshold is scaled relative
+        relative to ref_magnitude.
+        If callable, the threshold is scaled relative
         to ref_magnitude(np.abs(y)). (Default value = None)
     pad :
         boolean, if True, then y[0] is considered a valid
@@ -254,9 +256,12 @@ def mean_crossing_rate_sqi(y, threshold=1e-10, ref_magnitude=None,
 
 def msq_sqi(y, peaks_1, peak_detect2=6):
     """
-    MSQ SQI as defined in Elgendi et al "Optimal Signal Quality Index for Photoplethysmogram Signals" 
-    with modification of the second algorithm used. Instead of Bing's, a SciPy built-in implementation is used. 
-    The SQI tracks the agreement between two peak detectors to evaluate quality of the signal.
+    MSQ SQI as defined in Elgendi et al
+    "Optimal Signal Quality Index for Photoplethysmogram Signals"
+    with modification of the second algorithm used.
+    Instead of Bing's, a SciPy built-in implementation is used.
+    The SQI tracks the agreement between two peak detectors
+    to evaluate quality of the signal.
 
     Parameters
     ----------
