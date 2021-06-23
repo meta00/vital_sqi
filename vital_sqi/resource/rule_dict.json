@@ -159,7 +159,7 @@
       {"op": ">", "value": "0.5", "label": "accept"},
       {"op": "<=", "value": "0.5", "label": "reject"}],
   "unit": "10",
-  "desc": "Median value of the peak-to-nadia amplitude difference of the QRS complexes detected",
+  "desc": "Median value of the peak-to-nadir amplitude difference of the QRS complexes detected",
   "ref": "DiMarco2012",
   "type": ["ECG"],
   "category": "waveform"
