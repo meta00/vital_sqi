@@ -282,9 +282,11 @@ def msq_sqi(y, peaks_1, peak_detect2=6):
     """
     detector = PeakDetector(wave_type='ppg')
     peaks_2,_ = detector.ppg_detector(y, detector_type=peak_detect2, preprocess=False)
-    if len(peaks_1)==0:
+    if len(peaks_1)==0 or len(peaks_2)==0:
         return 0.0
-    return len(np.intersect1d(peaks_1,peaks_2))/len(peaks_1)
+    peak1_dom = len(np.intersect1d(peaks_1,peaks_2))/len(peaks_1)
+    peak2_dom = len(np.intersect1d(peaks_2,peaks_1))/len(peaks_2)
+    return min(peak1_dom, peak2_dom)
 
 def per_beat_sqi(sqi_func, troughs, signal, taper, **kwargs):
     """
