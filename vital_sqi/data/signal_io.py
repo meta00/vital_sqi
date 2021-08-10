@@ -5,7 +5,6 @@ import pandas as pd
 import datetime as dt
 import os
 import glob
-# from vital_sqi.common import generate_timestamp, utils
 from vital_sqi.common import utils
 from vital_sqi.common.utils import generate_timestamp
 from vital_sqi.data.signal_sqi_class import SignalSQI
@@ -22,7 +21,7 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
 
     file_type :
         (Default value = None)
-    channel_num : frm 0
+    channel_num : from 0
         (Default value = None)
     channel_name :
         (Default value = None)
@@ -83,12 +82,14 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
                 pass
         else:
             header['startdate'] = start_datetime
-        signals = signals.transpose()
+        signals = pd.DataFrame(signals.transpose())
+        timestamps = generate_timestamp(start_datetime, sampling_rate,
+                                        len(signals))
+        signals["timestamps"] = timestamps
         info = [header, signal_headers]
         out = SignalSQI(signals=signals,
                         wave_type='ecg',
                         sampling_rate=sampling_rate,
-                        start_datetime=start_datetime,
                         info=info)
 
     if file_type == 'mit':
@@ -127,10 +128,12 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
         else:
             info['base_date'] = start_datetime.date()
             info['base_time'] = start_datetime.time()
-
+        timestamps = generate_timestamp(start_datetime, sampling_rate,
+                                        len(signals))
+        signals = pd.DataFrame(signals)
+        signals["timestamps"] = timestamps
         out = SignalSQI(signals=signals, wave_type='ecg',
                         sampling_rate=sampling_rate,
-                        start_datetime=start_datetime,
                         info=info)
     if file_type == 'csv':
         use_cols = None
@@ -138,10 +141,10 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
             use_cols = channel_name
         if channel_num is not None:
             use_cols = channel_num
-        out = pd.read_csv(file_name,
+        signals = pd.read_csv(file_name,
                           usecols=use_cols,
                           skipinitialspace=True)
-        timestamps = out.iloc[:, 0].to_numpy()
+        timestamps = signals.iloc[:, 0].to_numpy()
         if start_datetime is None:
             try:
                 start_datetime = utils.parse_datetime(timestamps[0])
@@ -151,10 +154,8 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
             sampling_rate = utils.calculate_sampling_rate(timestamps)
             assert sampling_rate is not None, 'Sampling rate not found nor ' \
                                               'inferred'
-        signals = out.drop(0).to_numpy()
         out = SignalSQI(signals=signals, wave_type='ecg',
-                        sampling_rate=sampling_rate,
-                        start_datetime=start_datetime)
+                        sampling_rate=sampling_rate)
     return out
 
 
@@ -187,7 +188,7 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
 
 
     """
-    signals = signal_sqi.signals
+    signals = signal_sqi.signals.to_numpy()
     sampling_rate = signal_sqi.sampling_rate
     start_datetime = signal_sqi.start_datetime
     assert isinstance(sampling_rate, int) or isinstance(sampling_rate,
@@ -199,7 +200,8 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
             signal_headers = info[1]
             header = info[0]
             annotations = header['annotations']
-            # issue https://github.com/holgern/pyedflib/issues/119
+            # issue https://github.com/holgern/pyedflib/issues/119 - fixed to
+            # be checked
             for i in range(len(annotations)):
                 if isinstance(header['annotations'][i][1], bytes):
                     header['annotations'][i][1] = \
@@ -274,7 +276,6 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
                       skipinitialspace=True,
                       skip_blank_lines=True)
     timestamps = tmp[timestamp_idx[0]]
-    #TODO: Generate timestamps if they are not part of the signal, infer from sampling rate
     if start_datetime is None:
         start_datetime = timestamps[0]
     if isinstance(start_datetime, str):
@@ -307,10 +308,10 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
     signals = signals.set_index('timedelta')
     signals = signals.rename(columns={'index': 'idx'})
 
-    out = SignalSQI(signals = signals, wave_type = 'ppg',
-                    sampling_rate = sampling_rate,
-                    start_datetime = start_datetime,
-                    info = info)
+    out = SignalSQI(signals=signals, wave_type='ppg',
+                    sampling_rate=sampling_rate,
+                    start_datetime=start_datetime,
+                    info=info)
     return out
 
 
