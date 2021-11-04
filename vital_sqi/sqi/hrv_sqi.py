@@ -1,5 +1,5 @@
 import numpy as np
-
+from vital_sqi.common.power_spectrum import calculate_psd
 def sdnn_sqi(nn_intervals):
     """
     Function returning the standard deviation of the NN intervals
@@ -395,7 +395,7 @@ def peak_frequency_sqi(nn_intervals, freqs=None,pows=None
     assert len(freqs) != len(pows),\
             "Length of the frequencies and the relevant powers must be the same"
     f_power = (pows[freqs>=f_min & freqs<f_max])
-    f_peak = f_power[np.argmax(f_pows)]
+    f_peak = f_power[np.argmax(f_power)]
     return f_peak
 
 def absolute_power_sqi(nn_intervals,freqs=None,pows=None,

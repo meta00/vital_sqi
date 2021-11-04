@@ -4,7 +4,10 @@ from scipy.sparse import coo
 from vital_sqi.preprocess.band_filter import BandpassFilter
 from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
-            
+
+from hrvanalysis import get_time_domain_features,get_frequency_domain_features,\
+    get_nn_intervals,get_csi_cvi_features,get_geometrical_features
+
 def compute_SQI(signal, segment_length='30s', primary_peakdet=7, secondary_peakdet=6, wave_type='ppg', sampling_rate=100, template_type=1):
     """
     Run the segment SQI computation using pandas groupby().apply() on the whole dataset.
@@ -39,7 +42,10 @@ def compute_SQI(signal, segment_length='30s', primary_peakdet=7, secondary_peakd
 
     """
     if wave_type == 'ppg':
-        sqis = signal.groupby(pd.Grouper(freq=segment_length)).apply(segment_PPG_SQI_extraction, sampling_rate, primary_peakdet, secondary_peakdet, (1, 1), (20, 4), template_type)
+        # try:
+            sqis = signal.groupby(pd.Grouper(freq=segment_length)).apply(segment_PPG_SQI_extraction, sampling_rate, primary_peakdet, secondary_peakdet, (1, 1), (20, 4), template_type)
+        # except Exception as e:
+        #     return None
     elif wave_type == 'ecg':
         sqis = signal.groupby(pd.Grouper(freq=segment_length)).apply(segment_ECG_SQI_extraction, sampling_rate, primary_peakdet, secondary_peakdet, (1, 1), (20, 4), template_type)
     else:
@@ -99,20 +105,45 @@ def segment_PPG_SQI_extraction(signal_segment, sampling_rate=100, primary_peakde
     #Filtered signal SQI computation
     SQI_dict['zero_cross'] = sq.standard_sqi.zero_crossings_rate_sqi(filtered_segment)
     SQI_dict['msq'] = sq.standard_sqi.msq_sqi(y=filtered_segment, peaks_1=peak_list, peak_detect2=secondary_peakdet)
-    correlogram_list = sq.rpeaks_sqi.correlogram_sqi(filtered_segment)
-    for idx, variations in enumerate(variations_acf):
-        SQI_dict['correlogram'+variations] = correlogram_list[idx]
     #Per beat SQI calculation
     dtw_list = sq.standard_sqi.per_beat_sqi(sqi_func=sq.dtw_sqi, troughs=trough_list, signal=filtered_segment, taper=True, template_type=template_type)
     SQI_dict['dtw_mean'] = np.mean(dtw_list)
     SQI_dict['dtw_std'] = np.std(dtw_list)
+
+    correlogram_list = sq.rpeaks_sqi.correlogram_sqi(filtered_segment)
+    for idx, variations in enumerate(variations_acf):
+        try:
+            SQI_dict['correlogram'+variations] = correlogram_list[idx]
+        except Exception as e:
+            return pd.Series(SQI_dict)
     for funcion in stats_functions:
         SQI_dict[funcion[0]+variations_stats[0]] = funcion[1](filtered_segment)
         statSQI_list = sq.standard_sqi.per_beat_sqi(sqi_func=funcion[1], troughs=trough_list, signal=filtered_segment, taper=True)
         SQI_dict[funcion[0]+variations_stats[1]] = np.mean(statSQI_list)
         SQI_dict[funcion[0]+variations_stats[2]] = np.median(statSQI_list)
         SQI_dict[funcion[0]+variations_stats[3]] = np.std(statSQI_list)
+
+
+    #==================================================
+    #       HRV features
+    #==================================================
+    try:
+        rr_list = np.diff(peak_list) * (1000 / sampling_rate)  # 1000 milisecond
+        nn_list = get_nn_intervals(rr_list)
+        nn_list_non_na = np.copy(nn_list)
+        nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+
+        time_domain_features = get_time_domain_features(rr_list)
+        frequency_domain_features = get_frequency_domain_features(rr_list)
+    except Exception as e:
+        return pd.Series(SQI_dict)
+
     #
+    for key in time_domain_features.keys():
+        SQI_dict[key] = time_domain_features[key]
+    for key in frequency_domain_features.keys():
+        SQI_dict[key] = frequency_domain_features[key]
+
     return pd.Series(SQI_dict)
 
 def segment_ECG_SQI_extraction(signal_segment, sampling_rate=100, primary_peakdet=7, secondary_peakdet=6, hp_cutoff_order=(1, 1), lp_cutoff_order=(20, 4), template_type=1):

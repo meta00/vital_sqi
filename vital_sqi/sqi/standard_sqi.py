@@ -331,4 +331,5 @@ def per_beat_sqi(sqi_func, troughs, signal, taper, **kwargs):
         return sqi_vals
 
     else:
+        return -np.inf
         raise Exception("Not enough peaks in the signal to generate per beat SQI")
