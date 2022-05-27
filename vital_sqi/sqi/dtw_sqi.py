@@ -1,5 +1,14 @@
 import numpy as np
-from dtw import dtw
+import sys
+import os
+if bool(getattr(sys, 'ps1', sys.flags.interactive)):
+    old_stdout = sys.stdout
+    sys.stdout = open(os.devnull, 'w')
+    from dtw import dtw
+    sys.stdout = old_stdout
+else:
+    from dtw import dtw
+
 from vital_sqi.common.generate_template import (
         ppg_absolute_dual_skewness_template,
         ppg_dual_double_frequency_template,
@@ -7,11 +16,21 @@ from vital_sqi.common.generate_template import (
         ecg_dynamic_template
     )
 from vital_sqi.common.utils import check_valid_signal
+from scipy.spatial.distance import euclidean
+
+def compute_dtw_distance(input_sequence, template_sequence):
+    dtw_distances = np.ones((len(input_sequence),len(template_sequence))) * np.inf
+    #first matching sample is set to zero
+    dtw_distances[0,0] = 0
+    for i in range(len(input_sequence)):
+        for j in range(len(template_sequence)):
+            cost = euclidean(input_sequence[i],template_sequence[j])
+            # dtw_distances
+
 
 
 def dtw_sqi(x, template_type=0):
-    """
-    Using DTW to get the mapping point distance between a signal and its
+    """Using DTW to get the mapping point distance between a signal and its
     template. The DTW SQI is the ratio of the distance sum to
     the trace of cost matrix. The closer to 1 the better SQI.
 
@@ -29,8 +48,6 @@ def dtw_sqi(x, template_type=0):
 
     Returns
     -------
-    type
-        float, the matching score with the chosen template
 
     """
     check_valid_signal(x)
@@ -54,8 +71,7 @@ def dtw_sqi(x, template_type=0):
                 )
     trace = alignmentOBE.costMatrix.trace()
     if trace == 0:
-        ratio = float(1)
+        ratio = float(np.log(1))
     else:
-        ratio = float(np.sum(match_distance)/trace)
-
+        ratio = float(np.log(np.sum(match_distance)/trace))
     return ratio

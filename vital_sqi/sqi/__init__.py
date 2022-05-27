@@ -1,6 +1,6 @@
 """
 vital_sqi.sqi
-========
+==============
 A subpackage for signal quality index calculation, including:
 	- Standard: Statistical domain and xx
 	- Dynamic template maching based
@@ -19,4 +19,7 @@ from vital_sqi.sqi.standard_sqi import (
 	signal_to_noise_sqi,
 	zero_crossings_rate_sqi,
 	mean_crossing_rate_sqi
+	)
+from vital_sqi.sqi.rpeaks_sqi import (
+	correlogram_sqi
 	)

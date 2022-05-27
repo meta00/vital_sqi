@@ -57,9 +57,9 @@ def save_each_segment(filename,segment_list,save_file_folder,
             warnings.warn(e)
         i=i+1
 
-def split_to_subsegments(signal_data,filename=None,sampling_rate=100.0,
+def split_to_segments(signal_data,filename=None,sampling_rate=100.0,
                          segment_length_second=30.0,minute_remove=5.0,
-                         signal_type="ecg",split_type="time",
+                         wave_type="ecg",split_type="time",
                          is_trim=False,save_file_folder=None,
                          save_image=False,save_img_folder=None,display_trough_peak=True):
     """
@@ -77,7 +77,7 @@ def split_to_subsegments(signal_data,filename=None,sampling_rate=100.0,
         filename = 'segment'
     if save_file_folder == None:
         save_file_folder = '.'
-    save_file_folder = os.path.join(save_file_folder, signal_type)
+    save_file_folder = os.path.join(save_file_folder, wave_type)
     if not os.path.exists(save_file_folder):
         os.makedirs(save_file_folder)
 
@@ -107,6 +107,13 @@ def split_to_subsegments(signal_data,filename=None,sampling_rate=100.0,
     save_each_segment(filename, np.array(segments),save_file_folder,
                       save_image,save_img_folder,display_trough_peak)
 
+def generate_segment_idx(segment_length, sampling_rate, signal_array):
+    segments = []
+    for channel in signal_array:
+        segments.append(np.arange(0,len(channel),segment_length*sampling_rate))
+    return np.asarray(segments)
+
+
 
 def get_split_time_index(segment_seconds,sequence):
     """
@@ -124,7 +131,8 @@ def get_split_rr_index(segment_seconds,sequence):
     """
     handy
     Return the index of the splitting points
-    :param segment_seconds: the length of each cut split (in seconds)
+    :param segmen
+    t_seconds: the length of each cut split (in seconds)
     :param sequence:
     :return:
     """

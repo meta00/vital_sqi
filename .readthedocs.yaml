@@ -1,0 +1,15 @@
+# Required
+version: 2
+
+# Build documentation.
+sphinx:
+  configuration: docs/source/conf.py
+
+# Optionally set the version of Python
+python:
+  version: 3.7
+  install:
+    - requirements: ./docs/requirements.txt
+    - requirements: ./requirements.txt
+    - method: pip
+      path: .

@@ -1,0 +1,28 @@
+{
+"sqi1": {
+  "name": "sqi1",
+  "def": [
+      {"op": ">=", "value": "10", "label": "reject"},
+      {"op": ">=", "value": "3", "label": "accept"},
+      {"op": "<", "value": "3", "label": "reject"}],
+  "desc": "",
+  "ref": ""
+  },
+"sqi2": {
+   "name": "sqi2",
+   "def": [
+      {"op": ">", "value": "0", "label": "accept"},
+      {"op": "<=", "value": "0", "label": "reject"}],
+   "desc": "",
+   "ref": ""
+  },
+"sqi3": {
+   "name": "sqi3",
+   "def": [
+      {"op": "=", "value": "0", "label": "accept"},
+      {"op": ">", "value": "0", "label": "reject"},
+      {"op": "<", "value": "0", "label": "reject"}],
+   "desc": "",
+   "ref": ""
+  }
+}

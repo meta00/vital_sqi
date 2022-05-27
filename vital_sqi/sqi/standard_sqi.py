@@ -2,6 +2,8 @@
 
 import numpy as np
 from scipy.stats import kurtosis, skew, entropy
+from vital_sqi.common.rpeak_detection import PeakDetector
+import vital_sqi.preprocess.preprocess_signal as sqi_pre
 
 """
 Most of the sqi scores are obtained from the following paper Elgendi,
@@ -31,7 +33,7 @@ def perfusion_sqi(x, y):
     -------
 
     """
-    return (np.max(y)-np.min(y))/np.abs(x)*100
+    return (np.max(y)-np.min(y))/np.abs(np.mean(x))*100
 
 
 def kurtosis_sqi(x, axis=0, fisher=True, bias=True,
@@ -42,7 +44,7 @@ def kurtosis_sqi(x, axis=0, fisher=True, bias=True,
     high kurtosis tend to have heavy tails, or outliers.
     Data sets with low kurtosis tend to have light tails, or lack of outliers.
     A uniform distribution would be the extreme case.
-    
+
     Kurtosis is a statistical measure used to describe the distribution of
     observed data around the mean. It represents a heavy tail and peakedness
     or a light tail and flatness of a distribution relative to the normal
@@ -65,7 +67,7 @@ def kurtosis_sqi(x, axis=0, fisher=True, bias=True,
     -------
 
     """
-    
+
     return kurtosis(x, axis, fisher, bias, nan_policy)
 
 
@@ -74,7 +76,7 @@ def skewness_sqi(x, axis=0, bias=True, nan_policy='propagate'):
     Skewness is a measure of symmetry, or more precisely, the lack of
     symmetry. A distribution, or data set, is symmetric if it looks the same
     to the left and right of the center point.
-    
+
     Skewness is a measure of the symmetry (or the lack of it) of a
     probability distribution, which is defined as:
     SSQI=1/N∑i=1N[xi−μˆx/σ]3
@@ -110,7 +112,8 @@ def entropy_sqi(x, qk=None, base=None, axis=0):
     x :
         list the input signal
     qk :
-        list, array against which the relative entropy is computed (Default value = None)
+        list, array against which the relative entropy
+        is computed (Default value = None)
     base :
         float, (Default value = None)
     axis :
@@ -163,7 +166,8 @@ def zero_crossings_rate_sqi(y, threshold=1e-10, ref_magnitude=None,
         -threshold <= y <= threshold are clipped to 0.
     ref_magnitude :
         float >0 If numeric, the threshold is scaled
-        relative to ref_magnitude. If callable, the threshold is scaled relative
+        relative to ref_magnitude.
+        If callable, the threshold is scaled relative
         to ref_magnitude(np.abs(y)). (Default value = None)
     pad :
         boolean, if True, then y[0] is considered a valid
@@ -248,3 +252,84 @@ def mean_crossing_rate_sqi(y, threshold=1e-10, ref_magnitude=None,
     """
     return zero_crossings_rate_sqi(y-np.mean(y), threshold, ref_magnitude,
                                    pad, zero_pos, axis)
+
+
+def msq_sqi(y, peaks_1, peak_detect2=6):
+    """
+    MSQ SQI as defined in Elgendi et al
+    "Optimal Signal Quality Index for Photoplethysmogram Signals"
+    with modification of the second algorithm used.
+    Instead of Bing's, a SciPy built-in implementation is used.
+    The SQI tracks the agreement between two peak detectors
+    to evaluate quality of the signal.
+
+    Parameters
+    ----------
+    x : sequence
+        A signal with peaks.
+
+    peaks_1 : array of int  
+        Already computed peaks arry from the primary peak_detector
+
+    peak_detect2 : int
+        Type of the second peak detection algorithm, default = Scipy
+
+    Returns
+    -------
+    msq_sqi : number
+        MSQ SQI value for the given signal
+
+    """
+    detector = PeakDetector(wave_type='ppg')
+    peaks_2,_ = detector.ppg_detector(y, detector_type=peak_detect2, preprocess=False)
+    if len(peaks_1)==0 or len(peaks_2)==0:
+        return 0.0
+    peak1_dom = len(np.intersect1d(peaks_1,peaks_2))/len(peaks_1)
+    peak2_dom = len(np.intersect1d(peaks_2,peaks_1))/len(peaks_2)
+    return min(peak1_dom, peak2_dom)
+
+def per_beat_sqi(sqi_func, troughs, signal, taper, **kwargs):
+    """
+    Perform a per-beat application of the selected SQI function on the signal segment
+
+    Parameters
+    ----------
+    sqi_func : function 
+        An SQI function to be performed.
+
+    troughs : array of int  
+        Idices of troughs in the signal provided by peak detector to be able to extract individual beats
+
+    signal : 
+        Signal array containing one segment of the waveform
+
+    taper : bool
+        Is each beat need to be tapered or not before executing the SQI function
+
+    **kwargs : dict
+        Additional positional arguments that needs to be fed into the SQI function
+
+    Returns
+    -------
+    calculated_SQI : array
+        An array with SQI values for each beat of the signal
+
+    """
+    #Remove first and last trough as they might be on the edge
+    troughs = troughs[1:-1]
+    if len(troughs) > 2:
+        sqi_vals = []
+        for idx, beat_start in enumerate(troughs[:-1]):
+            single_beat = signal[beat_start:troughs[idx+1]]
+            if taper:
+                single_beat = sqi_pre.tapering(single_beat)
+            if len(kwargs) != 0:
+                args = tuple(kwargs.values()) 
+                sqi_vals.append(sqi_func(single_beat, *args))
+            else:
+                sqi_vals.append(sqi_func(single_beat))
+        return sqi_vals
+
+    else:
+        return -np.inf
+        raise Exception("Not enough peaks in the signal to generate per beat SQI")
