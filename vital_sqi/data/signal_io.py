@@ -344,13 +344,13 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
         out_df.to_excel(file_name, index=False, header=True)
     return os.path.isfile(file_name)
 
-# import os, tempfile
-# file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/test_data/example.edf')
-# out = ECG_reader(file_in, 'edf')
-# file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/test_data/out.edf')
-# out1 = ECG_reader(file_in, 'edf')
+import os, tempfile
+file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
+                          '/vital_sqi/tests/test_data/example.edf')
+out = ECG_reader(file_in, 'edf')
+file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
+                          '/vital_sqi/tests/test_data/out.edf')
+out1 = ECG_reader(file_in, 'edf')
 # file_out = '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/out.edf'
 # out.sampling_rate = 15.8
 # out.info[0]['annotations'][0][1] = float(str(out.info[0]['annotations'][0][

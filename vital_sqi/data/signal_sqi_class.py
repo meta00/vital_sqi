@@ -18,7 +18,7 @@ class SignalSQI:
                  signals=None,
                  sampling_rate=None,
                  # start_datetime=None,
-                 # info=None,
+                 info=None,
                  # segments=None,
                  sqis=None,
                  rules=None,
@@ -35,17 +35,16 @@ class SignalSQI:
         self.isSplit = False
         self.isFiltered = False
         self.SQIComputed = False
-        self.unfilteredsignal = None
+        # self.unfilteredsignal = None
 
     def __setattr__(self, name, value):
         if name == 'wave_type':
             assert value == 'ecg' or value == 'ppg', \
                 'Expected either ecg or ppg.'
         if name == 'signals':
-            assert isinstance(value, np.ndarray) or \
-                   isinstance(value, pd.DataFrame), 'Expected signals to be ' \
-                                                  'numpy array, with one ' \
-                                                  'channel per column.'
+            assert isinstance(value, pd.DataFrame), 'Expected signals as a' \
+                                                    'dataframe with ' \
+                                                    'one channel per column.'
         if name == 'sampling_rate':
             assert np.isreal(value), 'Expected a numeric value. Sampling ' \
                                      'rate is round up to the nearest integer.'
@@ -55,15 +54,14 @@ class SignalSQI:
         #            isinstance(value, dt.date) or value is None, \
         #         'Expected str or datetime object, or None'
         if name == 'sqis':
-            assert isinstance(value, np.ndarray) or \
-                   isinstance(value, pd.DataFrame) or value is None, \
-                'Expected SQI table as array or data frame or None'
+            assert isinstance(value, pd.DataFrame) or value is None, \
+                'Expected SQI table as a dataframe or None'
         if name == 'rules':
             assert isinstance(value, list) or \
-                   value is None, 'Expected a list of Rule objects.'
+                   value is None, 'Expected rules as a list of Rule objects.'
         if name == 'ruleset':
             assert isinstance(value, dict) or \
-                   value is None, 'Expected an object of RuleSet'
+                   value is None, 'Expected ruleset as a RuleSet object'
         super().__setattr__(name, value)
         return
 
