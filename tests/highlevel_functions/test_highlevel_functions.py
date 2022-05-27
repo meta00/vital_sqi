@@ -1,10 +1,7 @@
 import pytest
 import os
-import numpy as np
 from vital_sqi.data.signal_io import PPG_reader
-from vital_sqi.highlevel_functions.highlevel import \
-    compute_SQI,compute_multiple_SQIs,get_clean_signals,\
-    get_cutpoints,basic_ecg_pipeline,basic_ppg_pipeline,segment_PPG_SQI_extraction
+
 
 class TestSignalPreProcess(object):
     def test_on_signal_preprocess(self):
