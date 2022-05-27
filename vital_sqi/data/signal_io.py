@@ -85,7 +85,7 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
         signals = pd.DataFrame(signals.transpose())
         timestamps = generate_timestamp(start_datetime, sampling_rate,
                                         len(signals))
-        signals["timestamps"] = timestamps
+        signals.insert(0, 'timestamps', timestamps)
         info = [header, signal_headers]
         out = SignalSQI(signals=signals,
                         wave_type='ecg',
@@ -310,7 +310,6 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
 
     out = SignalSQI(signals=signals, wave_type='ppg',
                     sampling_rate=sampling_rate,
-                    start_datetime=start_datetime,
                     info=info)
     return out
 
