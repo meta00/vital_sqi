@@ -22,13 +22,13 @@ class TestECGReader(object):
 
     def test_on_float_sampling_rate(self):
         file_name = os.path.abspath('tests/test_data/example.edf')
-        out = ECG_reader(file_name, 'edf', sampling_rate = 120.8)
+        out = ECG_reader(file_name, 'edf', sampling_rate=120.8)
         assert out.sampling_rate == 121
 
     def test_on_start_datetime(self):
         file_name = os.path.abspath('tests/test_data/example.edf')
-        out = ECG_reader(file_name, 'edf', sampling_rate = 120.8,
-                         start_datetime = '2020/12/12 10:10:00')
+        out = ECG_reader(file_name, 'edf', sampling_rate=120.8,
+                         start_datetime='2020/12/12 10:10:00')
         assert isinstance(out.start_datetime, dt.datetime) is True
 
     def test_on_KeyError(self):
@@ -42,17 +42,17 @@ class TestECGReader(object):
     def test_on_valid_csv(self):
         file_name = os.path.abspath('tests/test_data/ecg_test1.csv')
         assert isinstance(ECG_reader(file_name, 'csv',
-                                     channel_name = ['Time', '1']), SignalSQI)
+                                     channel_name=['Time', '1']), SignalSQI)
         assert isinstance(ECG_reader(file_name, 'csv',
-                                     channel_num = [0, 1]), SignalSQI)
+                                     channel_num=[0, 1]), SignalSQI)
 
     def test_on_csv_infer_sampling_rate(self):
         file_name = os.path.abspath('tests/test_data/ecg_test_w.csv')
-        out = ECG_reader(file_name, 'csv', channel_name = ['Time', '1'])
+        out = ECG_reader(file_name, 'csv', channel_name=['Time', '1'])
         assert out.sampling_rate == 256
         file_name = os.path.abspath('tests/test_data/ecg_test2.csv')
         with pytest.raises(Exception) as exc_info:
-            out = ECG_reader(file_name, 'csv', channel_name = ['Time', '1'])
+            out = ECG_reader(file_name, 'csv', channel_name=['Time', '1'])
         assert exc_info.match("Sampling rate not found nor inferred")
 
 
@@ -79,7 +79,7 @@ class TestECGWriter(object):
 
     def test_on_valid_csv(self):
         file_in = os.path.abspath('tests/test_data/ecg_test1.csv')
-        out = ECG_reader(file_in, 'csv', channel_name = ['Time', '1'])
+        out = ECG_reader(file_in, 'csv', channel_name=['Time', '1'])
         file_out = tempfile.gettempdir() + '/ecg_test_write.csv'
         assert ECG_writer(out, file_out, 'csv') is True
 
@@ -95,9 +95,9 @@ class TestPPGReader(object):
                           sampling_rate=100,
                           start_datetime='2020/12/30 10:00:00'), SignalSQI) is\
                True
-        assert isinstance(PPG_reader(file_name, signal_idx = ['PLETH'],
-                                     timestamp_idx = ['TIMESTAMP_MS'],
-                                     info_idx = ['PULSE_BPM', 'SPO2_PCT',
+        assert isinstance(PPG_reader(file_name, signal_idx=['PLETH'],
+                                     timestamp_idx=['TIMESTAMP_MS'],
+                                     info_idx=['PULSE_BPM', 'SPO2_PCT',
                                                  'PERFUSION_INDEX']),
                           SignalSQI) is \
                True
@@ -125,12 +125,12 @@ class TestPPGWriter(object):
 
     def test_on_valid_ppg(self):
         file_in = os.path.abspath('tests/test_data/ppg_smartcare.csv')
-        out = PPG_reader(file_in, signal_idx = ['PLETH'],
-                                     timestamp_idx = ['TIMESTAMP_MS'],
-                                     info_idx = ['PULSE_BPM', 'SPO2_PCT',
+        out = PPG_reader(file_in, signal_idx=['PLETH'],
+                                     timestamp_idx=['TIMESTAMP_MS'],
+                                     info_idx=['PULSE_BPM', 'SPO2_PCT',
                                                  'PERFUSION_INDEX'],
-                                     sampling_rate = 100,
-                                     start_datetime = '2020/12/30 10:00:00')
+                                     sampling_rate=100,
+                                     start_datetime='2020/12/30 10:00:00')
         file_out = tempfile.gettempdir() + '/ppg_test_write.csv'
         assert PPG_writer(out, file_out, 'csv') is True
         file_out = tempfile.gettempdir() + '/ppg_test_write.xlsx'

@@ -96,14 +96,17 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
     -------
     list : list of timestamps with length equal to signal_length.
     """
-    number_of_seconds = (signal_length - 1) / sampling_rate
+    number_of_seconds = signal_length / sampling_rate
     if start_datetime is None:
         start_datetime = dt.datetime.now()
-    end_datetime = start_datetime + dt.timedelta(seconds=number_of_seconds)
-    time_range = DateTimeRange(start_datetime, end_datetime)
     timestamps = []
-    for value in time_range.range(dt.timedelta(seconds=1 / sampling_rate)):
-        timestamps.append(value)
+    timestamps.append(dt.datetime.timestamp(start_datetime))
+    # end_datetime = start_datetime + dt.timedelta(seconds=number_of_seconds)
+    # time_range = DateTimeRange(start_datetime, end_datetime)
+    # timestamps = []
+    # for value in time_range.range(dt.timedelta(seconds=1 / sampling_rate)):
+    for value in range(1, signal_length):
+            timestamps.append(timestamps[value-1] + 1 / sampling_rate)
     return timestamps
 
 

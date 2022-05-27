@@ -107,6 +107,7 @@ def split_to_segments(signal_data,filename=None,sampling_rate=100.0,
     save_each_segment(filename, np.array(segments),save_file_folder,
                       save_image,save_img_folder,display_trough_peak)
 
+
 def generate_segment_idx(segment_length, sampling_rate, signal_array):
     segments = []
     for channel in signal_array:
@@ -114,8 +115,7 @@ def generate_segment_idx(segment_length, sampling_rate, signal_array):
     return np.asarray(segments)
 
 
-
-def get_split_time_index(segment_seconds,sequence):
+def get_split_time_index(segment_seconds, sequence):
     """
     handy
     Return the index of splitting points
@@ -127,12 +127,12 @@ def get_split_time_index(segment_seconds,sequence):
                for i in range(0, int(np.ceil(len(sequence) / segment_seconds)))]
     return indices
 
+
 def get_split_rr_index(segment_seconds,sequence):
     """
     handy
     Return the index of the splitting points
-    :param segmen
-    t_seconds: the length of each cut split (in seconds)
+    :param segment_seconds: the length of each cut split (in seconds)
     :param sequence:
     :return:
     """

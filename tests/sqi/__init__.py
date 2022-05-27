@@ -21,3 +21,4 @@ from vital_sqi.sqi.standard_sqi import (
 	mean_crossing_rate_sqi,
 	msq_sqi
 	)
+from vital_sqi.sqi.waveform_sqi import *
