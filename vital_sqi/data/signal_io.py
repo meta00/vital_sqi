@@ -333,8 +333,8 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
     timestamps = utils.generate_timestamp(
         start_datetime=signal_sqi.start_datetime,
         sampling_rate=signal_sqi.sampling_rate,
-        signal_length=len(signal_sqi.signals[0]))
-    signals = signal_sqi.signals[0]
+        signal_length=len(signal_sqi.signals))
+    signals = signal_sqi.signals.values
     timestamps = np.array(timestamps)
     out_df = pd.DataFrame({'time': timestamps, 'pleth': signals})
     if file_type == 'csv':

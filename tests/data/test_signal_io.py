@@ -124,7 +124,7 @@ class TestPPGReader(object):
 class TestPPGWriter(object):
 
     def test_on_valid_ppg(self):
-        file_in = os.path.abspath('tests/test_data/ppg_smartcare.csv')
+        file_in = os.path.abspath('../../tests/test_data/ppg_smartcare.csv')
         out = PPG_reader(file_in, signal_idx = ['PLETH'],
                                      timestamp_idx = ['TIMESTAMP_MS'],
                                      info_idx = ['PULSE_BPM', 'SPO2_PCT',
