@@ -334,7 +334,7 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
         start_datetime=signal_sqi.start_datetime,
         sampling_rate=signal_sqi.sampling_rate,
         signal_length=len(signal_sqi.signals))
-    signals = signal_sqi.signals.values
+    signals = signal_sqi.signals.iloc[:,1]
     timestamps = np.array(timestamps)
     out_df = pd.DataFrame({'time': timestamps, 'pleth': signals})
     if file_type == 'csv':
@@ -362,14 +362,12 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
 # file_out = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/out_mit')
 # ECG_writer(out, file_out, file_type='mit', info=out.info)
-# out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
-#             '/test_data/ppg_smartcare.csv', timestamp_idx = [
-#     'TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
-#                                                          'SPO2_PCT','PERFUSION_INDEX'],
-#                  start_datetime = '2020-04-12 10:00:00')
-# out.sampling_rate = 2
-# PPG_writer(out, '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests'
-#             '/test_data/ppg_smartcare_w.csv')
+#out = PPG_reader('D:/Workspace/oucru/medical_signal/Github/vital_sqi/vital_sqi/dataset/ppg_smartcare.csv',
+#                 timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
+#                                                         'SPO2_PCT','PERFUSION_INDEX'],
+#                 start_datetime = '2020-04-12 10:00:00')
+#out.sampling_rate = 2
+#PPG_writer(out, 'D:/Workspace/oucru/medical_signal/Github/vital_sqi/vital_sqi/dataset/ppg_smartcare_w.csv')
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/ecg_test2.csv')
 # out = ECG_reader(file_in, 'csv', channel_name = ['Time', '1'])
