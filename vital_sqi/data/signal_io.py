@@ -276,8 +276,6 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
                       skipinitialspace=True,
                       skip_blank_lines=True)
     timestamps = tmp[timestamp_idx[0]]
-    if start_datetime is None:
-        start_datetime = timestamps[0]
     if isinstance(start_datetime, str):
         try:
             start_datetime = dt.datetime.strptime(start_datetime, '%Y-%m-%d '
@@ -287,27 +285,24 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
             pass
     else:
         start_datetime = None
-    if sampling_rate is None:
-        if timestamp_unit is None:
-            raise Exception("Missing sampling_rate, not able to infer "
-                            "sampling_rate without timestamp_unit")
-        elif timestamp_unit == 'ms':
-            timestamps = timestamps / 1000
-        elif timestamp_unit != 's':
-            raise Exception("Timestamp unit must be either second (s) or "
+    if start_datetime is None:
+        start_datetime = dt.datetime.now()
+    start_datetime = dt.datetime.timestamp(start_datetime)
+    if timestamp_unit is None:
+        raise Exception("Missing sampling_rate, not able to infer "
+                        "sampling_rate without timestamp_unit")
+    elif timestamp_unit == 'ms':
+        timestamps = timestamps / 1000
+    elif timestamp_unit != 's':
+        raise Exception("Timestamp unit must be either second (s) or "
                             "millisecond (ms)")
-        sampling_rate = utils.calculate_sampling_rate(timestamps.to_numpy())
+    timestamps = start_datetime + timestamps
+    if sampling_rate is None:
+        sampling_rate = utils.calculate_sampling_rate(timestamps)
     
     info = tmp[info_idx].to_dict('list')
-    #Add index column
     signals = tmp[signal_idx]
-    signals = signals.reset_index()
-    #Transform timestamps
-    signals['timedelta'] = pd.to_timedelta(signals.index / sampling_rate, unit='s')
-    #signals['idx'] = signals.index
-    signals = signals.set_index('timedelta')
-    signals = signals.rename(columns={'index': 'idx'})
-
+    signals.insert(0, 'timestamps', timestamps)
     out = SignalSQI(signals=signals, wave_type='ppg',
                     sampling_rate=sampling_rate,
                     info=info)
@@ -343,7 +338,7 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
         out_df.to_excel(file_name, index=False, header=True)
     return os.path.isfile(file_name)
 
-# import os, tempfile
+import os, tempfile
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/example.edf')
 # out = ECG_reader(file_in, 'edf')
@@ -362,11 +357,11 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
 # file_out = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/out_mit')
 # ECG_writer(out, file_out, file_type='mit', info=out.info)
-#out = PPG_reader('D:/Workspace/oucru/medical_signal/Github/vital_sqi/vital_sqi/dataset/ppg_smartcare.csv',
+# out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/ppg_smartcare.csv',
 #                 timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
 #                                                         'SPO2_PCT','PERFUSION_INDEX'],
-#                 start_datetime = '2020-04-12 10:00:00')
-#out.sampling_rate = 2
+# start_datetime = '2020-04-12 10:00:00')
+# out.sampling_rate = 2
 #PPG_writer(out, 'D:/Workspace/oucru/medical_signal/Github/vital_sqi/vital_sqi/dataset/ppg_smartcare_w.csv')
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/ecg_test2.csv')
