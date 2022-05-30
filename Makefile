@@ -16,7 +16,7 @@ help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 build: ## install package with editable option
-	pip install -e .
+	pip install --use-feature=2020-resolver -e .
 
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
