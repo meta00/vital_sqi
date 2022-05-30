@@ -17,7 +17,7 @@ class SignalSQI:
     def __init__(self, wave_type=None,
                  signals=None,
                  sampling_rate=None,
-                 # start_datetime=None,
+                 start_datetime=None,
                  info=None,
                  # segments=None,
                  sqis=None,
@@ -25,7 +25,7 @@ class SignalSQI:
                  ruleset=None):
         self.signals = signals
         self.sampling_rate = sampling_rate
-        # self.start_datetime = start_datetime
+        self.start_datetime = start_datetime
         self.wave_type = wave_type
         self.info = info
         self.sqis = sqis
@@ -133,20 +133,20 @@ class SignalSQI:
         self.sampling_rate = sampling_rate
         return self
 
-    # def update_start_datetime(self, start_datetime):
-    #     """
-    #
-    #     Parameters
-    #     ----------
-    #     start_datetime : datetime
-    #     start date and
-    #
-    #     Returns
-    #     -------
-    #     object of si
-    #     """
-    #     self.start_datetime = start_datetime
-    #     return self
+    def update_start_datetime(self, start_datetime):
+        """
+
+        Parameters
+        ----------
+        start_datetime : datetime
+        start date and
+
+        Returns
+        -------
+        object of si
+        """
+        self.start_datetime = start_datetime
+        return self
     #
     # def update_segment_indices(self, segments):
     #     """
