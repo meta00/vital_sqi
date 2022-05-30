@@ -83,8 +83,9 @@ ppg_sample_idx = int(len(ppg_data.signals)/2)
 #%%
 
 ppg_sample_complex_for_tapering = \
-    ppg_data.signals[0][ppg_sample_idx+185:ppg_sample_idx+225]
-ppg_sample_complex = ppg_data.signals[0][ppg_sample_idx+195:ppg_sample_idx+267]
+    ppg_data.signals.iloc[:, 1][ppg_sample_idx+185:ppg_sample_idx+225]
+ppg_sample_complex = ppg_data.signals.iloc[:, 1][
+                     ppg_sample_idx+195:ppg_sample_idx+267]
 
 #%% md
 

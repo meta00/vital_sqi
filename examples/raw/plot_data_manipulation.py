@@ -105,7 +105,8 @@ save_file_name = "example_file"
 save_file_folder = "subsegments_time"
 if not os.path.exists(save_file_folder):
     os.makedirs(save_file_folder)
-split_to_segments(ppg_data.signals[0],filename=None,
+split_to_segments(ppg_data.signals.iloc[:, 1],
+                  filename=None,
                   sampling_rate=100,
                   segment_length_second=10.0,
                   wave_type=ppg_data.wave_type,
@@ -191,7 +192,7 @@ plt.show()
 
 save_file_name = "example_file"
 save_file_folder = "subsegments_frequency"
-split_to_segments(ppg_data.signals[0],
+split_to_segments(ppg_data.signals.iloc[:, 0],
                   filename=None,
                   sampling_rate=256,
                   segment_length_second=10.0,
@@ -268,7 +269,7 @@ plt.show()
 
 #%%
 
-trimmed_data_ppg = trim_data(ppg_data.signals[0], minute_remove=1)
+trimmed_data_ppg = trim_data(ppg_data.signals.iloc[:, 1], minute_remove=1)
 
 #%%
 
@@ -285,8 +286,8 @@ trimmed_data_ppg = trim_data(ppg_data.signals[0], minute_remove=1)
 # fig.show()
 
 fig = plt.Figure()
-plt.plot(np.arange(len(ppg_data.signals[0])),
-         ppg_data.signals[0])
+plt.plot(np.arange(len(ppg_data.signals.iloc[:, 1])),
+         ppg_data.signals.iloc[:, 1])
 plt.show()
 plt.plot(np.arange(len(trimmed_data_ppg)),
          trimmed_data_ppg,
@@ -436,7 +437,7 @@ out = PPG_reader(os.path.join(os.getcwd(),'../../', 'tests/test_data/ppg_smartca
 #%%
 
 start_list, end_list = \
-    cut_by_frequency_partition(ppg_data.signals[0],
+    cut_by_frequency_partition(ppg_data.signals.iloc[:, 1],
                               window_size=30000,
                               peak_threshold_ratio=2,
                               lower_bound_threshold=2)
@@ -450,8 +451,8 @@ start_list, end_list = \
 #                              name='trimmed data'))
 # fig.show()
 fig = plt.Figure()
-plt.plot(np.arange(len(ppg_data.signals[0])),
-         ppg_data.signals[0])
+plt.plot(np.arange(len(ppg_data.signals.iloc[:, 1])),
+         ppg_data.signals.iloc[:, 1])
 plt.show()
 
 # .. note gives an error
