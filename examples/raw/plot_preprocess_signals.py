@@ -17,10 +17,8 @@ import os
 
 #%%
 
-# file_name = "example_edf.edf"
-# file_name = "../../tests/test_data/example.edf"
-# ecg_data = ECG_reader(file_name,'edf')
-from vital_sqi.dataset import load_ecg,load_ppg
+
+from vital_sqi.dataset import load_ecg, load_ppg
 ecg_data = load_ecg()
 #%%
 
@@ -44,7 +42,7 @@ all_channels = ecg_data.signals
 
 #%%
 
-channel_1 = all_channels[:,0]
+channel_1 = all_channels.iloc[:, 1]
 ecg_sample_idx = int(len(all_channels)/2)
 
 #%%
@@ -66,17 +64,12 @@ import numpy as np
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_complex))
+                         y=ecg_sample_complex))
 #fig.show()
 fig
 
 #%%
 
-# file_name = "ppg_smartcare.csv"
-# ppg_data = PPG_reader(os.path.join("../../tests/test_data",file_name),
-#                       signal_idx=['PLETH'],
-#                       timestamp_idx= ['TIMESTAMP_MS'],
-#                       info_idx=['SPO2_PCT','PULSE_BPM','PERFUSION_INDEX'])
 ppg_data = load_ppg()
 
 #%%
