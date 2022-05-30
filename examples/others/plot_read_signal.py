@@ -23,7 +23,7 @@ from scipy.stats import kurtosis
 
 # vitalSQI
 from vital_sqi.data.signal_io import ECG_reader
-from vital_sqi.dataset import load_ppg,load_ecg
+from vital_sqi.dataset import load_ppg, load_ecg
 
 # ----------------------------
 # Load data
