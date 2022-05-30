@@ -16,21 +16,13 @@ from vital_sqi.data.signal_io import ECG_reader,PPG_reader
 from vital_sqi.dataset import load_ppg,load_ecg
 import os
 
-# file_name = "example.edf"
-# ecg_data = ECG_reader(os.path.join("../../tests/test_data",file_name),'edf')
 ecg_data = load_ecg()
-
-# file_name = "ppg_smartcare.csv"
-# ppg_data = PPG_reader(os.path.join("../../tests/test_data",file_name),
-#                       signal_idx=['PLETH'],
-#                       timestamp_idx= ['TIMESTAMP_MS'],
-#                       info_idx=['SPO2_PCT','PULSE_BPM','PERFUSION_INDEX'])
 ppg_data = load_ppg()
 
 #%%
 
 all_channels = ecg_data.signals
-channel_1 = all_channels[:,0]
+channel_1 = all_channels.iloc[:, 1]
 
 #%% md
 
@@ -58,12 +50,13 @@ from vital_sqi.data.segment_split import split_to_segments
 
 save_file_name = "example_file"
 save_file_folder = "subsegments_time"
-split_to_segments(channel_1,filename=None,
-                     sampling_rate=256,
-                     segment_length_second=10.0,
-                     wave_type=ecg_data.wave_type,
-                     split_type="time",
-                     save_file_folder=save_file_folder)
+split_to_segments(channel_1,
+                  filename=None,
+                  sampling_rate=256,
+                  segment_length_second=10.0,
+                  wave_type=ecg_data.wave_type,
+                  split_type="time",
+                  save_file_folder=save_file_folder)
 
 #%% md
 
@@ -113,20 +106,20 @@ save_file_folder = "subsegments_time"
 if not os.path.exists(save_file_folder):
     os.makedirs(save_file_folder)
 split_to_segments(ppg_data.signals[0],filename=None,
-                     sampling_rate=100,
-                     segment_length_second=10.0,
-                     wave_type=ppg_data.wave_type,
-                     split_type="time",
-                     save_file_folder=save_file_folder)
+                  sampling_rate=100,
+                  segment_length_second=10.0,
+                  wave_type=ppg_data.wave_type,
+                  split_type="time",
+                  save_file_folder=save_file_folder)
 
 #%%
-ppg_folder = os.path.join(save_file_folder,"ppg")
+ppg_folder = os.path.join(save_file_folder, "ppg")
 file_list = os.listdir(ppg_folder)
 print(file_list)
 
 #%%
-segment_1 = np.loadtxt(os.path.join(ppg_folder,file_list[0]))
-segment_2 = np.loadtxt(os.path.join(ppg_folder,file_list[0]))
+segment_1 = np.loadtxt(os.path.join(ppg_folder, file_list[0]))
+segment_2 = np.loadtxt(os.path.join(ppg_folder, file_list[0]))
 
 #%%
 
@@ -158,11 +151,12 @@ plt.show()
 
 save_file_name = "example_file"
 save_file_folder = "subsegments_frequency"
-split_to_segments(channel_1,filename=None,
-                     sampling_rate=256,
-                     segment_length_second=10.0,
-                     split_type="peak_interval",
-                     save_file_folder=save_file_folder)
+split_to_segments(channel_1,
+                  filename=None,
+                  sampling_rate=256,
+                  segment_length_second=10.0,
+                  split_type="peak_interval",
+                  save_file_folder=save_file_folder)
 
 #%%
 
@@ -197,12 +191,13 @@ plt.show()
 
 save_file_name = "example_file"
 save_file_folder = "subsegments_frequency"
-split_to_segments(ppg_data.signals[0],filename=None,
-                     sampling_rate=256,
-                     segment_length_second=10.0,
-                     wave_type=ppg_data.wave_type,
-                     split_type="peak_interval",
-                     save_file_folder=save_file_folder)
+split_to_segments(ppg_data.signals[0],
+                  filename=None,
+                  sampling_rate=256,
+                  segment_length_second=10.0,
+                  wave_type=ppg_data.wave_type,
+                  split_type="peak_interval",
+                  save_file_folder=save_file_folder)
 
 #%%
 
@@ -264,7 +259,7 @@ plt.plot(np.arange(len(channel_1)),
          channel_1)
 plt.show()
 plt.plot(np.arange(len(trimmed_data)),
-         trimmed_data,color=u'#ff7f0e')
+         trimmed_data, color=u'#ff7f0e')
 plt.show()
 
 #%% md
@@ -273,7 +268,7 @@ plt.show()
 
 #%%
 
-trimmed_data_ppg = trim_data(ppg_data.signals[0],minute_remove=1)
+trimmed_data_ppg = trim_data(ppg_data.signals[0], minute_remove=1)
 
 #%%
 
@@ -331,7 +326,7 @@ plt.show()
 
 start_list, end_list = \
     remove_unchanged_squences(unchanged_data,
-                              unchanged_seconds= 10,
+                              unchanged_seconds=10,
                               sampling_rate=256,
                               as_dataframe=False)
 
@@ -345,8 +340,8 @@ start_list, end_list = \
 # fig.show()
 
 fig = plt.Figure()
-for start,end in zip(start_list,end_list):
-    plt.plot(np.arange(start,end),
+for start, end in zip(start_list, end_list):
+    plt.plot(np.arange(start, end),
          unchanged_data[start:end])
 plt.show()
 
@@ -360,7 +355,7 @@ from vital_sqi.data import remove_invalid
 
 #%%
 
-trimmed_data = trim_data(channel_1,minute_remove=10)
+trimmed_data = trim_data(channel_1, minute_remove=10)
 error_data = trimmed_data.copy()
 
 #%%
