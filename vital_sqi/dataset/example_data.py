@@ -1,4 +1,4 @@
-from vital_sqi.data.signal_io import ECG_reader,PPG_reader
+from vital_sqi.data.signal_io import ECG_reader, PPG_reader
 import os
 
 def load_ecg():
