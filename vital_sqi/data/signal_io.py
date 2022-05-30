@@ -89,6 +89,7 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
         info = [header, signal_headers]
         out = SignalSQI(signals=signals,
                         wave_type='ecg',
+                        start_datetime=start_datetime,
                         sampling_rate=sampling_rate,
                         info=info)
 
@@ -154,7 +155,9 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
             sampling_rate = utils.calculate_sampling_rate(timestamps)
             assert sampling_rate is not None, 'Sampling rate not found nor ' \
                                               'inferred'
-        out = SignalSQI(signals=signals, wave_type='ecg',
+        out = SignalSQI(signals=signals,
+                        wave_type='ecg',
+                        start_datetime=start_datetime,
                         sampling_rate=sampling_rate)
     return out
 
@@ -188,7 +191,8 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
 
 
     """
-    signals = signal_sqi.signals.to_numpy()
+    signals = signal_sqi.signals.loc[:, signal_sqi.signals.columns !=
+                                'timestamps'].to_numpy()
     sampling_rate = signal_sqi.sampling_rate
     start_datetime = signal_sqi.start_datetime
     assert isinstance(sampling_rate, int) or isinstance(sampling_rate,
