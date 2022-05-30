@@ -23,7 +23,7 @@ setup(
                         'hrv-analysis>=1.0.3',
                         'matplotlib>=3.3.3',
                         'numpy>=1.20.2',
-                        'pandas>=1.2.1',
+                        'pandas>=1.1.5',
                         'plotly>=4.14.3',
                         'scikit-learn>=0.24.1',
                         'scipy>=1.6.0',
