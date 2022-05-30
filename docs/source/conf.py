@@ -17,8 +17,8 @@ sys.path.insert(0, os.path.abspath('../../vital_sqi/'))
 # -- Project information -----------------------------------------------------
 
 project = 'vital_sqi'
-copyright = '2021, Oucru_VN'
-author = 'Oucru_VN'
+copyright = '2022, Oucru'
+author = 'Oucru'
 
 # The full version, including alpha/beta/rc tags
 release = '1.0.0'
