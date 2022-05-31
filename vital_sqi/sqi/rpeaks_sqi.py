@@ -1,5 +1,6 @@
 """Signal quality indexes based on R peak detection"""
 import numpy as np
+import scipy.interpolate
 from scipy import signal
 
 import heartpy as hp
@@ -13,7 +14,8 @@ from heartpy.peakdetection import check_peaks, detect_peaks
 from statsmodels.tsa.stattools import acf
 from vital_sqi.common.rpeak_detection import PeakDetector
 
-def get_all_features_hrva(data_sample,sample_rate=100,rpeak_method=0):
+
+def get_all_features_hrva(data_sample, sample_rate=100, rpeak_method=0):
     """
     :param data_sample:
     :param sample_rate:
@@ -43,7 +45,8 @@ def get_all_features_hrva(data_sample,sample_rate=100,rpeak_method=0):
     return time_domain_features,frequency_domain_features,\
            geometrical_features,csi_cvi_features
 
-def get_all_features_heartpy(data_sample,sample_rate=100,rpeak_detector = 0):
+
+def get_all_features_heartpy(data_sample, sample_rate=100, rpeak_detector=0):
     # time domain features
     td_features = ["bpm", "ibi", "sdnn", "sdsd", "rmssd",
                    "pnn20", "pnn50", "hr_mad", "sd1", "sd2",
@@ -94,7 +97,8 @@ def get_all_features_heartpy(data_sample,sample_rate=100,rpeak_detector = 0):
 
     return time_domain_features,frequency_domain_features
 
-def get_peak_error_features(data_sample,sample_rate=100,rpeak_detector = 0,low_rri=300,
+
+def get_peak_error_features(data_sample, sample_rate=100, rpeak_detector=0, low_rri=300,
                             high_rri=2000):
     rules = ["malik", "karlsson", "kamath", "acar"]
     try:
@@ -136,7 +140,8 @@ def get_peak_error_features(data_sample,sample_rate=100,rpeak_detector = 0,low_r
 
     return error_sqi
 
-def correlogram_sqi(data_sample,sample_rate=100,time_lag=3,n_selection = 3):
+
+def correlogram_sqi(data_sample, sample_rate=100, time_lag=3, n_selection=3):
     """
     The method is based on the paper 'Classification of the Quality of Wristband-based
     Photoplethysmography Signals'
@@ -160,3 +165,10 @@ def correlogram_sqi(data_sample,sample_rate=100,time_lag=3,n_selection = 3):
     corr_sqi = [i for i in corr_peaks_idx[:n_selection]]+\
           [i for i in corr_peaks_value[:n_selection]]
     return corr_sqi
+
+
+def ectopic_sqi():
+    # interpolation vs non-interpolation: detect probabilistically
+    # contained a missed beat or a false-detected beat
+    return None
+
