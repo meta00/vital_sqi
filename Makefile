@@ -66,3 +66,6 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
 
+rtd:	## Build readthedocs locally
+	sphinx-build -a docs/source /tmp/mydocs
+
