@@ -2,8 +2,7 @@
 This module allows to compute time and frequency domain HRV
 to use those as signal quality indexes, including:
 HR
-- HR: Mean, median heart rate
-- HR: mean, min, max, std
+- HR: Mean, median, min, max, std of heart rate
 - HR: Ratio of HR out of a defined range
 HRV time domain
 - SDNN
@@ -159,9 +158,6 @@ def median_nn_sqi(nn_intervals):
     ----------
     nn_intervals : list
         Normal to Normal Interval
-    interpolation :
-        interpolation: bool
-        Options to do interpolation of NN interval before calculating median NN.
 
     Returns
     -------
@@ -206,11 +202,30 @@ def hr_mean_sqi(nn_intervals):
 
     Returns
     -------
-    float
+    int
         The mean heart rate
     """
     nn_bpm = np.divide(60000, nn_intervals)
     return int(np.round(np.mean(nn_bpm)))
+
+
+def hr_median_sqi(nn_intervals):
+    """Function returning the median heart rate .
+    The input nn_interval in ms is converted into
+    heart rate bpm (beat per minute) unit
+
+    Parameters
+    ----------
+    nn_intervals : list
+        Normal to Normal Interval
+
+    Returns
+    -------
+    int
+        The median heart rate
+    """
+    nn_bpm = np.divide(60000, nn_intervals)
+    return int(np.round(np.median(nn_bpm)))
 
 
 def hr_min_sqi(nn_intervals):
@@ -225,7 +240,7 @@ def hr_min_sqi(nn_intervals):
 
     Returns
     -------
-    float
+    int
         The minimum heart rate
     """
 
@@ -245,7 +260,7 @@ def hr_max_sqi(nn_intervals):
 
     Returns
     -------
-    float
+    int
         The maximum heart rate
 
     """
@@ -287,9 +302,14 @@ def hr_range_sqi(nn_intervals, range_min=40, range_max=200):
 
     Returns
     -------
-
-    
+        float
+            The percentage of heart rate out of range with decimal 2.
     """
+    nn_bpm = np.divide(60000, nn_intervals)
+    out = sum(range_min >= nn_bpm) + sum(nn_bpm >= range_max)
+    out = round(100*out/len(nn_bpm), 2)
+    return out
+
 
 def peak_frequency_sqi(nn_intervals, freqs=None, pows=None, f_min=0.04, f_max=0.15):
     """The function mimics features obtaining from the frequency domain of HRV.
@@ -327,8 +347,8 @@ def peak_frequency_sqi(nn_intervals, freqs=None, pows=None, f_min=0.04, f_max=0.
     """
     if freqs is None or pows is None:
         freqs, pows = calculate_psd(nn_intervals)
-    assert len(freqs) != len(pows),\
-            "Length of the frequencies and the relevant powers must be the same"
+    assert len(freqs) != len(pows), \
+        "Length of the frequencies and the relevant powers must be the same"
     f_power = (pows[f_min <= freqs < f_max])
     f_peak = f_power[np.argmax(f_power)]
     return f_peak
