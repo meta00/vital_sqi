@@ -2,7 +2,11 @@
 - By duration with option for overlapping
 - By beat
 
-To be revised: gom 4 functions cuoi vao split_segment
+To be revised: gom 4 functions cuoi vao split_segment, bo save_segment_image.
+
+- save_segment
+- split_segment
+
 """
 
 import pandas as pd
@@ -11,7 +15,7 @@ import plotly.graph_objects as go
 import numpy as np
 import warnings
 import os
-from vital_sqi.data.removal_utilities import remove_invalid_smartcare, \
+from vital_sqi.preprocess.removal_utilities import remove_invalid_smartcare, \
     trim_signal
 from vital_sqi.common.rpeak_detection import PeakDetector
 
@@ -92,8 +96,8 @@ def save_segment(filename, segment_list, save_file_folder,
         i = i+1
 
 
-def split_segment(s, by=[duration-0, beat-1], duration=None,
-                   peak_detector=None)
+def split_segment(s, by=[duration-0, beat-1], duration=None, overlapping=None,
+                   peak_detector=None):
     return
 
 def split_to_segments(signal_data, filename=None, sampling_rate=100.0,
