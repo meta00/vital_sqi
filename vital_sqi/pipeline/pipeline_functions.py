@@ -112,7 +112,7 @@ def per_beat_sqi(sqi_func, troughs, signal, taper, **kwargs):
         for idx, beat_start in enumerate(troughs[:-1]):
             single_beat = signal[beat_start:troughs[idx+1]]
             if taper:
-                single_beat = sqi_pre.tapering(single_beat)
+                single_beat = sqi_pre.taper_signal(single_beat)
             if len(kwargs) != 0:
                 args = tuple(kwargs.values())
                 sqi_vals.append(sqi_func(single_beat, *args))
