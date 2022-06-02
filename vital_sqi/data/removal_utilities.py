@@ -9,7 +9,7 @@ import warnings
 import pmdarima as pm
 
 
-def remove_unchanged_squences(df, unchanged_seconds=10, sampling_rate=100,
+def remove_unchanged(df, unchanged_seconds=10, sampling_rate=100,
                               as_dataframe=True):
     """
 
@@ -57,11 +57,13 @@ def remove_unchanged_squences(df, unchanged_seconds=10, sampling_rate=100,
             start_cut_pivot.append(key)
             end_cut_pivot.append(key+continuous_dict[key])
 
-    start_milestone,end_milestone = get_start_end_points(start_cut_pivot,end_cut_pivot,len(df))
-    return start_milestone,end_milestone
+    start_milestone, end_milestone = get_start_end_points(start_cut_pivot,
+                                                          end_cut_pivot,
+                                                          len(df))
+    return start_milestone, end_milestone
 
 
-def remove_invalid(df, as_dataframe=True):
+def remove_invalid_smartcare(df, as_dataframe=True):
     """Exposed
     Remove  the list of invalid data signal
 
@@ -99,7 +101,7 @@ def remove_invalid(df, as_dataframe=True):
     return start_milestone,end_milestone
 
 
-def trim_data(data, minute_remove=1, sampling_rate=100):
+def trim_signal(data, minute_remove=1, sampling_rate=100):
     """Expose
 
     Parameters
@@ -129,7 +131,7 @@ def trim_data(data, minute_remove=1, sampling_rate=100):
     return data
 
 
-def get_start_end_points(start_cut_pivot,end_cut_pivot,length_df):
+def get_start_end_points(start_cut_pivot, end_cut_pivot, length_df):
     """handy
 
     Parameters
@@ -157,39 +159,12 @@ def get_start_end_points(start_cut_pivot,end_cut_pivot,length_df):
     return start_milestone,end_milestone
 
 
-def concate_removed_index(start_list,end_list,remove_sliding_window = 0):
-    """handy
-
-    Parameters
-    ----------
-    start_list :
-        param end_list:
-    remove_sliding_window :
-        return: (Default value = 0)
-    end_list :
-        
-
-    Returns
-    -------
-
-    """
-    start_list = np.array(start_list)
-    end_list = np.array(end_list)
-    diff_list = start_list[1:]-end_list[:-1]
-    end_list_rm_indices = np.where(diff_list<=remove_sliding_window)[0]
-    start_list_rm_indices = np.where(diff_list <= remove_sliding_window)[0]+1
-    start_out_list = np.delete(start_list,start_list_rm_indices)
-    end_out_list = np.delete(end_list, end_list_rm_indices)
-    return start_out_list,end_out_list
-
-
-def cut_invalid_rr_peak(df):
+def remove_invalid_peak(nn_intervals):
     """expose
 
     Parameters
     ----------
-    df :
-        return:
+    nn_intervals :
 
     Returns
     -------
@@ -199,88 +174,14 @@ def cut_invalid_rr_peak(df):
     return
 
 
-def cut_by_frequency_partition(df_examine,
-                                window_size=None,peak_threshold_ratio=None,
-                                lower_bound_threshold=None,
-                                remove_sliding_window=None,
-                                overlap_rate =None):
-    """Expose
-
-    Parameters
-    ----------
-    df_examine :
-        param window_size:
-    peak_threshold_ratio :
-        param lower_bound_threshold: (Default value = None)
-    remove_sliding_window :
-        param overlap_rate: (Default value = None)
-    window_size :
-         (Default value = None)
-    lower_bound_threshold :
-         (Default value = None)
-    overlap_rate :
-         (Default value = None)
-
-    Returns
-    -------
-
-    """
-    if window_size is None:
-        window_size = 500
-    if window_size > len(df_examine):
-        window_size  = len(df_examine)
-    if peak_threshold_ratio is None:
-        peak_threshold_ratio = 1.8
-    if lower_bound_threshold is None:
-        lower_bound_threshold = 1
-    if remove_sliding_window is None:
-        remove_sliding_window = 0
-    if overlap_rate is None:
-        overlap_rate = 1
-
-    window = signal.get_window("boxcar", window_size)
-    welch_full = signal.welch(df_examine, window=window)
-    peaks_full = signal.find_peaks(welch_full[1], threshold=np.mean(welch_full[1]))
-    if len(peaks_full[0]) < 2:
-        num_peaks_full = 2
-    else:
-        num_peaks_full = len(peaks_full[0])
-
-    remove_start_indices = []
-    remove_end_indices = []
-
-    pter = 0
-    while pter < len(df_examine):
-        end_pointer = pter + (window_size)
-        if end_pointer >= len(df_examine):
-            break
-        small_partition = df_examine[pter:end_pointer]
-        welch_small_partition = signal.welch(small_partition, window=window)
-        peaks_small_partition = signal.find_peaks(welch_small_partition[1],
-                                                  threshold=np.mean(welch_small_partition[1]))
-        if (len(peaks_small_partition[0]) > num_peaks_full * peak_threshold_ratio) or  \
-                (len(peaks_small_partition[0]) < num_peaks_full * lower_bound_threshold):
-            remove_start_indices.append(pter)
-            remove_end_indices.append(end_pointer)
-
-        pter = pter + int(window_size * overlap_rate)
-
-    start_trim_by_freq, end_trim_by_freq = concate_removed_index(remove_start_indices, remove_end_indices,
-                                                                remove_sliding_window)
-    start_milestone_by_freq,end_milestone_by_freq = \
-        get_start_end_points(start_trim_by_freq, end_trim_by_freq,len(df_examine))
-
-    return start_milestone_by_freq,end_milestone_by_freq
-
-
-def fill_missing_value(s, missing_index, missing_len, method='arima',
+def interpolate_signal(s, missing_index, missing_len, method='arima',
                        lag_ratio=10):
     """
 
     Parameters
     ----------
     s :
-        array of input time series
+        array-like signal
     missing_index :
         array of list of starting indices missing data
     missing_len :

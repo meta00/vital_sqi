@@ -24,7 +24,6 @@ from scipy.spatial.distance import euclidean
 def euclidean_sqi(input_sequence, template_sequence):
     """
     Euclidean distance between signal and its template
-    Previous name: compute_dtw_distance
 
     Parameters
     ----------

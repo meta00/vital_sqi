@@ -2,6 +2,9 @@
 Most of the sqi scores are obtained from the following paper Elgendi,
 Mohamed, Optimal signal quality index for photoplethysmogram
 signals, Bioengineering.
+
+List of sqi
+
 """
 
 import numpy as np

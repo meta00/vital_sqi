@@ -1,7 +1,8 @@
 """
 Implementation of SQIs for waveform:
  - For ECG based on DiMarco2012.
- - For PPG ...
+ - For PPG to be coded (Khoa check with Stefan)
+ Doi lai tham so signal
 """
 import scipy.signal as sn
 import numpy as np

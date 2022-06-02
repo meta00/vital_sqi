@@ -1,6 +1,11 @@
 """Signal quality indexes based on R peak detection
 This module capitalises on different R peak detectors for ECG and PGG,
 using the resulted NN series to evaluate the raw signal quality.
+- Ratio of ectopic beats
+- Correlogram
+- MSQ: Evaluate the consistency of two NN intervals by two peak detectors.
+- Interpolation: Comparison of interpolated and non-interpolated NN intervals
+    evaluate gap in the non-interpolated NN interval.
 """
 import numpy as np
 import scipy.interpolate
@@ -151,8 +156,9 @@ def msq_sqi(y, peaks_1, peak_detect2=6):
         MSQ SQI value for the given signal
 
     """
+    # Viet lai cho ecg va ppg, input la ten 2 peaks
     detector = PeakDetector(wave_type='ppg')
-    peaks_2,_ = detector.ppg_detector(y, detector_type=peak_detect2, preprocess=False)
+    peaks_2 = detector.ppg_detector(y, detector_type=peak_detect2, preprocess=False)
     if len(peaks_1)==0 or len(peaks_2)==0:
         return 0.0
     peak1_dom = len(np.intersect1d(peaks_1,peaks_2))/len(peaks_1)

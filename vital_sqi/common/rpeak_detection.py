@@ -1,4 +1,10 @@
-"""R peak detection approaches for PPG and ECG"""
+"""R peak detection approaches for PPG and ECG
+
+Add code peak detector cho ECG
+Check lai cac ham handy va expose
+"""
+
+
 import numpy as np
 from sklearn.cluster import KMeans
 from scipy import signal
