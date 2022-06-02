@@ -2,7 +2,11 @@
 - By duration with option for overlapping
 - By beat
 
-To be revised: gom 4 functions cuoi vao split_segment
+To be revised: gom 4 functions cuoi vao split_segment, bo save_segment_image.
+
+- save_segment
+- split_segment
+
 """
 
 import pandas as pd
@@ -58,6 +62,7 @@ def save_segment(filename, segment_list, save_file_folder,
         except Exception as e:
             warnings.warn(e)
         i = i+1
+
 
 def split_segment(s, split_type=0, duration=30.0,
                       overlaping=1,sampling_rate=100,

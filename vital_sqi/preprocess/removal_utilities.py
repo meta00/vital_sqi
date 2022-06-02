@@ -1,6 +1,12 @@
 """
 Trimming raw signals using: invalid values, noise at start/end of
 recordings etc.
+
+- output processed signal
+- input: signal (s) in pandas df, check by type checking function (utils,
+io - find it).
+- bo option as_dataframe
+- them option_index
 """
 import numpy as np
 from scipy import signal
@@ -9,14 +15,16 @@ import warnings
 import pmdarima as pm
 
 
-def remove_unchanged(df, unchanged_seconds=10, sampling_rate=100,
-                              as_dataframe=True):
+def remove_unchanged(s, unchanged_seconds=10, sampling_rate=100,
+                              output_index=False):
     """
+    Remove flat signal waveform. Unchanged signals are considered noise. This
+    is observed in PPG waveform.
 
     Parameters
     ----------
-    df :
-        
+    s :
+        array-like signal
     unchanged_seconds :
          (Default value = 10)
     sampling_rate :
@@ -26,17 +34,18 @@ def remove_unchanged(df, unchanged_seconds=10, sampling_rate=100,
 
     Returns
     -------
-
+        array
+         Start and end indexes of flat segments
     """
     number_removed_instances = sampling_rate*unchanged_seconds
     if as_dataframe:
-        pleth_array = np.array(df["PLETH"])
+        pleth_array = np.array(s["PLETH"])
     else:
-        pleth_array =  np.array(df)
+        pleth_array = np.array(s)
     diff = np.diff(pleth_array)         # 123 35 4 0 0 0 0 0 0 123 34 3 1 5 0 0 23 45
     unchanged_idx = np.where(diff == 0)[0]  # 3 4 5 6 7 8 14 15
     if len(unchanged_idx) < 1:
-        return [0],[len(df)]
+        return [0], [len(s)]
     continuous_dict = {} #index of continuous value and the len
     continuous_len = 0
     key = -1
@@ -44,7 +53,7 @@ def remove_unchanged(df, unchanged_seconds=10, sampling_rate=100,
         if diff[i] == 0:
             if key == -1:
                 key = i
-            continuous_len =  continuous_len + 1
+            continuous_len = continuous_len + 1
         else:
             if continuous_len > 0:
                 continuous_dict[key] = continuous_len
@@ -59,38 +68,43 @@ def remove_unchanged(df, unchanged_seconds=10, sampling_rate=100,
 
     start_milestone, end_milestone = get_start_end_points(start_cut_pivot,
                                                           end_cut_pivot,
-                                                          len(df))
-    return start_milestone, end_milestone
+                                                          len(s))
+    return start_milestone, end_milestone # chuyen thanh 1 array
 
 
-def remove_invalid_smartcare(df, as_dataframe=True):
-    """Exposed
-    Remove  the list of invalid data signal
+def remove_invalid_smartcare(s, info, as_dataframe=True):
+    """
+    Filter invalid signal sample in PPG recorded by Smartcare oximeter.
+    Invalid samples are one with default value:
+    - signal value = 0
+    - SpO2 < 80)
+    - pulse > 255
+    - perfusion_array < 0.1
 
     Parameters
     ----------
-    df :
-        param as_dataframe:
+    s :
+        array-like signal
     as_dataframe :
          (Default value = True)
 
     Returns
     -------
-
+        array-like filtered signal
     """
 
-    #TODO Cover the case of different input instead of SMARTCARE device
     if as_dataframe:
-        pleth_array = np.array(df["PLETH"])
-        spo2_array = np.array(df["SPO2_PCT"])
-        perfusion_array = np.array(df["PERFUSION_INDEX"])
-        pulse_array = np.array(df["PULSE_BPM"])
+        pleth_array = np.array(s["PLETH"])
+        spo2_array = np.array(s["SPO2_PCT"])
+        perfusion_array = np.array(s["PERFUSION_INDEX"])
+        pulse_array = np.array(s["PULSE_BPM"])
         indices_start_end = np.where((pleth_array != 0) & (spo2_array >= 80)
-                                     & (pulse_array <= 255) & (perfusion_array>=0.1))[0]
+                                     & (pulse_array <= 255) & (
+                                             perfusion_array >= 0.1))[0]
     else:
-        indices_start_end = np.where(df!=0)[0]
+        indices_start_end = np.where(s != 0)[0]
     diff_res = indices_start_end[1:] - indices_start_end[:-1]
-    diff_loc = np.where(diff_res>1)[0]
+    diff_loc = np.where(diff_res > 1)[0]
     start_milestone = [indices_start_end[0]]
     end_milestone = []
     for loc in diff_loc:
@@ -98,7 +112,7 @@ def remove_invalid_smartcare(df, as_dataframe=True):
         start_milestone.append(indices_start_end[loc+1])
     end_milestone.append(indices_start_end[-1]+1)
 
-    return start_milestone,end_milestone
+    return start_milestone, end_milestone
 
 
 def trim_signal(data, minute_remove=1, sampling_rate=100):
@@ -156,11 +170,11 @@ def get_start_end_points(start_cut_pivot, end_cut_pivot, length_df):
     else:
         start_milestone = np.array(end_cut_pivot) + 1
         end_milestone = np.hstack((np.array(start_cut_pivot)[1:] - 1, length_df - 1))
-    return start_milestone,end_milestone
+    return start_milestone, end_milestone
 
 
 def remove_invalid_peak(nn_intervals):
-    """expose
+    """
 
     Parameters
     ----------
