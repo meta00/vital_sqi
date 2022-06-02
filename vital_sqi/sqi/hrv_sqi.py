@@ -29,9 +29,6 @@ from heartpy.datautils import rolling_mean
 from hrvanalysis import get_time_domain_features, \
     get_frequency_domain_features,  get_nn_intervals, get_csi_cvi_features, \
     get_geometrical_features
-import heartpy as hp
-from heartpy.analysis import calc_ts_measures, calc_rr, calc_fd_measures,\
-    clean_rr_intervals, calc_poincare, calc_breathing
 from heartpy.peakdetection import check_peaks, detect_peaks
 from vital_sqi.common.rpeak_detection import PeakDetector
 
@@ -51,7 +48,7 @@ def nn_mean_sqi(nn_intervals):
     
     """
 
-    return None
+    return np.mean(nn_intervals)
 
 
 def sdnn_sqi(nn_intervals):
@@ -176,7 +173,7 @@ def median_nn_sqi(nn_intervals):
     return np.median(nn_intervals)
 
 
-def pnn_sqi(nn_intervals, exceed):
+def pnn_sqi(nn_intervals, exceed=50):
     """Function returning the percentage of nn intervals
     that exceed the previous 50ms
 
@@ -626,7 +623,7 @@ def poincare_features_sqi(nn_intervals):
     return sd1, sd2, area, ratio
 
 
-def get_all_features_hrva(data_sample, sample_rate=100, rpeak_method=0):
+def get_all_features_hrva(s, sample_rate=100, rpeak_method=0,wave_type='ecg'):
     """
 
     Parameters
@@ -644,14 +641,20 @@ def get_all_features_hrva(data_sample, sample_rate=100, rpeak_method=0):
 
     """
 
-    if rpeak_method in [1, 2, 3, 4]:
-        detector = PeakDetector()
-        peak_list = detector.ppg_detector(data_sample, rpeak_method)[0]
+    # if rpeak_method in [1, 2, 3, 4]:
+    #     detector = PeakDetector()
+    #     peak_list = detector.ppg_detector(data_sample, rpeak_method)[0]
+    # else:
+    #     rol_mean = rolling_mean(data_sample, windowsize=0.75, sample_rate=100.0)
+    #     peaks_wd = detect_peaks(data_sample, rol_mean, ma_perc=20,
+    #                             sample_rate=100.0)
+    #     peak_list = peaks_wd["peaklist"]
+    if wave_type=='ppg':
+        detector = PeakDetector(wave_type='ppg')
+        peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
     else:
-        rol_mean = rolling_mean(data_sample, windowsize=0.75, sample_rate=100.0)
-        peaks_wd = detect_peaks(data_sample, rol_mean, ma_perc=20,
-                                sample_rate=100.0)
-        peak_list = peaks_wd["peaklist"]
+        detector = PeakDetector(wave_type='ecg')
+        peak_list, trough_list = detector.ecg_detector(s, detector_type=rpeak_method)
 
     rr_list = np.diff(peak_list) * (1000 / sample_rate)  # 1000 milisecond
 

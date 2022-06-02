@@ -3,14 +3,14 @@ import numpy as np
 from scipy import signal
 
 
-def tapering(signal_data, window=None, shift_min_to_zero=True):
+def tapering(s, window=None, shift_min_to_zero=True):
     """expose
     Pin the leftmost and rightmost signal to the zero baseline
     and amplify the remainder according to the window shape
 
     Parameters
     ----------
-    signal_data :
+    s :
         list,
     window :
         sequence, array of floats indicates the windows types
@@ -25,14 +25,14 @@ def tapering(signal_data, window=None, shift_min_to_zero=True):
 
     """
     if shift_min_to_zero:
-        signal_data = signal_data-np.min(signal_data)
+        s = s-np.min(s)
     if window is None:
-        window = signal.windows.tukey(len(signal_data),0.9)
-    signal_data_tapered = np.array(window) * (signal_data)
-    return np.array(signal_data_tapered)
+        window = signal.windows.tukey(len(s),0.9)
+    s_tapered = np.array(window) * (s)
+    return np.array(s_tapered)
 
 
-def smooth(x, window_len=5, window='flat'):
+def smooth(s, window_len=5, window='flat'):
     """expose
 
     Parameters
@@ -48,20 +48,20 @@ def smooth(x, window_len=5, window='flat'):
     -------
 
     """
-    x = np.array(x)
-    if x.ndim != 1:
+    s = np.array(s)
+    if s.ndim != 1:
         raise(ValueError, "smooth only accepts 1 dimension arrays.")
 
-    if x.size < window_len:
+    if s.size < window_len:
         raise(ValueError, "Input vector needs to be bigger than window size.")
 
     if window_len < 3:
-        return x
+        return s
 
     if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
         raise(ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
 
-    s = np.r_[x[window_len - 1:0:-1], x, x[-2:-window_len - 1:-1]]
+    s = np.r_[s[window_len - 1:0:-1], s, s[-2:-window_len - 1:-1]]
     # print(len(s))
     if window == 'flat':  # moving average
         w = np.ones(window_len, 'd')
@@ -69,7 +69,7 @@ def smooth(x, window_len=5, window='flat'):
         w = eval('np.' + window + '(window_len)')
 
     # y = np.convolve(w / w.sum(), s, mode='valid')
-    y = np.convolve(w / w.sum(), x, mode='same')
+    y = np.convolve(w / w.sum(), s, mode='same')
     return y
 
 

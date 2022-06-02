@@ -1,7 +1,5 @@
 """R peak detection approaches for PPG and ECG
 
-Add code peak detector cho ECG
-Check lai cac ham handy va expose
 """
 
 
@@ -23,6 +21,14 @@ MOVING_AVERAGE_METHOD = 5
 DEFAULT_SCIPY = 6
 BILLAUER_METHOD = 7
 
+HAMILTON = 1
+CHRISTOV = 2
+ENGZEE = 3
+SWT = 4
+MVA = 5
+MTEMP = 6
+PAN_TOMPKINS = 7
+
 
 class PeakDetector:
     """Various peak detection approaches getting from the paper
@@ -42,7 +48,7 @@ class PeakDetector:
         self.wave_type = wave_type
         self.fs = fs
 
-    def ecg_detector(self, s, detector_type="pan_tompkins"):
+    def ecg_detector(self, s, detector_type=PAN_TOMPKINS):
         """Expose
 
         ECG peak detector from the github
@@ -74,25 +80,6 @@ class PeakDetector:
 
 
         """
-        # if self.wave_type == 'ppg':
-        #     warnings.warn("A ECG detectors is using on PPG waveform. "
-        #                   "Output may produce incorrect result")
-        # detector = Detectors(self.fs)
-        # if detector_type == 'hamilton':
-        #     res = detector.hamilton_detector(s)
-        # elif detector_type == 'christov':
-        #     res = detector.christov_detector(s)
-        # elif detector_type == 'engzee':
-        #     res = detector.engzee_detector(s)
-        # elif detector_type == 'swt':
-        #     res = detector.swt_detector(s)
-        # elif detector_type == 'mva':
-        #     res = detector.two_average_detector(s)
-        # elif detector_type == 'mtemp':
-        #     res = self.matched_filter_detector(s)
-        # else:
-        #     res = detector.pan_tompkins_detector(s)
-        # return np.array(res)
         f1 = 5/self.fs
         f2 = 15/self.fs
 
@@ -113,7 +100,25 @@ class PeakDetector:
 
         mwa[:int(0.2*self.fs)] = 0
 
-        mwa_peaks = panPeakDetect(mwa, self.fs)
+        if self.wave_type == 'ppg':
+            warnings.warn("A ECG detectors is using on PPG waveform. "
+                          "Output may produce incorrect result")
+        detector = Detectors(self.fs)
+        if detector_type == HAMILTON:
+            mwa_peaks = detector.hamilton_detector(s)
+        elif detector_type == CHRISTOV:
+            mwa_peaks = detector.christov_detector(s)
+        elif detector_type == ENGZEE:
+            mwa_peaks = detector.engzee_detector(s)
+        elif detector_type == SWT:
+            mwa_peaks = detector.swt_detector(s)
+        elif detector_type == MVA:
+            mwa_peaks = detector.two_average_detector(s)
+        elif detector_type == MTEMP:
+            mwa_peaks = detector.matched_filter_detector(s)
+        else:
+            mwa_peaks = detector.pan_tompkins_detector(s)
+            # mwa_peaks = panPeakDetect(mwa, self.fs)
 
         # append the first and the last
         normal_beat_length = (self.fs * (60/100))/2
@@ -313,7 +318,7 @@ class PeakDetector:
 
     def get_ROI(self, s, mva):
         """
-
+        handy
         Parameters
         ----------
         s :

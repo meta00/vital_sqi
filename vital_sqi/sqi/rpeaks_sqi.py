@@ -10,20 +10,33 @@ using the resulted NN series to evaluate the raw signal quality.
 import numpy as np
 import scipy.interpolate
 from scipy import signal
+import heartpy as hp
+from heartpy.analysis import clean_rr_intervals,calc_rr
+from heartpy.peakdetection import check_peaks
 from hrvanalysis.preprocessing import remove_outliers, remove_ectopic_beats, interpolate_nan_values
 from statsmodels.tsa.stattools import acf
 from vital_sqi.common.rpeak_detection import PeakDetector
 
 
-def ectopic_sqi(data_sample, sample_rate=100, rpeak_detector=0,
-                            low_rri=300,
-                            high_rri=2000):
+def ectopic_sqi(data_sample, rule_index=0, sample_rate=100, rpeak_detector=0,
+                            wave_type='ppg',low_rri=300,
+                            high_rri=2000,):
     """
-
+    Evaluate the invalid peaks (which exceeds normal range)
+    base on HRV rules: Malik, Karlsson, Kamath, Acar
+    Output the ratio of invalid
     Parameters
     ----------
     data_sample :
-        
+
+    rule_index:
+        0: Default Outlier Peak
+        1: Malik
+        2: Karlsson
+        3: Kamath
+        4: Acar
+        (Default rule is Malik)
+
     sample_rate :
         (Default value = 100)
     rpeak_detector :
@@ -50,15 +63,19 @@ def ectopic_sqi(data_sample, sample_rate=100, rpeak_detector=0,
             error_dict["outlier_error"] = np.nan
             return error_dict
 
-    if rpeak_detector in [1, 2, 3, 4]:
+    # if rpeak_detector in [1, 2, 3, 4]:
+    if wave_type=='ecg':
         detector = PeakDetector(wave_type='ecg')
+        peak_list = detector.ecg_detector(data_sample, rpeak_detector)[0]
+    else:
+        detector = PeakDetector(wave_type='ppg')
         peak_list = detector.ppg_detector(data_sample, rpeak_detector,
                                           preprocess=False)[0]
-        wd["peaklist"] = peak_list
-        wd = calc_rr(peak_list, sample_rate, working_data=wd)
-        wd = check_peaks(wd['RR_list'], wd['peaklist'], wd['ybeat'],
+    wd["peaklist"] = peak_list
+    wd = calc_rr(peak_list, sample_rate, working_data=wd)
+    wd = check_peaks(wd['RR_list'], wd['peaklist'], wd['ybeat'],
                          reject_segmentwise=False, working_data=wd)
-        wd = clean_rr_intervals(working_data=wd)
+    wd = clean_rr_intervals(working_data=wd)
 
     rr_intervals = wd["RR_list"]
 
@@ -66,20 +83,21 @@ def ectopic_sqi(data_sample, sample_rate=100, rpeak_detector=0,
                                            high_rri=high_rri)
     number_outliers = len(np.where(np.isnan(rr_intervals_cleaned))[0])
     outlier_ratio = number_outliers/(len(rr_intervals_cleaned)-number_outliers)
+    if rule_index == 0:
+        return outlier_ratio
 
-    error_sqi = {}
-    error_sqi['outlier_error'] = outlier_ratio
+    # error_sqi = {}
+    # error_sqi['outlier_error'] = outlier_ratio
 
     interpolated_rr_intervals = interpolate_nan_values(rr_intervals_cleaned)
 
-    for rule in rules:
-        nn_intervals = remove_ectopic_beats(interpolated_rr_intervals,
+    rule = rules[rule_index]
+    nn_intervals = remove_ectopic_beats(interpolated_rr_intervals,
                                             method=rule)
-        number_ectopics = len(np.where(np.isnan(nn_intervals))[0])
-        ectopic_ratio = number_ectopics/(len(nn_intervals)-number_ectopics)
-        error_sqi[rule+"_error"] = ectopic_ratio
+    number_ectopics = len(np.where(np.isnan(nn_intervals))[0])
+    ectopic_ratio = number_ectopics/(len(nn_intervals)-number_ectopics)
 
-    return error_sqi
+    return ectopic_ratio
 
 
 def correlogram_sqi(data_sample, sample_rate=100, time_lag=3, n_selection=3):
@@ -130,7 +148,7 @@ def interpolation_sqi(sample_data):
     return None
 
 
-def msq_sqi(y, peaks_1, peak_detect2=6):
+def msq_sqi(s, peak_detector_1=7, peak_detector_2=6,wave_type='ppg'):
     """
     MSQ SQI as defined in Elgendi et al
     "Optimal Signal Quality Index for Photoplethysmogram Signals"
@@ -141,11 +159,11 @@ def msq_sqi(y, peaks_1, peak_detect2=6):
 
     Parameters
     ----------
-    x : sequence
+    s : sequence
         A signal with peaks.
 
-    peaks_1 : array of int
-        Already computed peaks arry from the primary peak_detector
+    peak_detector_1 : array of int
+        Type of the primary peak detection algorithm, default = Billauer
 
     peak_detect2 : int
         Type of the second peak detection algorithm, default = Scipy
@@ -156,9 +174,14 @@ def msq_sqi(y, peaks_1, peak_detect2=6):
         MSQ SQI value for the given signal
 
     """
-    # Viet lai cho ecg va ppg, input la ten 2 peaks
-    detector = PeakDetector(wave_type='ppg')
-    peaks_2 = detector.ppg_detector(y, detector_type=peak_detect2, preprocess=False)
+    if wave_type=='ppg':
+        detector = PeakDetector(wave_type='ppg')
+        peaks_1, trough_list = detector.ppg_detector(s, detector_type=peak_detector_1)
+        peaks_2 = detector.ppg_detector(s, detector_type=peak_detector_2, preprocess=False)
+    else:
+        detector = PeakDetector(wave_type='ecg')
+        peaks_1, trough_list = detector.ecg_detector(s, detector_type=peak_detector_1)
+        peaks_2 = detector.ecg_detector(s, detector_type=peak_detector_2, preprocess=False)
     if len(peaks_1)==0 or len(peaks_2)==0:
         return 0.0
     peak1_dom = len(np.intersect1d(peaks_1,peaks_2))/len(peaks_1)

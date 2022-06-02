@@ -167,7 +167,7 @@ def qrs_a_sqi(signal, sampling_rate):
     """
     detector = PeakDetector(wave_type='ecg', fs=sampling_rate)
     peaks, troughs, nadirs = detector.ecg_detector(signal,
-                                            detector_type="pan_tompkins")
+                                            detector_type=7)
     peak_to_nadir = np.array(peaks) - np.array(nadirs)
     peak_to_nadir = np.delete(peak_to_nadir, np.where(peak_to_nadir > 5))
     qrs_a = np.median(peak_to_nadir)
