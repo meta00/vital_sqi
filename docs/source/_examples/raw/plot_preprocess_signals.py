@@ -203,10 +203,10 @@ window_ppg = list(wd.hann(len(ppg_sample_complex)))
 
 #%%
 
-ecg_sample_tapering_hann = preprocess.tapering(ecg_sample_complex,
+ecg_sample_tapering_hann = preprocess.taper_signal(ecg_sample_complex,
                                            window=window_ecg,
                                            shift_min_to_zero=False)
-ppg_sample_tapering_hann = preprocess.tapering(ppg_sample_complex,
+ppg_sample_tapering_hann = preprocess.taper_signal(ppg_sample_complex,
                                            window=window_ppg,
                                            shift_min_to_zero=False)
 

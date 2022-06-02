@@ -3,65 +3,66 @@ import numpy as np
 from scipy import signal
 
 
-def tapering(signal_data, window=None, shift_min_to_zero=True):
-    """expose
-    Pin the leftmost and rightmost signal to the zero baseline
-    and amplify the remainder according to the window shape
+def taper_signal(s, window=None, shift_min_to_zero=True):
+    """Pin the leftmost and rightmost signal to the zero baseline
+    and amplify the remainder according to the window shape.
 
     Parameters
     ----------
-    signal_data :
-        list,
+    s :
+        array-like signal
     window :
         sequence, array of floats indicates the windows types
         as described in scipy.windows (Default value = None)
     shift_min_to_zero :
-         (Default value = True)
+        (Default value = True)
 
     Returns
     -------
-    type
-        the tapered signal
 
+    
     """
     if shift_min_to_zero:
-        signal_data = signal_data-np.min(signal_data)
+        s = s-np.min(s)
     if window is None:
-        window = signal.windows.tukey(len(signal_data),0.9)
-    signal_data_tapered = np.array(window) * (signal_data)
-    return np.array(signal_data_tapered)
+        window = signal.windows.tukey(len(s), 0.9)
+    s = np.array(window) * s
+    return np.array(s)
 
 
-def smooth(x, window_len=5, window='flat'):
-    """expose
+def smooth_signal(s, window_len=5, window='flat'):
+    """
 
     Parameters
     ----------
-    x :
-        param window_len:
-    window :
-        return: (Default value = 'flat')
+    s :
+        
     window_len :
-         (Default value = 5)
+        int
+        (Default value = 5)
+    window :
+         (Default value = 'flat')
+         Options are: 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
 
     Returns
     -------
 
     """
-    x = np.array(x)
-    if x.ndim != 1:
+    s = np.array(s)
+    if s.ndim != 1:
         raise(ValueError, "smooth only accepts 1 dimension arrays.")
 
-    if x.size < window_len:
+    if s.size < window_len:
         raise(ValueError, "Input vector needs to be bigger than window size.")
 
     if window_len < 3:
-        return x
+        return s
 
     if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
-        raise(ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
+        raise(ValueError, "Window is on of 'flat', 'hanning', "
+                          "'hamming', 'bartlett', 'blackman'")
 
-    s = np.r_[x[window_len - 1:0:-1], x, x[-2:-window_len - 1:-1]]
+    s = np.r_[s[window_len - 1:0:-1], s, s[-2:-window_len - 1:-1]]
     # print(len(s))
     if window == 'flat':  # moving average
         w = np.ones(window_len, 'd')
@@ -69,7 +70,7 @@ def smooth(x, window_len=5, window='flat'):
         w = eval('np.' + window + '(window_len)')
 
     # y = np.convolve(w / w.sum(), s, mode='valid')
-    y = np.convolve(w / w.sum(), x, mode='same')
+    y = np.convolve(w / w.sum(), s, mode='same')
     return y
 
 
@@ -89,6 +90,7 @@ def scale_pattern(s, window_size):
     Returns
     -------
 
+    
     """
     scale_res = []
     if len(s) == window_size:
@@ -106,8 +108,8 @@ def scale_pattern(s, window_size):
 
     # scale_res = smooth_window(scale_res, span_size=5)
     # scale_res = smooth(scale_res, span_size=5)
-    smmoothed_scale_res = smooth(scale_res)
-    return np.array(smmoothed_scale_res)
+    smoothed_scale_res = smooth_signal(scale_res)
+    return np.array(smoothed_scale_res)
 
 
 def squeeze_template(s, width):
@@ -123,6 +125,7 @@ def squeeze_template(s, width):
     Returns
     -------
 
+    
     """
     s = np.array(s)
     total_len = len(s)
