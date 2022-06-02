@@ -1,3 +1,5 @@
+"""Signal quality indexes based on dynamic template matching
+"""
 import numpy as np
 import sys
 import os
@@ -18,15 +20,33 @@ from vital_sqi.common.generate_template import (
 from vital_sqi.common.utils import check_valid_signal
 from scipy.spatial.distance import euclidean
 
-def compute_dtw_distance(input_sequence, template_sequence):
-    dtw_distances = np.ones((len(input_sequence),len(template_sequence))) * np.inf
+
+def euclidean_sqi(input_sequence, template_sequence):
+    """
+    Euclidean distance between signal and its template
+    Previous name: compute_dtw_distance
+
+    Parameters
+    ----------
+    input_sequence :
+        array_like, signal containing int or float values.
+        
+    template_sequence :
+        array_like, signal containing int or float values.
+
+    Returns
+    -------
+
+    """
+    dtw_distances = np.ones((len(input_sequence), len(template_sequence))) * \
+                    np.inf
     #first matching sample is set to zero
-    dtw_distances[0,0] = 0
+    dtw_distances[0, 0] = 0
     for i in range(len(input_sequence)):
         for j in range(len(template_sequence)):
-            cost = euclidean(input_sequence[i],template_sequence[j])
+            cost = euclidean(input_sequence[i], template_sequence[j])
             # dtw_distances
-
+    return cost
 
 
 def dtw_sqi(x, template_type=0):
@@ -49,6 +69,7 @@ def dtw_sqi(x, template_type=0):
     Returns
     -------
 
+    
     """
     check_valid_signal(x)
     if template_type > 3 or type(template_type) != int:

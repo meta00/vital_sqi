@@ -1,5 +1,7 @@
 """
-Implementation of SQIs for ECG raw signals based on DiMarco2012.
+Implementation of SQIs for waveform:
+ - For ECG based on DiMarco2012.
+ - For PPG ...
 """
 import scipy.signal as sn
 import numpy as np
@@ -124,8 +126,7 @@ def vhf_norm_power_sqi(signal, sampling_rate, band=[150, np.Inf]):
     sampling_rate :
 
     band :
-         (Default value = [150)
-    np.Inf] :
+         (Default value = [150, np.Inf] :
 
 
     Returns

@@ -25,6 +25,15 @@ HRV frequency domain
 
 import numpy as np
 from vital_sqi.common.power_spectrum import calculate_psd
+from heartpy.datautils import rolling_mean
+from hrvanalysis import get_time_domain_features, \
+    get_frequency_domain_features,  get_nn_intervals, get_csi_cvi_features, \
+    get_geometrical_features
+import heartpy as hp
+from heartpy.analysis import calc_ts_measures, calc_rr, calc_fd_measures,\
+    clean_rr_intervals, calc_poincare, calc_breathing
+from heartpy.peakdetection import check_peaks, detect_peaks
+from vital_sqi.common.rpeak_detection import PeakDetector
 
 
 def nn_mean_sqi(nn_intervals):
@@ -615,3 +624,114 @@ def poincare_features_sqi(nn_intervals):
     ratio = sd1/sd2
 
     return sd1, sd2, area, ratio
+
+
+def get_all_features_hrva(data_sample, sample_rate=100, rpeak_method=0):
+    """
+
+    Parameters
+    ----------
+    data_sample :
+        Raw signal
+    rpeak_method :
+        return: (Default value = 0)
+    sample_rate :
+        (Default value = 100)
+
+    Returns
+    -------
+
+
+    """
+
+    if rpeak_method in [1, 2, 3, 4]:
+        detector = PeakDetector()
+        peak_list = detector.ppg_detector(data_sample, rpeak_method)[0]
+    else:
+        rol_mean = rolling_mean(data_sample, windowsize=0.75, sample_rate=100.0)
+        peaks_wd = detect_peaks(data_sample, rol_mean, ma_perc=20,
+                                sample_rate=100.0)
+        peak_list = peaks_wd["peaklist"]
+
+    rr_list = np.diff(peak_list) * (1000 / sample_rate)  # 1000 milisecond
+
+    nn_list = get_nn_intervals(rr_list)
+    nn_list_non_na = np.copy(nn_list)
+    nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+
+    time_domain_features = get_time_domain_features(rr_list)
+    frequency_domain_features = get_frequency_domain_features(rr_list)
+    geometrical_features = get_geometrical_features(rr_list)
+    csi_cvi_features = get_csi_cvi_features(rr_list)
+
+    return time_domain_features, frequency_domain_features, geometrical_features, csi_cvi_features
+
+
+def get_all_features_heartpy(data_sample, sample_rate=100, rpeak_detector=0):
+    """
+
+    Parameters
+    ----------
+    data_sample :
+        Raw signal
+
+    sample_rate :
+        (Default value = 100)
+    rpeak_detector :
+        (Default value = 0)
+
+    Returns
+    -------
+
+
+    """
+    # time domain features
+    td_features = ["bpm", "ibi", "sdnn", "sdsd", "rmssd", "pnn20", "pnn50",
+                   "hr_mad", "sd1", "sd2", "s", "sd1/sd2", "breathingrate"]
+    # frequency domain features
+    fd_features = ["lf", "hf", "lf/hf"]
+    try:
+        wd, m = hp.process(data_sample, sample_rate, calc_freq=True)
+    except Exception as e:
+        try:
+            wd, m = hp.process(data_sample, sample_rate)
+        except:
+            time_domain_features = {k: np.nan for k in td_features}
+            frequency_domain_features = {k: np.nan for k in fd_features}
+            return time_domain_features, frequency_domain_features
+    if rpeak_detector in [1, 2, 3, 4]:
+        detector = PeakDetector(wave_type='ecg')
+        peak_list = \
+        detector.ppg_detector(data_sample, rpeak_detector, preprocess=False)[0]
+        wd["peaklist"] = peak_list
+        wd = calc_rr(peak_list, sample_rate, working_data=wd)
+        wd = check_peaks(wd['RR_list'], wd['peaklist'], wd['ybeat'],
+                         reject_segmentwise=False, working_data=wd)
+        wd = clean_rr_intervals(working_data=wd)
+        rr_diff = wd['RR_list']
+        rr_sqdiff = np.power(rr_diff, 2)
+        wd, m = calc_ts_measures(wd['RR_list'], rr_diff, rr_sqdiff,
+                                 working_data=wd)
+        m = calc_poincare(wd['RR_list'], wd['RR_masklist'], measures=m,
+                          working_data=wd)
+        try:
+            measures, working_data = calc_breathing(wd['RR_list_cor'],
+                                                    data_sample, sample_rate,
+                                                    measures=m, working_data=wd)
+        except:
+            measures['breathingrate'] = np.nan
+
+        wd, m = calc_fd_measures(measures=measures, working_data=working_data)
+
+    time_domain_features = {k: m[k] for k in td_features}
+
+    frequency_domain_features = {}
+    for k in fd_features:
+        if k in m.keys():
+            frequency_domain_features[k] = m[k]
+        else:
+            frequency_domain_features[k] = np.nan
+    # frequency_domain_features = {k:m[k] for k in fd_features if k in m.keys}
+    # frequency_domain_features = {k:np.na for k in fd_features if k not in m.keys}
+
+    return time_domain_features, frequency_domain_features

@@ -18,7 +18,7 @@ from vital_sqi.sqi.standard_sqi import (
 	entropy_sqi,
 	signal_to_noise_sqi,
 	zero_crossings_rate_sqi,
-	mean_crossing_rate_sqi,
-	msq_sqi
+	mean_crossing_rate_sqi
 	)
 from vital_sqi.sqi.waveform_sqi import *
+from vital_sqi.sqi.rpeaks_sqi import *

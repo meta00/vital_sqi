@@ -1,30 +1,52 @@
+
 import numpy as np
 from scipy import signal
 
-def tapering(signal_data,window=None,shift_min_to_zero=True):
-    """
-    expose
+
+def tapering(signal_data, window=None, shift_min_to_zero=True):
+    """expose
     Pin the leftmost and rightmost signal to the zero baseline
     and amplify the remainder according to the window shape
-    :param signal_data: list,
-    :param window:sequence, array of floats indicates the windows types
-    as described in scipy.windows
-    :return: the tapered signal
+
+    Parameters
+    ----------
+    signal_data :
+        list,
+    window :
+        sequence, array of floats indicates the windows types
+        as described in scipy.windows (Default value = None)
+    shift_min_to_zero :
+         (Default value = True)
+
+    Returns
+    -------
+    type
+        the tapered signal
+
     """
     if shift_min_to_zero:
         signal_data = signal_data-np.min(signal_data)
-    if window == None:
+    if window is None:
         window = signal.windows.tukey(len(signal_data),0.9)
     signal_data_tapered = np.array(window) * (signal_data)
     return np.array(signal_data_tapered)
 
-def smooth(x,window_len=5,window='flat'):
-    """
-    expose
-    :param x:
-    :param window_len:
-    :param window:
-    :return:
+
+def smooth(x, window_len=5, window='flat'):
+    """expose
+
+    Parameters
+    ----------
+    x :
+        param window_len:
+    window :
+        return: (Default value = 'flat')
+    window_len :
+         (Default value = 5)
+
+    Returns
+    -------
+
     """
     x = np.array(x)
     if x.ndim != 1:
@@ -50,16 +72,23 @@ def smooth(x,window_len=5,window='flat'):
     y = np.convolve(w / w.sum(), x, mode='same')
     return y
 
-def scale_pattern(s,window_size):
-    """
-    expose
+
+def scale_pattern(s, window_size):
+    """expose
     This method is ONLY used for small segment to compare with the template.
     Please change to use scipy.signal.resample function for the purpose of
     resampling.
 
-    :param s:
-    :param window_size:
-    :return:
+    Parameters
+    ----------
+    s :
+        param window_size:
+    window_size :
+        
+
+    Returns
+    -------
+
     """
     scale_res = []
     if len(s) == window_size:
@@ -80,12 +109,20 @@ def scale_pattern(s,window_size):
     smmoothed_scale_res = smooth(scale_res)
     return np.array(smmoothed_scale_res)
 
-def squeeze_template(s,width):
-    """
-    handy
-    :param s:
-    :param width:
-    :return:
+
+def squeeze_template(s, width):
+    """handy
+
+    Parameters
+    ----------
+    s :
+        param width:
+    width :
+        
+
+    Returns
+    -------
+
     """
     s = np.array(s)
     total_len = len(s)

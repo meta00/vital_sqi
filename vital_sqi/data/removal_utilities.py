@@ -1,12 +1,33 @@
-"""Trimming raw signals using: invalid values, noise at start/end of
-recordings etc."""
+"""
+Trimming raw signals using: invalid values, noise at start/end of
+recordings etc.
+"""
 import numpy as np
 from scipy import signal
 import pandas as pd
 import warnings
 import pmdarima as pm
 
-def remove_unchanged_squences(df,unchanged_seconds = 10,sampling_rate=100, as_dataframe=True):
+
+def remove_unchanged_squences(df, unchanged_seconds=10, sampling_rate=100,
+                              as_dataframe=True):
+    """
+
+    Parameters
+    ----------
+    df :
+        
+    unchanged_seconds :
+         (Default value = 10)
+    sampling_rate :
+         (Default value = 100)
+    as_dataframe :
+         (Default value = True)
+
+    Returns
+    -------
+
+    """
     number_removed_instances = sampling_rate*unchanged_seconds
     if as_dataframe:
         pleth_array = np.array(df["PLETH"])
@@ -39,13 +60,21 @@ def remove_unchanged_squences(df,unchanged_seconds = 10,sampling_rate=100, as_da
     start_milestone,end_milestone = get_start_end_points(start_cut_pivot,end_cut_pivot,len(df))
     return start_milestone,end_milestone
 
-def remove_invalid(df,as_dataframe=True):
-    """
-    Exposed
+
+def remove_invalid(df, as_dataframe=True):
+    """Exposed
     Remove  the list of invalid data signal
-    :param df:
-    :param as_dataframe:
-    :return:
+
+    Parameters
+    ----------
+    df :
+        param as_dataframe:
+    as_dataframe :
+         (Default value = True)
+
+    Returns
+    -------
+
     """
 
     #TODO Cover the case of different input instead of SMARTCARE device
@@ -69,31 +98,52 @@ def remove_invalid(df,as_dataframe=True):
 
     return start_milestone,end_milestone
 
-def trim_data(data,minute_remove=1,sampling_rate=100):
-    """
-    Expose
-    :param data:
-    :param minute_remove:
-    :param sampling_rate:
-    :return:
+
+def trim_data(data, minute_remove=1, sampling_rate=100):
+    """Expose
+
+    Parameters
+    ----------
+    data :
+        param minute_remove:
+    sampling_rate :
+        return: (Default value = 100)
+    minute_remove :
+         (Default value = 1)
+
+    Returns
+    -------
+
     """
     # check if the input trimming length exceed the data length
     if minute_remove*sampling_rate*2 > len(data):
-        warnings.warn("Input trimming length exceed the data length. Return the same array")
+        warnings.warn("Input trimming length exceed the data length. Return "
+                      "the same array")
         return data
     if type(data) == type(pd.DataFrame()):
-        data = data.iloc[minute_remove * 60 * sampling_rate:-(minute_remove * 60 * sampling_rate)]
+        data = data.iloc[minute_remove * 60 *
+                         sampling_rate:-(minute_remove * 60 * sampling_rate)]
     else:
-        data = data[minute_remove * 60 * sampling_rate:-(minute_remove * 60 * sampling_rate)]
+        data = data[minute_remove * 60 *
+                    sampling_rate:-(minute_remove * 60 * sampling_rate)]
     return data
 
+
 def get_start_end_points(start_cut_pivot,end_cut_pivot,length_df):
-    """
-    handy
-    :param start_cut_pivot: array of starting points of the removal segment
-    :param end_cut_pivot: array of relevant ending points of removal segment
-    :param length_df: the length of the origin signal
-    :return:
+    """handy
+
+    Parameters
+    ----------
+    start_cut_pivot :
+        array of starting points of the removal segment
+    end_cut_pivot :
+        array of relevant ending points of removal segment
+    length_df :
+        the length of the origin signal
+
+    Returns
+    -------
+
     """
     if 0 not in np.array(start_cut_pivot):
         start_milestone = np.hstack((0, np.array(end_cut_pivot) + 1))
@@ -106,13 +156,22 @@ def get_start_end_points(start_cut_pivot,end_cut_pivot,length_df):
         end_milestone = np.hstack((np.array(start_cut_pivot)[1:] - 1, length_df - 1))
     return start_milestone,end_milestone
 
+
 def concate_removed_index(start_list,end_list,remove_sliding_window = 0):
-    """
-    handy
-    :param start_list:
-    :param end_list:
-    :param remove_sliding_window:
-    :return:
+    """handy
+
+    Parameters
+    ----------
+    start_list :
+        param end_list:
+    remove_sliding_window :
+        return: (Default value = 0)
+    end_list :
+        
+
+    Returns
+    -------
+
     """
     start_list = np.array(start_list)
     end_list = np.array(end_list)
@@ -123,42 +182,60 @@ def concate_removed_index(start_list,end_list,remove_sliding_window = 0):
     end_out_list = np.delete(end_list, end_list_rm_indices)
     return start_out_list,end_out_list
 
+
 def cut_invalid_rr_peak(df):
-    """
-    expose
-    :param df:
-    :return:
+    """expose
+
+    Parameters
+    ----------
+    df :
+        return:
+
+    Returns
+    -------
+
     """
     #TODO
     return
+
 
 def cut_by_frequency_partition(df_examine,
                                 window_size=None,peak_threshold_ratio=None,
                                 lower_bound_threshold=None,
                                 remove_sliding_window=None,
                                 overlap_rate =None):
-    """
-    Expose
+    """Expose
 
-    :param df_examine:
-    :param window_size:
-    :param peak_threshold_ratio:
-    :param lower_bound_threshold:
-    :param remove_sliding_window:
-    :param overlap_rate:
-    :return:
+    Parameters
+    ----------
+    df_examine :
+        param window_size:
+    peak_threshold_ratio :
+        param lower_bound_threshold: (Default value = None)
+    remove_sliding_window :
+        param overlap_rate: (Default value = None)
+    window_size :
+         (Default value = None)
+    lower_bound_threshold :
+         (Default value = None)
+    overlap_rate :
+         (Default value = None)
+
+    Returns
+    -------
+
     """
-    if window_size == None:
+    if window_size is None:
         window_size = 500
     if window_size > len(df_examine):
         window_size  = len(df_examine)
-    if peak_threshold_ratio == None:
+    if peak_threshold_ratio is None:
         peak_threshold_ratio = 1.8
-    if lower_bound_threshold == None:
+    if lower_bound_threshold is None:
         lower_bound_threshold = 1
-    if remove_sliding_window == None:
+    if remove_sliding_window is None:
         remove_sliding_window = 0
-    if overlap_rate == None:
+    if overlap_rate is None:
         overlap_rate = 1
 
     window = signal.get_window("boxcar", window_size)
@@ -196,21 +273,39 @@ def cut_by_frequency_partition(df_examine,
     return start_milestone_by_freq,end_milestone_by_freq
 
 
-def fill_missing_value(s,missing_index,missing_len,method='arima',lag_ratio = 10):
+def fill_missing_value(s, missing_index, missing_len, method='arima',
+                       lag_ratio=10):
     """
 
-    :param s: array of input time series
-    :param missing_index: array of list of starting indices missing data
-    :param missing_len: array of number of missing instances,
-    matching with the index list
-    :param method:
-    :return:
+    Parameters
+    ----------
+    s :
+        array of input time series
+    missing_index :
+        array of list of starting indices missing data
+    missing_len :
+        array of number of missing instances,
+        matching with the index list
+    method :
+        return:
+        
+        Example:
+        > missing_index = np.where(np.diff(df.TIMESTAMP_MS) > 10)[0]
+        > missing_len = [int((df.TIMESTAMP_MS.iloc[i+1] - df.TIMESTAMP_MS.iloc[i])/10-1)
+        for i in missing]
+        > filled_s = fill_missing_value(np.array(df1.PLETH),missing,missing_len) (Default value = 'arima')
+    lag_ratio :
+         (Default value = 10)
 
-    Example:
-    > missing_index = np.where(np.diff(df.TIMESTAMP_MS) > 10)[0]
-    > missing_len = [int((df.TIMESTAMP_MS.iloc[i+1] - df.TIMESTAMP_MS.iloc[i])/10-1)
-              for i in missing]
-    > filled_s = fill_missing_value(np.array(df1.PLETH),missing,missing_len)
+    Returns
+    -------
+    type
+        Example:
+        > missing_index = np.where(np.diff(df.TIMESTAMP_MS) > 10)[0]
+        > missing_len = [int((df.TIMESTAMP_MS.iloc[i+1] - df.TIMESTAMP_MS.iloc[i])/10-1)
+        for i in missing]
+        > filled_s = fill_missing_value(np.array(df1.PLETH),missing,missing_len)
+
     """
     filled_s = []
     for pos,number_of_missing_instances in zip(missing_index,missing_len):

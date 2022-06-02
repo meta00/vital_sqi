@@ -1,4 +1,9 @@
-""" Splitting long recordings into segments"""
+""" Splitting long recording into segments
+- By duration with option for overlapping
+- By beat
+
+To be revised
+"""
 
 import pandas as pd
 from tqdm import tqdm
@@ -9,14 +14,25 @@ import os
 from vital_sqi.data.removal_utilities import remove_invalid,trim_data
 from vital_sqi.common.rpeak_detection import PeakDetector
 
-def save_segment_image(segment,saved_filename,save_img_folder,display_trough_peak):
-    """
-    handy
-    :param segment:
-    :param saved_filename:
-    :param save_img_folder:
-    :param display_trough_peak:
-    :return:
+
+def save_segment_image(segment, saved_filename, save_img_folder,
+                       display_trough_peak):
+    """handy
+
+    Parameters
+    ----------
+    segment :
+        param saved_filename:
+    save_img_folder :
+        param display_trough_peak:
+    saved_filename :
+        
+    display_trough_peak :
+        
+
+    Returns
+    -------
+
     """
     fig = go.Figure()
     fig.add_traces(go.Scatter(x=np.arange(1, len(segment)),
@@ -33,14 +49,29 @@ def save_segment_image(segment,saved_filename,save_img_folder,display_trough_pea
     )
     fig.write_image(os.path.join(save_img_folder, saved_filename + '.png'))
 
-def save_each_segment(filename,segment_list,save_file_folder,
-                      save_image,save_img_folder,display_trough_peak):
-    """
-    Save each n-second segment into csv and the relevant image
-    :param filename: str, the origin file name
-    :param segment_list: list, the list all split 30-second segments
-    :param display_trough_peak: bool, default = False, display to trough and peak in the saved images
-    :return:
+
+def save_segment(filename, segment_list, save_file_folder,
+                      save_image, save_img_folder, display_trough_peak):
+    """Save each n-second segment into csv and the relevant image
+
+    Parameters
+    ----------
+    filename :
+        str, the origin file name
+    segment_list :
+        list, the list all split 30-second segments
+    display_trough_peak :
+        bool, default = False, display to trough and peak in the saved images
+    save_file_folder :
+        
+    save_image :
+        
+    save_img_folder :
+        
+
+    Returns
+    -------
+
     """
     extension_len = len(str(len(segment_list)))
     i = 1
@@ -55,41 +86,69 @@ def save_each_segment(filename,segment_list,save_file_folder,
             np.savetxt(os.path.join(save_file_folder, saved_filename + '.csv'), segment, delimiter=',')  # as an array
         except Exception as e:
             warnings.warn(e)
-        i=i+1
+        i = i+1
 
-def split_to_segments(signal_data,filename=None,sampling_rate=100.0,
-                         segment_length_second=30.0,minute_remove=5.0,
-                         wave_type="ecg",split_type="time",
-                         is_trim=False,save_file_folder=None,
-                         save_image=False,save_img_folder=None,display_trough_peak=True):
-    """
-    Expose
+
+def split_to_segments(signal_data, filename=None, sampling_rate=100.0,
+                    segment_length_second=30.0, minute_remove=5.0,
+                    wave_type="ecg", split_type="time", is_trim=False,
+                    save_file_folder=None, save_image=False,
+                    save_img_folder=None, display_trough_peak=True):
+    """Expose
     Split the data after applying bandpass filter and removing the first and last n-minutes
     (High pass filter with cutoff at 1Hz)
     The signal is split according to time domain - default is 30s
-    :param filename: str, path to load file
-    :param sampling_rate:float, default = 100.0. The sampling rate of the wearable device
-    :param segment_length:float, default = 30.0. The length of the segment (in seconds)
-    :param minute_remove: float, default = 5.0. The first and last of n-minutes to be removed
-    :return:
+
+    Parameters
+    ----------
+    filename :
+        str, path to load file (Default value = None)
+    sampling_rate :
+        float, default = 100.0. The sampling rate of the wearable device
+    segment_length :
+        float, default = 30.0. The length of the segment (in seconds)
+    minute_remove :
+        float, default = 5.0. The first and last of n-minutes to be removed
+    signal_data :
+        
+    segment_length_second :
+         (Default value = 30.0)
+    wave_type :
+         (Default value = "ecg")
+    split_type :
+         (Default value = "time")
+    is_trim :
+         (Default value = False)
+    save_file_folder :
+         (Default value = None)
+    save_image :
+         (Default value = False)
+    save_img_folder :
+         (Default value = None)
+    display_trough_peak :
+         (Default value = True)
+
+    Returns
+    -------
+
     """
-    if filename == None:
+    if filename is None:
         filename = 'segment'
-    if save_file_folder == None:
+    if save_file_folder is None:
         save_file_folder = '.'
     save_file_folder = os.path.join(save_file_folder, wave_type)
     if not os.path.exists(save_file_folder):
         os.makedirs(save_file_folder)
 
-    if  save_image == True:
-        if save_img_folder == None:
+    if save_image is True:
+        if save_img_folder is None:
             save_img_folder = '.'
         save_img_folder = os.path.join(save_img_folder, "img")
         if not os.path.exists(save_img_folder):
             os.makedirs(save_img_folder)
 
     if is_trim:
-        signal_data = trim_data(signal_data,minute_remove,sampling_rate)
+        signal_data = trim_data(signal_data, minute_remove, sampling_rate)
 
     start_milestone, end_milestone = remove_invalid(signal_data, False)
 
@@ -104,11 +163,26 @@ def split_to_segments(signal_data,filename=None,sampling_rate=100.0,
         segments = segments + [sub_signal_data[chunk_indices[i]:chunk_indices[i+1]]
                                for i in range(len(chunk_indices)-1)]
 
-    save_each_segment(filename, np.array(segments),save_file_folder,
-                      save_image,save_img_folder,display_trough_peak)
+    save_segment(filename, np.array(segments), save_file_folder, save_image,
+                 save_img_folder, display_trough_peak)
 
 
 def generate_segment_idx(segment_length, sampling_rate, signal_array):
+    """
+
+    Parameters
+    ----------
+    segment_length :
+        
+    sampling_rate :
+        
+    signal_array :
+        
+
+    Returns
+    -------
+
+    """
     segments = []
     for channel in signal_array:
         segments.append(np.arange(0,len(channel),segment_length*sampling_rate))
@@ -116,12 +190,19 @@ def generate_segment_idx(segment_length, sampling_rate, signal_array):
 
 
 def get_split_time_index(segment_seconds, sequence):
-    """
-    handy
+    """handy
     Return the index of splitting points
-    :param segment_seconds: the length of each cut split (in seconds)
-    :param sequence:
-    :return:
+
+    Parameters
+    ----------
+    segment_seconds :
+        the length of each cut split (in seconds)
+    sequence :
+        return:
+
+    Returns
+    -------
+
     """
     indices = [int(segment_seconds * i)
                for i in range(0, int(np.ceil(len(sequence) / segment_seconds)))]
@@ -129,12 +210,19 @@ def get_split_time_index(segment_seconds, sequence):
 
 
 def get_split_rr_index(segment_seconds,sequence):
-    """
-    handy
+    """handy
     Return the index of the splitting points
-    :param segment_seconds: the length of each cut split (in seconds)
-    :param sequence:
-    :return:
+
+    Parameters
+    ----------
+    segment_seconds :
+        the length of each cut split (in seconds)
+    sequence :
+        return:
+
+    Returns
+    -------
+
     """
     detector = PeakDetector()
     indices = [0]
