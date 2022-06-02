@@ -52,7 +52,7 @@ print(len(channel_1))
 
 #%%
 
-from vital_sqi.data.segment_split import split_to_segments
+from vital_sqi.preprocess.segment_split import split_to_segments
 
 #%%
 

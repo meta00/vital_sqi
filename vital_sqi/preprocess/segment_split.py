@@ -2,7 +2,7 @@
 - By duration with option for overlapping
 - By beat
 
-To be revised
+To be revised: gom 4 functions cuoi vao split_segment
 """
 
 import pandas as pd
@@ -11,13 +11,14 @@ import plotly.graph_objects as go
 import numpy as np
 import warnings
 import os
-from vital_sqi.data.removal_utilities import remove_invalid,trim_data
+from vital_sqi.data.removal_utilities import remove_invalid_smartcare, \
+    trim_signal
 from vital_sqi.common.rpeak_detection import PeakDetector
 
 
 def save_segment_image(segment, saved_filename, save_img_folder,
                        display_trough_peak):
-    """handy
+    """
 
     Parameters
     ----------
@@ -51,8 +52,10 @@ def save_segment_image(segment, saved_filename, save_img_folder,
 
 
 def save_segment(filename, segment_list, save_file_folder,
-                      save_image, save_img_folder, display_trough_peak):
-    """Save each n-second segment into csv and the relevant image
+                      save_image=None, save_img_folder, display_trough_peak):
+    """
+    Save segment waveform and plot (optional) to csv and image file.
+    Input is a segment with timestamps.
 
     Parameters
     ----------
@@ -89,12 +92,16 @@ def save_segment(filename, segment_list, save_file_folder,
         i = i+1
 
 
+def split_segment(s, by=[duration-0, beat-1], duration=None,
+                   peak_detector=None)
+    return
+
 def split_to_segments(signal_data, filename=None, sampling_rate=100.0,
                     segment_length_second=30.0, minute_remove=5.0,
                     wave_type="ecg", split_type="time", is_trim=False,
                     save_file_folder=None, save_image=False,
                     save_img_folder=None, display_trough_peak=True):
-    """Expose
+    """Expose - to be removed
     Split the data after applying bandpass filter and removing the first and last n-minutes
     (High pass filter with cutoff at 1Hz)
     The signal is split according to time domain - default is 30s
@@ -135,7 +142,7 @@ def split_to_segments(signal_data, filename=None, sampling_rate=100.0,
     if filename is None:
         filename = 'segment'
     if save_file_folder is None:
-        save_file_folder = '.'
+        save_file_folder = '../data'
     save_file_folder = os.path.join(save_file_folder, wave_type)
     if not os.path.exists(save_file_folder):
         os.makedirs(save_file_folder)
@@ -148,9 +155,10 @@ def split_to_segments(signal_data, filename=None, sampling_rate=100.0,
             os.makedirs(save_img_folder)
 
     if is_trim:
-        signal_data = trim_data(signal_data, minute_remove, sampling_rate)
+        signal_data = trim_signal(signal_data, minute_remove, sampling_rate)
 
-    start_milestone, end_milestone = remove_invalid(signal_data, False)
+    start_milestone, end_milestone = remove_invalid_smartcare(signal_data,
+                                                              False)
 
     segments = []
     for start, end in zip(start_milestone, end_milestone):
@@ -168,7 +176,7 @@ def split_to_segments(signal_data, filename=None, sampling_rate=100.0,
 
 
 def generate_segment_idx(segment_length, sampling_rate, signal_array):
-    """
+    """ handy
 
     Parameters
     ----------
@@ -209,7 +217,7 @@ def get_split_time_index(segment_seconds, sequence):
     return indices
 
 
-def get_split_rr_index(segment_seconds,sequence):
+def get_split_rr_index(segment_seconds, sequence):
     """handy
     Return the index of the splitting points
 

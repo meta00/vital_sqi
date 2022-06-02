@@ -209,7 +209,7 @@ def interpolate_signal(s, missing_index, missing_len, method='arima',
 
     """
     filled_s = []
-    for pos,number_of_missing_instances in zip(missing_index,missing_len):
+    for pos, number_of_missing_instances in zip(missing_index, missing_len):
         seg_len = number_of_missing_instances * lag_ratio
         start_seg = max(0, int(pos - seg_len))
         ts = s[start_seg:int(pos)]

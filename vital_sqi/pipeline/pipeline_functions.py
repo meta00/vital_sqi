@@ -1,5 +1,10 @@
 import numpy as np
 import vital_sqi.preprocess.preprocess_signal as sqi_pre
+import heartpy as hp
+from heartpy.analysis import calc_ts_measures, calc_rr, calc_fd_measures,\
+    clean_rr_intervals, calc_poincare, calc_breathing
+from heartpy.peakdetection import check_peaks, detect_peaks
+from vital_sqi.common.rpeak_detection import PeakDetector
 
 
 def get_all_features_heartpy(data_sample, sample_rate=100, rpeak_detector=0):
