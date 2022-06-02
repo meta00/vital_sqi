@@ -2,11 +2,11 @@
 Trimming raw signals using: invalid values, noise at start/end of
 recordings etc.
 
-- output indexes to cut
+- output processed signal
 - input: signal (s) in pandas df, check by type checking function (utils,
 io - find it).
-- rename function
 - bo option as_dataframe
+- them option_index
 """
 import numpy as np
 from scipy import signal
@@ -16,7 +16,7 @@ import pmdarima as pm
 
 
 def remove_unchanged(s, unchanged_seconds=10, sampling_rate=100,
-                              as_dataframe=True):
+                              output_index=False):
     """
     Remove flat signal waveform. Unchanged signals are considered noise. This
     is observed in PPG waveform.
@@ -34,7 +34,8 @@ def remove_unchanged(s, unchanged_seconds=10, sampling_rate=100,
 
     Returns
     -------
-
+        array
+         Start and end indexes of flat segments
     """
     number_removed_instances = sampling_rate*unchanged_seconds
     if as_dataframe:
@@ -68,7 +69,7 @@ def remove_unchanged(s, unchanged_seconds=10, sampling_rate=100,
     start_milestone, end_milestone = get_start_end_points(start_cut_pivot,
                                                           end_cut_pivot,
                                                           len(s))
-    return start_milestone, end_milestone
+    return start_milestone, end_milestone # chuyen thanh 1 array
 
 
 def remove_invalid_smartcare(s, info, as_dataframe=True):
