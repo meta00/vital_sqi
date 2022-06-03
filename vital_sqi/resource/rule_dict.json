@@ -1,167 +1,1271 @@
 {
-"perfusion": {
-  "name": "perfusion",
-  "def": [
-    {"op": ">", "value": " ", "label": "accept"},
-    {"op": "<=", "value": " ", "label": "reject"}],
-  "unit": "cycle",
-  "desc": "The gold standard for assessment of PPG signal quality in industrial pulse oximeters. Defined as the ratio of the pulsatile (AC) part of the waveform to the static (DC) part of the waveform",
-  "ref": "Elgendi2016",
-  "type": ["ECG", "PPG"],
-  "category": "waveform"
+  "snr": {
+    "name": "snr",
+    "def": [
+      {
+        "op": ">",
+        "value": "-0.01",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-0.01",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.01",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.01",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"skewness": {
-   "name": "skewness",
-   "def": [
-      {"op": ">", "value": " ", "label": "accept"},
-      {"op": "<=", "value": " ", "label": "reject"}],
-  "unit": "cycle",
-  "desc": "A statistical measure of the symmetry (or the lack of it) in the analysed signal",
-   "ref": "Krishnan2010",
-   "type": ["ECG", "PPG"],
-   "category": "statistical"
+  "perfusion": {
+    "name": "perfusion",
+    "def": [
+      {
+        "op": ">",
+        "value": "33108.87",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "33108.87",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "8917154.7",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "8917154.7",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"kurtosis": {
-  "name": "kurtosis",
-  "def": [
-      {"op": ">", "value": " ", "label": "accept"},
-      {"op": "<=", "value": " ", "label": "reject"}],
-  "unit": "",
-  "desc": "A statistical measure of the analysed signal around mean compared to normal distribution",
-  "ref": "Selvaraj2011",
-  "type": ["ECG", "PPG"],
-  "category": "statistical"
+  "mean_cross": {
+    "name": "mean_cross",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.02",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.02",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.07",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.07",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"entropy": {
-  "name": "entropy",
-  "def": [
-    {"op": ">", "value": " ", "label": "accept"},
-    {"op": "<=", "value": " ", "label": "reject"}],
-  "unit": "",
-  "desc": "Entropy: A statistical measure that quantifies the different between probability density functions of analysed signal and uniform distribution.",
-  "ref": "Selvaraj2011",
-  "type": ["ECG", "PPG"],
-  "category": "statistical"
+  "zero_cross": {
+    "name": "zero_cross",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.03",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.03",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.07",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.07",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"zero_crossing_rate": {
-  "name": "zero_crossing_rate",
-  "def": [
-      {"op": ">", "value": " ", "label": "accept"},
-      {"op": "<=", "value": " ", "label": "reject"}],
-  "unit": "",
-  "desc": "A rate of how often the signal crosses the zero (switches between positive and negative value)",
-  "ref": "Elgendi2016",
-  "type": ["ECG", "PPG"],
-  "category": "waveform"
+  "msq": {
+    "name": "msq",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.27",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.27",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.99",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.99",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"snr": {
-  "name": "snr",
-  "def": [
-    {"op": ">", "value": " ", "label": "accept"},
-    {"op": "<=", "value": " ", "label": "reject"}],
-  "unit": "",
-  "desc": "Signal-to-noise ratio: In this case, SNR is defined as the ratio between the analysed signal variance and its noise variance",
-  "ref": "Elgendi2016",
-  "type": ["ECG", "PPG"],
-  "category": "waveform"
+  "dtw_mean": {
+    "name": "dtw_mean",
+    "def": [
+      {
+        "op": ">",
+        "value": "-0.0",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-0.0",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "-0.0",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "-0.0",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"msq": {
-  "name": "msq",
-  "def": [
-      {"op": ">", "value": " ", "label": "accept"},
-      {"op": "<=", "value": " ", "label": "reject"}],
-  "unit":"",
-  "desc": "Matching of multiple systolic wave detection or R peak algorithms: A measure of agreement between multiple different peak detection algorithms used on the analysed signal",
-  "ref": "Elgendi2016",
-  "type": ["ECG", "PPG"],
-  "category": "waveform"
+  "dtw_std": {
+    "name": "dtw_std",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.0",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.0",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.0",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.0",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"relative_power": {
-  "name": "relative_power",
-  "def": [
-    {"op": ">", "value": " ", "label": "accept"},
-    {"op": "<=", "value": " ", "label": "reject"}],
-  "unit": "",
-  "desc": "Relative power: The ratio between power spectral density within the frequency band of interest (1-2.25Hz) and the whole signal (0-8Hz)",
-  "ref": "Selvaraj2011",
-  "type": ["ECG", "PPG"],
-  "category": "waveform"
+  "correlogram_peak1": {
+    "name": "correlogram_peak1",
+    "def": [
+      {
+        "op": ">",
+        "value": "23.0",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "23.0",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "59.22",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "59.22",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"acf": {
-  "name": "acf",
-  "def": [
-      {"op": ">", "value": " ", "label": "accept"},
-      {"op": "<=", "value": " ", "label": "reject"}],
-  "unit": "",
-  "desc": "Auto-correlation based signal quality indices: Signal quality indices extracted from the correlogram computed by autcorrelation of the analysed signal",
-  "ref": "Pradhan2019",
-  "type": ["ECG", "PPG"],
-  "category": "waveform"
+  "correlogram_peak2": {
+    "name": "correlogram_peak2",
+    "def": [
+      {
+        "op": ">",
+        "value": "43.39",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "43.39",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "119.44",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "119.44",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"dtw": {
-  "name": "dtw",
-  "def": [
-      {"op": ">", "value": " ", "label": "accept"},
-      {"op": "<=", "value": " ", "label": "reject"}],
-  "unit": "cycle",
-  "desc": "Dynamic time warping: Compute correlation between a template signal and the analysed signal using dynamic type warping",
-  "ref": "Li2012",
-  "type": ["ECG", "PPG"],
-  "category": "waveform"
+  "correlogram_peak3": {
+    "name": "correlogram_peak3",
+    "def": [
+      {
+        "op": ">",
+        "value": "68.39",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "68.39",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "178.66",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "178.66",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"lf_energy": {
-  "name": "lf_energy",
-  "def": [
-      {"op": ">", "value": "0.5", "label": "accept"},
-      {"op": "<=", "value": "0.5", "label": "reject"}],
-  "unit": "10",
-  "desc": "Low-frequency time marginal energy: Peak value in the low frequency band (0-0.5 Hz). High value of lf_energy indicates baseline drift or flat line (constant amplitude)",
-  "ref": "DiMarco2012",
-  "type": ["ECG"],
-  "category": "waveform"
+  "correlogram_value1": {
+    "name": "correlogram_value1",
+    "def": [
+      {
+        "op": ">",
+        "value": "-0.54",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-0.54",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.98",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.98",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"qrs_energy": {
-  "name": "qrs_energy",
-  "def": [
-      {"op": ">", "value": "0.5", "label": "accept"},
-      {"op": "<=", "value": "0.5", "label": "reject"}],
-  "unit": "10",
-  "desc": "Peak value in the QRS frequency band (5-25 Hz). High value of qrs_energy indicates",
-  "ref": "DiMarco2012",
-  "type": ["ECG"],
-  "category": "waveform"
+  "correlogram_value2": {
+    "name": "correlogram_value2",
+    "def": [
+      {
+        "op": ">",
+        "value": "-0.16",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-0.16",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.98",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.98",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"hf_energy": {
-  "name": "hf_energy",
-  "def": [
-      {"op": ">", "value": "0.5", "label": "accept"},
-      {"op": "<=", "value": "0.5", "label": "reject"}],
-  "unit": "10",
-  "desc": "High frequency time marginal energy: Peak frequency in band over 100 Hz",
-  "ref": "DiMarco2012",
-  "type": ["ECG"],
-  "category": "waveform"
+  "correlogram_value3": {
+    "name": "correlogram_value3",
+    "def": [
+      {
+        "op": ">",
+        "value": "-0.51",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-0.51",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.95",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.95",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"vhf_energy": {
-  "name": "qrs_energy",
-  "def": [
-      {"op": ">", "value": "0.5", "label": "accept"},
-      {"op": "<=", "value": "0.5", "label": "reject"}],
-  "unit": "10",
-  "desc": "Very high frequency band frequency marginal: Normalised median value in the frequency band above 150 Hz over 10s recording",
-  "ref": "DiMarco2012",
-  "type": ["ECG"],
-  "category": "waveform"
+  "skewness": {
+    "name": "skewness",
+    "def": [
+      {
+        "op": ">",
+        "value": "-0.26",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-0.26",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.87",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.87",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   },
-"qrs_amplitude": {
-  "name": "qrs_amplitude",
-  "def": [
-      {"op": ">", "value": "0.5", "label": "accept"},
-      {"op": "<=", "value": "0.5", "label": "reject"}],
-  "unit": "10",
-  "desc": "Median value of the peak-to-nadir amplitude difference of the QRS complexes detected",
-  "ref": "DiMarco2012",
-  "type": ["ECG"],
-  "category": "waveform"
+  "skewness_mean": {
+    "name": "skewness_mean",
+    "def": [
+      {
+        "op": ">",
+        "value": "-0.46",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-0.46",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.97",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.97",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "skewness_median": {
+    "name": "skewness_median",
+    "def": [
+      {
+        "op": ">",
+        "value": "-0.47",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-0.47",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.98",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.98",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "skewness_std": {
+    "name": "skewness_std",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.02",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.02",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.25",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.25",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "kurtosis": {
+    "name": "kurtosis",
+    "def": [
+      {
+        "op": ">",
+        "value": "-1.25",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-1.25",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "1.17",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "1.17",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "kurtosis_mean": {
+    "name": "kurtosis_mean",
+    "def": [
+      {
+        "op": ">",
+        "value": "-1.61",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-1.61",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "-0.37",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "-0.37",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "kurtosis_median": {
+    "name": "kurtosis_median",
+    "def": [
+      {
+        "op": ">",
+        "value": "-1.63",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "-1.63",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "-0.36",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "-0.36",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "kurtosis_std": {
+    "name": "kurtosis_std",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.01",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.01",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.42",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.42",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "entropy": {
+    "name": "entropy",
+    "def": [
+      {
+        "op": ">",
+        "value": "7.73",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "7.73",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "7.96",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "7.96",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "entropy_mean": {
+    "name": "entropy_mean",
+    "def": [
+      {
+        "op": ">",
+        "value": "3.16",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "3.16",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "4.36",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "4.36",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "entropy_median": {
+    "name": "entropy_median",
+    "def": [
+      {
+        "op": ">",
+        "value": "3.16",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "3.16",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "4.36",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "4.36",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "entropy_std": {
+    "name": "entropy_std",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.01",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.01",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.32",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.32",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "mean_nni": {
+    "name": "mean_nni",
+    "def": [
+      {
+        "op": ">",
+        "value": "403.74",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "403.74",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "1031.03",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "1031.03",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "sdnn": {
+    "name": "sdnn",
+    "def": [
+      {
+        "op": ">",
+        "value": "7.93",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "7.93",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "676.03",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "676.03",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "sdsd": {
+    "name": "sdsd",
+    "def": [
+      {
+        "op": ">",
+        "value": "11.3",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "11.3",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "831.8",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "831.8",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "nni_50": {
+    "name": "nni_50",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.0",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.0",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "20.44",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "20.44",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "pnni_50": {
+    "name": "pnni_50",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.0",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.0",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "67.61",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "67.61",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "nni_20": {
+    "name": "nni_20",
+    "def": [
+      {
+        "op": ">",
+        "value": "1.39",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "1.39",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "28.22",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "28.22",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "pnni_20": {
+    "name": "pnni_20",
+    "def": [
+      {
+        "op": ">",
+        "value": "2.26",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "2.26",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "86.33",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "86.33",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "rmssd": {
+    "name": "rmssd",
+    "def": [
+      {
+        "op": ">",
+        "value": "11.31",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "11.31",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "831.94",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "831.94",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "median_nni": {
+    "name": "median_nni",
+    "def": [
+      {
+        "op": ">",
+        "value": "403.9",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "403.9",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "1041.1",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "1041.1",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "range_nni": {
+    "name": "range_nni",
+    "def": [
+      {
+        "op": ">",
+        "value": "40.0",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "40.0",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "3778.6",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "3778.6",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "cvsd": {
+    "name": "cvsd",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.02",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.02",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "1.01",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "1.01",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "cvnni": {
+    "name": "cvnni",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.02",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.02",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "0.78",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "0.78",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "mean_hr": {
+    "name": "mean_hr",
+    "def": [
+      {
+        "op": ">",
+        "value": "58.18",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "58.18",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "143.81",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "143.81",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "max_hr": {
+    "name": "max_hr",
+    "def": [
+      {
+        "op": ">",
+        "value": "62.36",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "62.36",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "201.52",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "201.52",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "min_hr": {
+    "name": "min_hr",
+    "def": [
+      {
+        "op": ">",
+        "value": "10.9",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "10.9",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "134.0",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "134.0",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "std_hr": {
+    "name": "std_hr",
+    "def": [
+      {
+        "op": ">",
+        "value": "1.12",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "1.12",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "22.2",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "22.2",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "lf": {
+    "name": "lf",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.33",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.33",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "89777.57",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "89777.57",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "hf": {
+    "name": "hf",
+    "def": [
+      {
+        "op": ">",
+        "value": "4.23",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "4.23",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "40866.56",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "40866.56",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "lf_hf_ratio": {
+    "name": "lf_hf_ratio",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.0",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.0",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "15.57",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "15.57",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "lfnu": {
+    "name": "lfnu",
+    "def": [
+      {
+        "op": ">",
+        "value": "0.46",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "0.46",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "93.92",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "93.92",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "hfnu": {
+    "name": "hfnu",
+    "def": [
+      {
+        "op": ">",
+        "value": "4.57",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "4.57",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "99.33",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "99.33",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
+  },
+  "total_power": {
+    "name": "total_power",
+    "def": [
+      {
+        "op": ">",
+        "value": "8.07",
+        "label": "accept"
+      },
+      {
+        "op": "<=",
+        "value": "8.07",
+        "label": "reject"
+      },
+      {
+        "op": ">=",
+        "value": "151606.01",
+        "label": "reject"
+      },
+      {
+        "op": "<",
+        "value": "151606.01",
+        "label": "accept"
+      }
+    ],
+    "desc": "",
+    "ref": ""
   }
 }
