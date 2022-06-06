@@ -43,7 +43,7 @@ def calculate_power(freq, pow, fmin, fmax):
     return band_power
 
 
-def get_interpolated_data(ts_rr, bpm_list, sampling_frequency,
+def get_interpolated_nn(ts_rr, bpm_list, sampling_frequency,
                           interpolation_method="linear"):
     """
     Method to interpolate the outlier hr data
@@ -142,7 +142,7 @@ def calculate_psd(rr_intervals, method='welch',
     ts_rr, bpm_list = get_time_and_bpm(rr_intervals)
 
     if method == 'welch':
-        nni_interpolation = get_interpolated_data(ts_rr,
+        nni_interpolation = get_interpolated_nn(ts_rr,
                                                   bpm_list,
                                                   hr_sampling_frequency)
         # ---------- Remove DC Component ---------- #

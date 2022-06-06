@@ -1,15 +1,14 @@
-"""Signal quality indexes based on dynamic template matching"""
-
-import numpy as np
-from scipy.stats import kurtosis, skew, entropy
-from vital_sqi.common.rpeak_detection import PeakDetector
-import vital_sqi.preprocess.preprocess_signal as sqi_pre
-
 """
 Most of the sqi scores are obtained from the following paper Elgendi,
 Mohamed, Optimal signal quality index for photoplethysmogram
 signals, Bioengineering.
+
+List of sqi
+
 """
+
+import numpy as np
+from scipy.stats import kurtosis, skew, entropy
 
 
 def perfusion_sqi(x, y):
@@ -253,83 +252,3 @@ def mean_crossing_rate_sqi(y, threshold=1e-10, ref_magnitude=None,
     return zero_crossings_rate_sqi(y-np.mean(y), threshold, ref_magnitude,
                                    pad, zero_pos, axis)
 
-
-def msq_sqi(y, peaks_1, peak_detect2=6):
-    """
-    MSQ SQI as defined in Elgendi et al
-    "Optimal Signal Quality Index for Photoplethysmogram Signals"
-    with modification of the second algorithm used.
-    Instead of Bing's, a SciPy built-in implementation is used.
-    The SQI tracks the agreement between two peak detectors
-    to evaluate quality of the signal.
-
-    Parameters
-    ----------
-    x : sequence
-        A signal with peaks.
-
-    peaks_1 : array of int  
-        Already computed peaks arry from the primary peak_detector
-
-    peak_detect2 : int
-        Type of the second peak detection algorithm, default = Scipy
-
-    Returns
-    -------
-    msq_sqi : number
-        MSQ SQI value for the given signal
-
-    """
-    detector = PeakDetector(wave_type='ppg')
-    peaks_2,_ = detector.ppg_detector(y, detector_type=peak_detect2, preprocess=False)
-    if len(peaks_1)==0 or len(peaks_2)==0:
-        return 0.0
-    peak1_dom = len(np.intersect1d(peaks_1,peaks_2))/len(peaks_1)
-    peak2_dom = len(np.intersect1d(peaks_2,peaks_1))/len(peaks_2)
-    return min(peak1_dom, peak2_dom)
-
-def per_beat_sqi(sqi_func, troughs, signal, taper, **kwargs):
-    """
-    Perform a per-beat application of the selected SQI function on the signal segment
-
-    Parameters
-    ----------
-    sqi_func : function 
-        An SQI function to be performed.
-
-    troughs : array of int  
-        Idices of troughs in the signal provided by peak detector to be able to extract individual beats
-
-    signal : 
-        Signal array containing one segment of the waveform
-
-    taper : bool
-        Is each beat need to be tapered or not before executing the SQI function
-
-    **kwargs : dict
-        Additional positional arguments that needs to be fed into the SQI function
-
-    Returns
-    -------
-    calculated_SQI : array
-        An array with SQI values for each beat of the signal
-
-    """
-    #Remove first and last trough as they might be on the edge
-    troughs = troughs[1:-1]
-    if len(troughs) > 2:
-        sqi_vals = []
-        for idx, beat_start in enumerate(troughs[:-1]):
-            single_beat = signal[beat_start:troughs[idx+1]]
-            if taper:
-                single_beat = sqi_pre.tapering(single_beat)
-            if len(kwargs) != 0:
-                args = tuple(kwargs.values()) 
-                sqi_vals.append(sqi_func(single_beat, *args))
-            else:
-                sqi_vals.append(sqi_func(single_beat))
-        return sqi_vals
-
-    else:
-        return -np.inf
-        raise Exception("Not enough peaks in the signal to generate per beat SQI")

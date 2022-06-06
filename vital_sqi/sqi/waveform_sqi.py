@@ -1,5 +1,8 @@
 """
-Implementation of SQIs for ECG raw signals based on DiMarco2012.
+Implementation of SQIs for waveform:
+ - For ECG based on DiMarco2012.
+ - For PPG to be coded (Khoa check with Stefan)
+ Doi lai tham so signal
 """
 import scipy.signal as sn
 import numpy as np
@@ -124,8 +127,7 @@ def vhf_norm_power_sqi(signal, sampling_rate, band=[150, np.Inf]):
     sampling_rate :
 
     band :
-         (Default value = [150)
-    np.Inf] :
+         (Default value = [150, np.Inf] :
 
 
     Returns
@@ -165,7 +167,7 @@ def qrs_a_sqi(signal, sampling_rate):
     """
     detector = PeakDetector(wave_type='ecg', fs=sampling_rate)
     peaks, troughs, nadirs = detector.ecg_detector(signal,
-                                            detector_type="pan_tompkins")
+                                            detector_type=7)
     peak_to_nadir = np.array(peaks) - np.array(nadirs)
     peak_to_nadir = np.delete(peak_to_nadir, np.where(peak_to_nadir > 5))
     qrs_a = np.median(peak_to_nadir)

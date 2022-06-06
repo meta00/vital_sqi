@@ -315,3 +315,55 @@ def get_value_label_list(df, boundaries, interval_label_list):
         else:
             value_label_list[idx] = decision.iloc[0]["label"]
     return value_label_list
+
+
+def cut_segment(df,milestone):
+    """
+    Spit Dataframe into segments, base on the pair of start and end indices.
+
+    Parameters
+    ----------
+    df :
+        Signal dataframe .
+    milestone :
+        Indices dataframe
+
+    Returns
+    -------
+    The list of split segments.
+    """
+    assert isinstance(milestone,pd.DataFrame), "Please convert the milestone as dataframe " \
+                                               "with 'start' and 'end' columns. " \
+                                               ">>> from vital_sqi.common.utils import format_milestone" \
+                                               ">>> milestones = format_milestone(start_milestone,end_milestone)"
+    start_milestone = np.array(milestone.iloc[:,0])
+    end_milestone = np.array(milestone.iloc[:, 1])
+    processed_df = []
+    for start, end in zip(start_milestone, end_milestone):
+        processed_df.append(df.iloc[int(start):int(end)])
+    return processed_df
+
+
+def format_milestone(start_milestone, end_milestone):
+    """
+
+    Parameters
+    ----------
+    start_milestone :
+        array-like represent the start indices of segment.
+    end_milestone :
+        array-like represent the end indices of segment.
+
+    Returns
+    -------
+    a dataframe of two columns.
+    The first column indicates the start indices, the second indicates the end indices
+    """
+    assert len(start_milestone) == end_milestone, "The list of  start indices and end indices must equal size"
+    df_milestones = pd.DataFrame()
+    df_milestones['start'] = start_milestone
+    df_milestones['end'] = end_milestone
+    return df_milestones
+
+def check_signal_format(s):
+    return True

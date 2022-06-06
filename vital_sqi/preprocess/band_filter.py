@@ -3,8 +3,9 @@ import numpy as np
 from scipy.signal import butter, lfilter, freqz
 from scipy import signal
 
+
 class BandpassFilter:
-    def __init__(self,band_type="butter",fs=100):
+    def __init__(self, band_type="butter", fs=100):
         """
 
         :param band_type: type of bandpass.
