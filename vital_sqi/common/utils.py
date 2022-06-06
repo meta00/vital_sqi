@@ -344,10 +344,8 @@ def cut_segment(df,milestone):
     return processed_df
 
 
-def format_milestone(start_milestone,end_milestone):
+def format_milestone(start_milestone, end_milestone):
     """
-    Save segment waveform and plot (optional) to csv and image file.
-    Input is a segment with timestamps.
 
     Parameters
     ----------
@@ -366,3 +364,6 @@ def format_milestone(start_milestone,end_milestone):
     df_milestones['start'] = start_milestone
     df_milestones['end'] = end_milestone
     return df_milestones
+
+def check_signal_format(s):
+    return True
