@@ -9,43 +9,10 @@ io - find it).
 - them option_index
 """
 import numpy as np
-from scipy import signal
-from vital_sqi.common.utils import generate_timestamp
+from vital_sqi.common.utils import cut_segment, format_milestone
 import pandas as pd
 import warnings
 import pmdarima as pm
-
-def get_df_format(df,sampling_rate):
-    """
-    handy function to convert array-like to dataframe format with timestamp
-    :param s:
-    :param sampling_rate:
-    :return:
-    """
-    if isinstance(df,pd.DataFrame):
-        return df
-    timestamps = generate_timestamp(None,sampling_rate,len(df))
-    df = pd.DataFrame(
-        np.hstack((np.array(timestamps).reshape(-1, 1),
-                   np.array(df).reshape(-1,1)))
-    )
-    return df
-
-def get_processed_df(df,start_milestone,end_milestone):
-    """
-    handy function to split the valid segment
-
-    :param df:
-    :param start_milestone:
-    :param end_milestone:
-    :return:
-    """
-    processed_df = []
-    milestones = []
-    for start, end in zip(start_milestone, end_milestone):
-        milestones = [start, end]
-        processed_df.append(df.iloc[start:end])
-    return processed_df, milestones
 
 def get_start_end_points(start_cut_pivot, end_cut_pivot, length_df):
     """handy
@@ -74,8 +41,8 @@ def get_start_end_points(start_cut_pivot, end_cut_pivot, length_df):
         end_milestone = np.hstack((np.array(start_cut_pivot)[1:] - 1, length_df - 1))
     return start_milestone, end_milestone
 
-def remove_unchanged(df, unchanged_seconds=10, sampling_rate=100,
-                              output_index=False):
+def remove_unchanged(s, unchanged_seconds=10, sampling_rate=100,
+                              output_signal=True):
     """
     Remove flat signal waveform. Unchanged signals are considered noise. This
     is observed in PPG waveform.
@@ -95,15 +62,15 @@ def remove_unchanged(df, unchanged_seconds=10, sampling_rate=100,
          Start and end indexes of flat segments
     """
     # Check to convert format to dataframe with timestamp
-    df = get_df_format(df, sampling_rate)
+    assert check_signal_format(s) is True
 
     number_removed_instances = sampling_rate*unchanged_seconds
-    signal_array = np.array(df.iloc[:,1])
+    signal_array = np.array(s.iloc[:,1])
     diff = np.diff(signal_array)         # 123 35 4 0 0 0 0 0 0 123 34 3 1 5 0 0 23 45
     unchanged_idx = np.where(diff == 0)[0]  # 3 4 5 6 7 8 14 15
     if len(unchanged_idx) < 1:
         start_milestone = [0]
-        end_milestone = [len(df)]
+        end_milestone = [len(s)]
     else:
         continuous_dict = {} #index of continuous value and the len
         continuous_len = 0
@@ -128,17 +95,19 @@ def remove_unchanged(df, unchanged_seconds=10, sampling_rate=100,
 
         start_milestone, end_milestone = get_start_end_points(start_cut_pivot,
                                                               end_cut_pivot,
-                                                              len(df))
+                                                              len(s))
+        milestones = format_milestone(start_milestone,end_milestone)
     #=====================================================================================
     #          Discard the unchanged => return list of dataframe
     #=====================================================================================
-    processed_df, milestones = get_processed_df(df,start_milestone,end_milestone)
-    if output_index:
-        return processed_df,milestones
-    return processed_df
+    # processed_df, milestones = get_processed_df(df,start_milestone,end_milestone)
+    if output_signal:
+        processed_df = cut_segment(s, milestones)
+        return processed_df, milestones
+    return milestones
 
 
-def remove_invalid_smartcare(df, sampling_rate=100, output_index=False):
+def remove_invalid_smartcare(s, output_signal=True):
     """
     Filter invalid signal sample in PPG recorded by Smartcare oximeter.
     Expect input to include additional SmartCare fields
@@ -161,18 +130,18 @@ def remove_invalid_smartcare(df, sampling_rate=100, output_index=False):
     """
 
     # Check to convert format to dataframe with timestamp
-    df = get_df_format(df, sampling_rate)
+    assert check_signal_format(s) is True
 
     if {"SPO2_PCT","PERFUSION_INDEX","PULSE_BPM"}.issubset(set(df.columns)):
-        spo2_array = np.array(df["SPO2_PCT"])
-        perfusion_array = np.array(df["PERFUSION_INDEX"])
-        pulse_array = np.array(df["PULSE_BPM"])
-        indices_start_end = np.where((df["PLETH"] != 0) & (spo2_array >= 80)
+        spo2_array = np.array(s["SPO2_PCT"])
+        perfusion_array = np.array(s["PERFUSION_INDEX"])
+        pulse_array = np.array(s["PULSE_BPM"])
+        indices_start_end = np.where((s["PLETH"] != 0) & (spo2_array >= 80)
                                      & (pulse_array <= 255) & (
                                              perfusion_array >= 0.1))[0]
     else:
-        s = df.iloc[:, 1]
-        indices_start_end = np.where(s != 0)[0]
+        s_channel = s.iloc[:, 1]
+        indices_start_end = np.where(s_channel != 0)[0]
     diff_res = indices_start_end[1:] - indices_start_end[:-1]
     diff_loc = np.where(diff_res > 1)[0]
     start_milestone = [indices_start_end[0]]
@@ -181,14 +150,15 @@ def remove_invalid_smartcare(df, sampling_rate=100, output_index=False):
         end_milestone.append(indices_start_end[loc]+1)
         start_milestone.append(indices_start_end[loc+1])
     end_milestone.append(indices_start_end[-1]+1)
+    milestones = format_milestone(start_milestone, end_milestone)
 
-    processed_df, milestones = get_processed_df(df, start_milestone, end_milestone)
-    if output_index:
+    if output_signal:
+        processed_df = cut_segment(s, milestones)
         return processed_df, milestones
-    return processed_df
+    return milestones
 
 
-def trim_signal(df, minute_remove=1, sampling_rate=100):
+def trim_signal(s, minute_remove=1, sampling_rate=100):
     """Expose
 
     Parameters
@@ -205,15 +175,15 @@ def trim_signal(df, minute_remove=1, sampling_rate=100):
 
     """
     # check if the input trimming length exceed the data length
-    if minute_remove*sampling_rate*2 > len(df):
+    if int(minute_remove*sampling_rate*2) > len(s):
         warnings.warn("Input trimming length exceed the data length. Return "
                       "the same array")
-        return df
+        return s
 
-    df = get_df_format(df,sampling_rate)
-    df = df.iloc[minute_remove * 60 *
-                         sampling_rate:-(minute_remove * 60 * sampling_rate)]
-    return df
+    assert check_signal_format(s) is True
+    s = s.iloc[int(minute_remove * 60 *
+                         sampling_rate):-int(minute_remove * 60 * sampling_rate)]
+    return s
 
 
 def remove_invalid_peak(nn_intervals):
@@ -231,7 +201,7 @@ def remove_invalid_peak(nn_intervals):
     return
 
 
-def interpolate_signal(df, missing_index, missing_len, method='arima',
+def interpolate_signal(s, missing_index, missing_len, method='arima',
                        lag_ratio=10):
     """
 
@@ -265,8 +235,8 @@ def interpolate_signal(df, missing_index, missing_len, method='arima',
         > filled_s = fill_missing_value(np.array(df1.PLETH),missing,missing_len)
 
     """
-    df = get_df_format(df)
-    s = df.iloc[:1]
+    assert check_signal_format(s) is True
+    s_channel = s.iloc[:1]
     filled_s = []
     for pos, number_of_missing_instances in zip(missing_index, missing_len):
         seg_len = number_of_missing_instances * lag_ratio
@@ -290,6 +260,6 @@ def interpolate_signal(df, missing_index, missing_len, method='arima',
 
         fc, confint = model.predict(n_periods=number_of_missing_instances, return_conf_int=True)
         filled_s = filled_s + list(ts) + list(fc)
-    filled_s = filled_s + list(s[int(pos):])
-    df.iloc[:,1] = filled_s
-    return df
+    filled_s = filled_s + list(s_channel[int(pos):])
+    s.iloc[:,1] = filled_s
+    return s

@@ -15,6 +15,7 @@ import plotly.graph_objects as go
 import numpy as np
 import warnings
 import os
+from vital_sqi.common.utils import cut_segment
 from vital_sqi.common.rpeak_detection import PeakDetector
 
 
@@ -93,33 +94,32 @@ def split_segment(s, split_type=0, duration=30.0,
 
     Returns
     -------
-
+    >>>from vital_sqi.common.utils import generate_timestamp
+    >>>s = np.arange(100000)
+    >>>timestamps = generate_timestamp(None,100,len(s))
+    >>>df = pd.DataFrame(np.hstack((np.array(timestamps).reshape(-1,1),
+                                 np.array(s).reshape(-1,1))))
+    >>>split_segment(df,overlaping=3)
     """
-    # start_milestone, end_milestone = remove_invalid_smartcare(s,
-    #                                                           False)
-    start_milestone = [0]
-    end_milestone = [len(s)-1]
-    segments = []
-    for start, end in zip(start_milestone, end_milestone):
-        sub_signal_data = s[int(start):int(end)]
-        if split_type == 0:
-            chunk_size = duration * sampling_rate
-            chunk_step = overlaping * sampling_rate
-            chunk_indices = [
-                sub_signal_data[i:i+chunk_size] for i in range(0,len(sub_signal_data),chunk_size-chunk_step)
+    if split_type == 0:
+        chunk_size = int(duration * sampling_rate)
+        chunk_step = int(overlaping * sampling_rate)
+        chunk_indices = [
+                [int(i),int(i + chunk_size)] for i in
+                range(0, len(s), chunk_size - chunk_step)
             ]
+    else:
+        if wave_type == 'ppg':
+            detector = PeakDetector(wave_type='ppg')
+            peak_list, trough_list = detector.ppg_detector(s, detector_type=peak_detector)
         else:
-            if wave_type == 'ppg':
-                detector = PeakDetector(wave_type='ppg')
-                peak_list, trough_list = detector.ppg_detector(sub_signal_data, detector_type=peak_detector)
-            else:
-                detector = PeakDetector(wave_type='ecg')
-                peak_list, trough_list = detector.ecg_detector(sub_signal_data, detector_type=peak_detector)
-            chunk_indices = [
-                peak_list[i:i+duration] for i in range(0,len(peak_list),duration-overlaping)
-            ]
-            chunk_indices[0] = 0
+            detector = PeakDetector(wave_type='ecg')
+            peak_list, trough_list = detector.ecg_detector(s, detector_type=peak_detector)
+        chunk_indices = [
+                [peak_list[i],peak_list[i+duration]] for i in range(0,len(peak_list),int(duration-overlaping))
+        ]
+        chunk_indices[0] = 0
+    milestones = pd.DataFrame(chunk_indices)
+    cut_df = cut_segment(s, milestones)
+    return cut_df, milestones
 
-        segments = segments + [sub_signal_data[chunk_indices[i]:chunk_indices[i + 1]]
-                               for i in range(len(chunk_indices) - 1)]
-    return segments
