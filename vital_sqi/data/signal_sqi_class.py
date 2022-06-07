@@ -42,12 +42,16 @@ class SignalSQI:
             assert value == 'ecg' or value == 'ppg', \
                 'Expected either ecg or ppg.'
         if name == 'signals':
-            assert isinstance(value, pd.DataFrame), 'Expected signals as a' \
-                                                    'dataframe with ' \
-                                                    'one channel per column.'
+            assert isinstance(value, pd.DataFrame), \
+                'Expected signals as a pd.DataFrame with one channel per ' \
+                'column.'
         if name == 'sampling_rate':
-            assert np.isreal(value), 'Expected a numeric value. Sampling ' \
-                                     'rate is round up to the nearest integer.'
+            assert np.isreal(value), \
+                'Expected a numeric value. Sampling rate is round up to the ' \
+                'nearest integer.'
+        if name == 'info':
+            assert np.isinstance(value, pd.DataFrame), \
+                'Expected info as a pd.DataFrame.'
         # if name == 'start_datetime':
         #     assert isinstance(value, str) or \
         #            isinstance(value, dt.datetime) or \
@@ -55,7 +59,7 @@ class SignalSQI:
         #         'Expected str or datetime object, or None'
         if name == 'sqis':
             assert isinstance(value, pd.DataFrame) or value is None, \
-                'Expected SQI table as a dataframe or None'
+                'Expected SQI table as a pd.DataFrame or None'
         if name == 'rules':
             assert isinstance(value, list) or \
                    value is None, 'Expected rules as a list of Rule objects.'
