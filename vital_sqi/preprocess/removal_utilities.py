@@ -9,6 +9,8 @@ io - find it).
 - them option_index
 """
 import numpy as np
+import pandas as pd
+
 from vital_sqi.common.utils import cut_segment, format_milestone, \
     check_signal_format
 import warnings
@@ -55,10 +57,11 @@ def remove_unchanged(s, duration=10, sampling_rate=100,
     Parameters
     ----------
     s : pandas DataFrame
-        Signal, with first column as pandas Timestamp and second column as float
+        Signal, with first column as pandas Timestamp and second column as
+        float.
     duration : float
         (Default value = 10)
-        Number of seconds considered to be noise to remove
+        Number of seconds considered to be noise to remove.
     sampling_rate : float
         (Default value = 100)
     output_signal : bool
@@ -70,7 +73,7 @@ def remove_unchanged(s, duration=10, sampling_rate=100,
     Returns
     -------
     processed_s : pandas DataFrame
-        Processed signal, i.e. signal with the unchanged segments removed
+        Processed signal, i.e. signal with the unchanged segments removed.
     milestones: pandas DataFrame
         DataFrame of two columns containing start and end indexes for the
         retained segments.
@@ -120,7 +123,7 @@ def remove_invalid_smartcare(s, info, output_signal=True):
     """Filtering invalid signal sample in PPG waveform recorded by the Smartcare
     oximeter based on other values generated from the oximeter such as SpO2,
     Pulse, Perfusion. This function expects additional SmartCare PPG fields
-    in the input and could be adapted for other
+    in the input and could be adapted for signals from other devices.
 
     Invalid samples are one with either:
     - signal value = 0
@@ -131,7 +134,8 @@ def remove_invalid_smartcare(s, info, output_signal=True):
     Parameters
     ----------
     s : pandas DataFrame
-        Signal, with first column as pandas Timestamp and second column as float
+        Signal, with first column as pandas Timestamp and second column as
+        float.
     info : pandas DataFrame
         Info generated from Smartcare containing "SPO2_PCT", "PERFUSION_INDEX",
         "PULSE_BPM" columns.
@@ -143,13 +147,16 @@ def remove_invalid_smartcare(s, info, output_signal=True):
     Returns
     -------
     processed_s : pandas DataFrame
-        Processed signal, i.e. signal with the invalid samples removed
+        Processed signal, i.e. signal with the invalid samples removed.
     milestones: pandas DataFrame
         DataFrame of two columns containing start and end indexes for the
         retained segments.
     
     """
-    assert check_signal_format(s) is True
+    check_signal_format(s)
+    assert isinstance(info, pd.DataFrame), ''
+    assert {"SPO2_PCT", "PERFUSION_INDEX", "PULSE_BPM"}.issubset(set(
+            info.columns)) is True, warnings
     info.columns = str.capitalize(info.columns)
 
     if {"SPO2_PCT", "PERFUSION_INDEX", "PULSE_BPM"}.issubset(set(info.columns)):
@@ -179,33 +186,48 @@ def remove_invalid_smartcare(s, info, output_signal=True):
     return milestones
 
 
-def trim_signal(s, duration_left=300, duration_right=300, sampling_rate=100):
-    """ Trimming
+def trim_signal(s, sampling_rate, duration_left=300, duration_right=300):
+    """ Trimming signal ends. Signal, especially ECG, obtained from wearables in
+    hospital setting often has noises in a few minutes at the beginning and at
+    the end of recording.
 
     Parameters
     ----------
-    s :
-        
-    sampling_rate :
-        return: (Default value = 100)
-    duration_left :
-        second
+    s : pandas DataFrame
+        Signal, with the first column of pd.Timestamp type and the second
+        column of float.
+
+    sampling_rate : float or int
+
+    duration_left : float or int
+        Number of seconds to trim from the left end (beginning).
         (Default value = 300)
-    duration_right :
+
+    duration_right : float or int
+        Number of seconds to trim from the right end (end).
         (Default value = 300)
 
     Returns
     -------
-
-    
+        processed_s : pandas DataFrame
+        Processed signal, i.e. signal with the ends of chosen durations removed.
     """
+    check_signal_format(s)
+    assert np.isreal(duration_right) or duration_right is None, \
+        'Expected a numeric value or None'
+    assert np.isreal(duration_left) or duration_left is None, \
+        'Expected a numeric value or None'
+    assert np.isreal(sampling_rate), 'Expected a numeric value'
+    if duration_left is None:
+        duration_left = 0
+    if duration_right is None:
+        duration_left = 0
+
     # check if the input trimming length exceed the data length
     if int((duration_left+duration_right)*sampling_rate*2) > len(s):
-        warnings.warn("Input trimming length exceed the data length. Return "
-                      "the same array")
+        warnings.warn("Trimming length exceeds the signal length. "
+                      "The input signal is returned.")
         return s
-
-    assert check_signal_format(s) is True
     s = s.iloc[int(duration_left * sampling_rate):-int(duration_right *
                                                        sampling_rate)]
     return s
