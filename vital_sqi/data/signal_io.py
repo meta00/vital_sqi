@@ -86,7 +86,7 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
         timestamps = generate_timestamp(start_datetime, sampling_rate,
                                         len(signals))
         signals.insert(0, 'timestamps', timestamps)
-        info = [header, signal_headers]
+        info = pd.DataFrame[header, signal_headers]
         out = SignalSQI(signals=signals,
                         wave_type='ecg',
                         start_datetime=start_datetime,
@@ -99,6 +99,7 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
                                channel_names=channel_name,
                                warn_empty=True,
                                return_res=64)
+        info = pd.DataFrame(info)
         if sampling_rate is None:
             try:
                 sampling_rate = info['fs']
@@ -177,11 +178,11 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
 
     file_type : edf or mit or csv
 
-    info : list
+    info : pd.DataFrame
         In case of writing edf file: A list containing signal_headers and
-        header (in
-        order). signal_headers is a list of dict with one signal header for
-        each signal channel. header (dict) contain ecg file information.
+        header (in order). signal_headers is a list of dict with one signal
+        header for each signal channel. header (dict) contain ecg file
+        information.
         In case of writing wfdb record (mit file): A dict containing header
         as defined in .hea file.
         (Default value = None)
@@ -201,8 +202,8 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
     if file_type == 'edf':
         signals = signals.transpose()
         if info is not None:
-            signal_headers = info[1]
-            header = info[0]
+            signal_headers = info.iloc[:, 1]
+            header = info.iloc[:, 0]
             annotations = header['annotations']
             # issue https://github.com/holgern/pyedflib/issues/119 - fixed to
             # be checked
@@ -304,7 +305,7 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
     if sampling_rate is None:
         sampling_rate = utils.calculate_sampling_rate(timestamps)
     
-    info = tmp[info_idx].to_dict('list')
+    info = pd.DataFrame(tmp[info_idx])
     signals = tmp[signal_idx]
     signals.insert(0, 'timestamps', timestamps)
     out = SignalSQI(signals=signals, wave_type='ppg',
@@ -333,8 +334,7 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
         start_datetime=signal_sqi.start_datetime,
         sampling_rate=signal_sqi.sampling_rate,
         signal_length=len(signal_sqi.signals))
-    signals = signal_sqi.signals.iloc[:,1]
-    timestamps = np.array(timestamps)
+    signals = signal_sqi.signals.iloc[:, 1]
     out_df = pd.DataFrame({'time': timestamps, 'pleth': signals})
     if file_type == 'csv':
         out_df.to_csv(file_name, index=False, header=True)
@@ -342,7 +342,7 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
         out_df.to_excel(file_name, index=False, header=True)
     return os.path.isfile(file_name)
 
-import os, tempfile
+# import os, tempfile
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/example.edf')
 # out = ECG_reader(file_in, 'edf')
