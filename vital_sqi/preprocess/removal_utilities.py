@@ -1,12 +1,5 @@
 """
-Trimming raw signals using: invalid values, noise at start/end of
-recordings etc.
 
-- output processed signal
-- input: signal (s) in pandas df, check by type checking function (utils,
-io - find it).
-- bo option as_dataframe
-- them option_index
 """
 import numpy as np
 import pandas as pd
@@ -48,8 +41,7 @@ def get_start_end_points(start_cut_pivot, end_cut_pivot, length_df):
     return start_milestone, end_milestone
 
 
-def remove_unchanged(s, duration=10, sampling_rate=100,
-                     output_signal=True):
+def remove_unchanged(s, sampling_rate, duration=10, output_signal=True):
     """Unchanged signal samples, i.e., flat segments, of over an user-defined
     duration are considered noise and to be removed. This is observed in PPG
     waveform, probably due to loose sensor.
@@ -59,16 +51,17 @@ def remove_unchanged(s, duration=10, sampling_rate=100,
     s : pandas DataFrame
         Signal, with first column as pandas Timestamp and second column as
         float.
-    duration : float
+
+    sampling_rate : float or int
+
+    duration : float or int
         (Default value = 10)
-        Number of seconds considered to be noise to remove.
-    sampling_rate : float
-        (Default value = 100)
+        Duration of unchanged signal, in seconds, to be considered noise.
+
     output_signal : bool
         (Default value = True)
         Option to output processed signal. If False, only milestones is
         returned.
-
 
     Returns
     -------
@@ -79,7 +72,14 @@ def remove_unchanged(s, duration=10, sampling_rate=100,
         retained segments.
     """
 
-    assert check_signal_format(s) is True
+    check_signal_format(s)
+    assert np.isreal(sampling_rate), 'Expected a numeric value.'
+    assert np.isreal(duration) or duration is None, \
+        'Expected a numeric value or None.'
+    assert isinstance(output_signal, bool), 'Expected a boolean value.'
+
+    if duration is None:
+        duration = 0
     number_removed_instances = sampling_rate*duration
     signal_array = np.array(s.iloc[:, 1])
     diff = np.diff(signal_array)  # 123 35 4 0 0 0 0 0 0 123 34 3 1 5 0 0 23 45
@@ -159,6 +159,7 @@ def remove_invalid_smartcare(s, info, output_signal=True):
             info.columns)) is False:
         warnings.warn('Info does not contain Smartcare columns. '
                       'Using only signal to filter')
+    assert isinstance(output_signal, bool), 'Expected a boolean value.'
 
     info.columns = str.capitalize(info.columns)
 
@@ -255,33 +256,38 @@ def remove_invalid_peak(nn_intervals):
 
 def interpolate_signal(s, missing_index, missing_len, method='arima',
                        lag_ratio=10):
-    """
+    """ Interpolating signal with arima method (default).
 
     Parameters
     ----------
-    s :
-        array-like signal
+    s : pandas DataFrame
+        Signal, with the first column of pd.Timestamp type and the second
+        column of float.
+
     missing_index :
         array of list of starting indices missing data
     missing_len :
         array of number of missing instances,
         matching with the index list
-    method :
-        return:
+    method : str
+        Interpolation method. Only 'arima' is supported at the moment.
         Example:
         > missing_index = np.where(np.diff(df.TIMESTAMP_MS) > 10)[0]
-        > missing_len = [int((df.TIMESTAMP_MS.iloc[i+1] - df.TIMESTAMP_MS.iloc[i])/10-1)
-        for i in missing]
-        > filled_s = fill_missing_value(np.array(df1.PLETH),missing,missing_len) (Default value = 'arima')
+        > missing_len = [int((df.TIMESTAMP_MS.iloc[i+1] -
+                        df.TIMESTAMP_MS.iloc[i])/10-1) for i in missing]
+        > filled_s = fill_missing_value(np.array(df1.PLETH),missing,missing_len)
+    (Default value = 'arima')
     lag_ratio :
         (Default value = 10)
 
     Returns
     -------
+        s: pandas DataFrame
+        Interpolated signal.
 
     
     """
-    assert check_signal_format(s) is True
+    check_signal_format(s)
     s_channel = s.iloc[:1]
     filled_s = []
     for pos, number_of_missing_instances in zip(missing_index, missing_len):
@@ -297,10 +303,11 @@ def interpolate_signal(s, missing_index, missing_len, method='arima',
                                   stationary=False,
                                   information_criterion='aic', alpha=0.005,
                                   test='kpss', seasonal_test='ocsb',
-                              stepwise=True, n_jobs=4, start_params=None,
-                              trend=None, method='lbfgs', maxiter=50,
-                                  offset_test_args=None, seasonal_test_args=None,
-                              suppress_warnings=True, error_action='trace',
+                                  stepwise=True, n_jobs=4, start_params=None,
+                                  trend=None, method='lbfgs', maxiter=50,
+                                  offset_test_args=None,
+                                  seasonal_test_args=None,
+                                  suppress_warnings=True, error_action='trace',
                                   trace=False, random=False,
                                   random_state=None, n_fits=10,
                                   return_valid_fits=False,
