@@ -87,7 +87,7 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
     ----------
     start_datetime :
 
-    sampling_rate : float
+    sampling_rate : float or int
 
     signal_length : int
 
@@ -107,7 +107,7 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
     # for value in time_range.range(dt.timedelta(seconds=1 / sampling_rate)):
     for value in range(1, signal_length):
             timestamps.append(timestamps[value-1] + 1 / sampling_rate)
-    return timestamps
+    return pd.Timestamp(timestamps)
 
 
 def parse_datetime(string, type='datetime'):
@@ -332,10 +332,11 @@ def cut_segment(df,milestone):
     -------
     The list of split segments.
     """
-    assert isinstance(milestone,pd.DataFrame), "Please convert the milestone as dataframe " \
-                                               "with 'start' and 'end' columns. " \
-                                               ">>> from vital_sqi.common.utils import format_milestone" \
-                                               ">>> milestones = format_milestone(start_milestone,end_milestone)"
+    assert isinstance(milestone, pd.DataFrame), \
+        "Please convert the milestone as dataframe " \
+        "with 'start' and 'end' columns. " \
+        ">>> from vital_sqi.common.utils import format_milestone" \
+        ">>> milestones = format_milestone(start_milestone,end_milestone)"
     start_milestone = np.array(milestone.iloc[:,0])
     end_milestone = np.array(milestone.iloc[:, 1])
     processed_df = []
@@ -366,4 +367,10 @@ def format_milestone(start_milestone, end_milestone):
     return df_milestones
 
 def check_signal_format(s):
+    assert isinstance(s, pd.DataFrame), 'Expected a pd.DataFrame.'
+    assert len(s.columns) is 2, 'Expect a datafram of only two columns.'
+    assert isinstance(s.iloc[:, 0], pd.Timestamp), \
+        'Expected type of the first column to be pd.Timestamp.'
+    assert isinstance(s.iloc[:, 1], float), \
+        'Expected type of the second column to be float'
     return True
