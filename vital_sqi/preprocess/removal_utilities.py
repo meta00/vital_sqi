@@ -154,9 +154,12 @@ def remove_invalid_smartcare(s, info, output_signal=True):
     
     """
     check_signal_format(s)
-    assert isinstance(info, pd.DataFrame), ''
-    assert {"SPO2_PCT", "PERFUSION_INDEX", "PULSE_BPM"}.issubset(set(
-            info.columns)) is True, warnings
+    assert isinstance(info, pd.DataFrame), 'Expected a pd.DataFrame.'
+    if {"SPO2_PCT", "PERFUSION_INDEX", "PULSE_BPM"}.issubset(set(
+            info.columns)) is False:
+        warnings.warn('Info does not contain Smartcare columns. '
+                      'Using only signal to filter')
+
     info.columns = str.capitalize(info.columns)
 
     if {"SPO2_PCT", "PERFUSION_INDEX", "PULSE_BPM"}.issubset(set(info.columns)):
