@@ -57,7 +57,7 @@ def save_segment(segment_list, filename='segment', save_file_folder=None,
         zero_adding = "".join(["0"] * (extension_len - len(str(i))))
 
         try:
-            saved_filename = filename+"-" + zero_adding + str(i)
+            saved_filename = filename + "-" + zero_adding + str(i)
             if save_image:
 
                 fig = go.Figure()
@@ -82,25 +82,25 @@ def split_segment(s, sampling_rate, split_type=1, duration=30.0,
     s : pandas DataFrame
         Signal, with the first column of pd.Timestamp type and the second
         column of float.
-
     sampling_rate : float or int
-
     split_type : int
         0: split by time
         1: split by beat
         (Default value = 1)
     duration : float or int
-        Length of segment in seconds, if split by time or in number of beats,
-        if split by beat. Round up to the neareat int.
+        Length of segment in seconds (split_type = 0) or number of beats (
+        split_type = 1).
         (Default value = 30)
-    peak_detector :
-        The type of peak detection if split the segment by beat.
+    overlapping : int
+
+        (Default value = None)
+    peak_detector : int
+        The type of peak detector (split_type = 1). List of
+        supported peak detectors, check 'resource/peak_detector.lst'
         (Default value = 7)
-    wave_type :
+    wave_type : str
         Type of signal, either 'ppg' or 'ecg'
         (Default value = 'ppg')
-    overlapping : int
-         (Default value = None)
 
     Returns
     -------
