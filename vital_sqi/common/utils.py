@@ -4,6 +4,8 @@ import numpy as np
 import datetime as dt
 import os
 import json
+from vital_sqi.common.rpeak_detection import PeakDetector
+from hrvanalysis import get_nn_intervals
 
 import pandas as pd
 from datetimerange import DateTimeRange
@@ -367,3 +369,19 @@ def format_milestone(start_milestone, end_milestone):
 
 def check_signal_format(s):
     return True
+
+def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,remove_ectopic_beat=False):
+    if wave_type=='ppg':
+        detector = PeakDetector(wave_type='ppg')
+        peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
+    else:
+        detector = PeakDetector(wave_type='ecg')
+        peak_list, trough_list = detector.ecg_detector(s, detector_type=rpeak_method)
+
+    rr_list = np.diff(peak_list) * (1000 / sample_rate)
+    if not remove_ectopic_beat:
+        return rr_list
+    nn_list = get_nn_intervals(rr_list)
+    nn_list_non_na = np.copy(nn_list)
+    nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+    return nn_list_non_na
