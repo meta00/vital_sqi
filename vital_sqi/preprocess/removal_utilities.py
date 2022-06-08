@@ -250,7 +250,6 @@ def remove_invalid_peak(nn_intervals):
 
     
     """
-    #TODO
     return
 
 
