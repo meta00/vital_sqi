@@ -2,6 +2,7 @@
 - By duration
 - By beat
 """
+import warnings
 
 import pandas as pd
 from tqdm import tqdm
@@ -112,7 +113,23 @@ def split_segment(s, sampling_rate, split_type=1, duration=30.0,
                                  np.array(s).reshape(-1,1))))
     >>>split_segment(df,overlapping=3)
     """
-    assert check_signal_format(s) is True
+    check_signal_format(s)
+    assert np.isreal(sampling_rate), 'Expected a numeric value.'
+    assert split_type is 1 or split_type is 0, 'Expected either 0 or 1.'
+    assert np.isreal(duration) or duration is None, \
+        'Expected a numeric value or None'
+    assert np.isreal(overlapping) or None, 'Expected a numeric value or None'
+    assert isinstance(peak_detector, int), 'Expected an int value in range [' \
+                                           '0, 7].'
+    assert 0 <= peak_detector <= 7, 'Expected an int value in range [0, 7].'
+    assert wave_type is 'ppg' or wave_type is 'ecg', 'Expected str of either ' \
+                                                     '"ppg" or "ecg".'
+    # To complete list of peak detectors for each type and assert accordingly.
+    if overlapping is None:
+        overlapping = 0
+    if duration is None:
+        warnings.warn('Segment duration not defined')
+        return None
     if split_type is 0:
         chunk_size = int(duration * sampling_rate)
         chunk_step = int(overlapping * sampling_rate)
