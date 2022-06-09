@@ -6,8 +6,8 @@ from heartpy.analysis import calc_ts_measures, calc_rr, calc_fd_measures,\
     clean_rr_intervals, calc_poincare, calc_breathing
 from heartpy.peakdetection import check_peaks
 from vital_sqi.common.rpeak_detection import PeakDetector
-from vital_sqi.common.utils import get_nn
-from vital_sqi.data.signal_io import PPG_reader
+from vital_sqi.common.utils import get_nn,generate_rule,create_rule_def
+from vital_sqi.rule import RuleSet
 import warnings
 import inspect
 import vital_sqi.sqi as sq
@@ -332,8 +332,8 @@ def compute_SQI(signal, segment_length='30s', primary_peakdet=7, secondary_peakd
         raise Exception("Wrong type of waveform supplied. Only accepts 'ppg' or 'ecg'.")
     return sqis
 
-# Example Pipeline
-# def pipeline(file_name):
+# Example Pipeline to get sqi
+# def pipeline_sqi(file_name):
 #     out = PPG_reader(file_name,
 #                      timestamp_idx=['TIMESTAMP_MS'], signal_idx=['PLETH'], info_idx=['PULSE_BPM',
 #                                                                                      'SPO2_PCT', 'PERFUSION_INDEX'],
@@ -347,3 +347,29 @@ def compute_SQI(signal, segment_length='30s', primary_peakdet=7, secondary_peakd
 #     sqis = compute_SQI(ppg_stable, '30s')
 #     print(sqis)
 #     return sqis
+
+
+def get_decision(df_sqi,selected_rule,json_rule_dict):
+    rule_list = {}
+    for (i, selected_sqi) in zip(range(len(selected_rule)), selected_rule):
+        rule = generate_rule(selected_sqi, json_rule_dict[selected_sqi]['def'])
+
+        rule_list[i + 1] = rule
+    ruleset = RuleSet(rule_list)
+
+    decision_list = []
+    for idx in range(len(df_sqi)):
+        row_data = pd.DataFrame(dict(df_sqi[selected_rule].iloc[idx]), index=[0])
+        decision_list.append(ruleset.execute(row_data))
+
+    return decision_list
+
+def example_rule_decision(df_sqi):
+    selected_rule = ['msq', 'entropy_std']
+    for single_rule in selected_rule:
+        boundary = np.around(np.quantile(df_sqi[single_rule], [0.05, 0.95]), decimals=2)
+        upper_bound = boundary[1]
+        lower_bound = boundary[0]
+        json_rule_dict = create_rule_def(single_rule,upper_bound, lower_bound)
+    decision_list = get_decision(df_sqi,selected_rule,json_rule_dict)
+    df_sqi['decision'] = decision_list

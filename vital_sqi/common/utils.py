@@ -5,6 +5,7 @@ import datetime as dt
 import os
 import json
 from vital_sqi.common.rpeak_detection import PeakDetector
+from vital_sqi.rule import Rule
 from hrvanalysis import get_nn_intervals
 
 import pandas as pd
@@ -385,3 +386,28 @@ def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,remove_ectopic_beat=
     nn_list_non_na = np.copy(nn_list)
     nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
     return nn_list_non_na
+
+
+def generate_rule(rule_name,rule_def):
+    rule_def, boundaries, label_list = update_rule(rule_def, is_update=False)
+    rule_detail = {'def': rule_def,
+                     'boundaries': boundaries,
+                     'labels': label_list}
+    rule = Rule(rule_name,rule_detail)
+    return rule
+
+
+def create_rule_def(sqi_name, upper_bound=0, lower_bound=1):
+    json_rule_dict = {}
+    json_rule_dict[sqi_name] = {
+        "name": sqi_name,
+        "def": [
+            {"op": ">", "value": str(lower_bound), "label": "accept"},
+            {"op": "<=", "value": str(lower_bound), "label": "reject"},
+            {"op": ">=", "value": str(upper_bound), "label": "reject"},
+            {"op": "<", "value": str(upper_bound), "label": "accept"},
+        ],
+        "desc": "",
+        "ref": ""
+    }
+    return json_rule_dict
