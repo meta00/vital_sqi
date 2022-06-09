@@ -50,7 +50,7 @@ class SignalSQI:
                 'Expected a numeric value. Sampling rate is round up to the ' \
                 'nearest integer.'
         if name == 'info':
-            assert np.isinstance(value, pd.DataFrame), \
+            assert isinstance(value, (list, dict, pd.DataFrame)), \
                 'Expected info as a pd.DataFrame.'
         # if name == 'start_datetime':
         #     assert isinstance(value, str) or \
