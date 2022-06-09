@@ -1,9 +1,8 @@
-import warnings
-
 import numpy as np
 import datetime as dt
 import os
 import json
+
 
 import pandas as pd
 from datetimerange import DateTimeRange
@@ -367,3 +366,19 @@ def format_milestone(start_milestone, end_milestone):
 
 def check_signal_format(s):
     return True
+
+
+def create_rule_def(sqi_name, upper_bound=0, lower_bound=1):
+    json_rule_dict = {}
+    json_rule_dict[sqi_name] = {
+        "name": sqi_name,
+        "def": [
+            {"op": ">", "value": str(lower_bound), "label": "accept"},
+            {"op": "<=", "value": str(lower_bound), "label": "reject"},
+            {"op": ">=", "value": str(upper_bound), "label": "reject"},
+            {"op": "<", "value": str(upper_bound), "label": "accept"},
+        ],
+        "desc": "",
+        "ref": ""
+    }
+    return json_rule_dict

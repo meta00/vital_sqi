@@ -4,8 +4,13 @@ import vital_sqi.preprocess.preprocess_signal as sqi_pre
 import heartpy as hp
 from heartpy.analysis import calc_ts_measures, calc_rr, calc_fd_measures,\
     clean_rr_intervals, calc_poincare, calc_breathing
-from heartpy.peakdetection import check_peaks, detect_peaks
+from heartpy.peakdetection import check_peaks
+from hrvanalysis import get_nn_intervals
 from vital_sqi.common.rpeak_detection import PeakDetector
+from vital_sqi.common.utils import create_rule_def
+from vital_sqi.rule import RuleSet,Rule,update_rule
+import warnings
+import inspect
 import vital_sqi.sqi as sq
 
 
@@ -79,53 +84,6 @@ def get_all_features_heartpy(data_sample, sample_rate=100, rpeak_detector=0):
     return time_domain_features, frequency_domain_features
 
 
-def per_beat_sqi(sqi_func, troughs, signal, taper, **kwargs):
-    """
-    Perform a per-beat application of the selected SQI function on the signal
-    segment
-
-    Parameters
-    ----------
-    sqi_func : function
-        An SQI function to be performed.
-
-    troughs : array of int
-        Idices of troughs in the signal provided by peak detector to be able to extract individual beats
-
-    signal :
-        Signal array containing one segment of the waveform
-
-    taper : bool
-        Is each beat need to be tapered or not before executing the SQI function
-
-    **kwargs : dict
-        Additional positional arguments that needs to be fed into the SQI function
-
-    Returns
-    -------
-    calculated_SQI : array
-        An array with SQI values for each beat of the signal
-
-    """
-    #Remove first and last trough as they might be on the edge
-    troughs = troughs[1:-1]
-    if len(troughs) > 2:
-        sqi_vals = []
-        for idx, beat_start in enumerate(troughs[:-1]):
-            single_beat = signal[beat_start:troughs[idx+1]]
-            if taper:
-                single_beat = sqi_pre.taper_signal(single_beat)
-            if len(kwargs) != 0:
-                args = tuple(kwargs.values())
-                sqi_vals.append(sqi_func(single_beat, *args))
-            else:
-                sqi_vals.append(sqi_func(single_beat))
-        return sqi_vals
-
-    else:
-        return -np.inf
-
-
 MASTER_SQI_DICT = {
     #Standard SQI
     'perf':     sq.perfusion_sqi,
@@ -142,6 +100,27 @@ MASTER_SQI_DICT = {
     'msq':      sq.msq_sqi,
     #HRV SQI
     #TODO
+    'nn_mean_sqi':          sq.nn_mean_sqi,
+    'sdnn_sqi':             sq.sdnn_sqi,
+    'sdsd_sqi':             sq.sdsd_sqi,
+    'rmssd_sqi':            sq.rmssd_sqi,
+    'cvsd_sqi':             sq.cvsd_sqi,
+    'cvnn_sqi':             sq.cvnn_sqi,
+    'mean_nn_sqi':          sq.mean_nn_sqi,
+    'median_nn_sqi':        sq.median_nn_sqi,
+    'pnn_sqi':              sq.pnn_sqi,
+    'hr_mean_sqi':          sq.hr_mean_sqi,
+    'hr_median_sqi':        sq.hr_median_sqi,
+    'hr_min_sqi':           sq.hr_min_sqi,
+    'hr_max_sqi':           sq.hr_max_sqi,
+    'hr_range_sqi':         sq.hr_range_sqi,
+    'peak_frequency_sqi':   sq.peak_frequency_sqi,
+    'absolute_power_sqi':   sq.absolute_power_sqi,
+    'log_power_sqi':        sq.log_power_sqi,
+    'relative_power_sqi':   sq.relative_power_sqi,
+    'normalized_power_sqi': sq.normalized_power_sqi,
+    'lf_hf_ratio_sqi':      sq.lf_hf_ratio_sqi,
+    # 'poincare_feature_sqi': sq.poincare_feature_sqi,
     #Waveform SQI
     'be':       sq.band_energy_sqi,
     'lfe':      sq.lf_energy_sqi,
@@ -209,3 +188,215 @@ def calculate_SQI(waveform_segment, trough_list, taper, sqi_dict):
     return pd.Series(SQI_dict)
 
 
+def per_beat_sqi(sqi_func, troughs, signal, taper, **kwargs):
+    """
+    Perform a per-beat application of the selected SQI function on the signal
+    segment
+
+    Parameters
+    ----------
+    sqi_func : function
+        An SQI function to be performed.
+
+    troughs : array of int
+        Idices of troughs in the signal provided by peak detector to be able to extract individual beats
+
+    signal :
+        Signal array containing one segment of the waveform
+
+    taper : bool
+        Is each beat need to be tapered or not before executing the SQI function
+
+    **kwargs : dict
+        Additional positional arguments that needs to be fed into the SQI function
+
+    Returns
+    -------
+    calculated_SQI : array
+        An array with SQI values for each beat of the signal
+
+    """
+    #Remove first and last trough as they might be on the edge
+    troughs = troughs[1:-1]
+    if len(troughs) > 2:
+        sqi_vals = []
+        for idx, beat_start in enumerate(troughs[:-1]):
+            single_beat = signal[beat_start:troughs[idx+1]]
+            if taper:
+                single_beat = sqi_pre.taper_signal(single_beat)
+            if len(kwargs) != 0:
+                args = tuple(kwargs.values())
+                sqi_vals.append(sqi_func(single_beat, *args))
+            else:
+                sqi_vals.append(sqi_func(single_beat))
+        return sqi_vals
+
+    else:
+        return -np.inf
+        raise Exception("Not enough peaks in the signal to generate per beat SQI")
+
+
+def get_sqi_dict(sqis, sqi_name):
+    """
+
+    :param sqis:
+    :param sqi_name:
+    :return:
+    """
+    if isinstance(sqis, dict):
+        return sqis
+
+    if isinstance(sqis, (float, int)):
+        return {sqi_name: sqis}
+
+    if isinstance(sqis, list):
+        SQI_dict = {}
+        variations_stats = ['_mean', '_median', '_std']
+        SQI_dict[sqi_name + variations_stats[1]] = np.mean(sqis)
+        SQI_dict[sqi_name + variations_stats[2]] = np.median(sqis)
+        SQI_dict[sqi_name + variations_stats[3]] = np.std(sqis)
+        return SQI_dict
+
+    if sqi_name == 'correlogram':
+        SQI_dict = {}
+        variations_acf = ['_peak1', '_peak2', '_peak3', '_value1', '_value2', '_value3']
+        for idx, variations in enumerate(variations_acf):
+            SQI_dict['correlogram' + variations] = sqis[idx]
+
+    if isinstance(sqis, tuple):
+        SQI_dict = {}
+        for features_dict in sqis:
+            SQI_dict = {**SQI_dict, **features_dict}
+        return SQI_dict
+
+def get_sqi(sqi_func, s, per_beat=False,
+            wave_type='ppg',peak_detector=7,
+            **kwargs):
+    signal_arg = inspect.getfullargspec(sqi_func)[0][0]
+    if signal_arg == 'nn_interval':
+        warnings.warn("Using a SQI requires NN interval input")
+    if per_beat:
+        # Prepare primary peak detector and perform peak detection
+        detector = PeakDetector()
+        if wave_type =='ppg':
+            peak_list, trough_list = detector.ppg_detector(s,
+                                                    peak_detector)
+        else:
+            peak_list, trough_list = detector.ecg_detector(s,
+                                                    peak_detector)
+        sqi_scores = per_beat_sqi(sqi_func, trough_list, s, **kwargs)
+    else:
+        if 'wave_type' in inspect.getfullargspec(sqi_func)[0]:
+            kwargs['wave_type'] = wave_type
+        sqi_scores = sqi_func(s,**kwargs)
+        sqi_name = sqi_func.__name__
+    sqi_score_dict = get_sqi_dict(sqi_scores,sqi_name)
+    return sqi_score_dict
+
+
+def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,remove_ectopic_beat=False):
+    if wave_type=='ppg':
+        detector = PeakDetector(wave_type='ppg')
+        peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
+    else:
+        detector = PeakDetector(wave_type='ecg')
+        peak_list, trough_list = detector.ecg_detector(s, detector_type=rpeak_method)
+
+    rr_list = np.diff(peak_list) * (1000 / sample_rate)
+    if not remove_ectopic_beat:
+        return rr_list
+    nn_list = get_nn_intervals(rr_list)
+    nn_list_non_na = np.copy(nn_list)
+    nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+    return nn_list_non_na
+
+
+def segment_PPG_SQI_extraction(sig,sqi_list,nn_sqi_list,nn_sqi_arg_list,sqi_arg_list):
+    """
+
+    :param sig:
+    :param sqi_list: list of sqi as in MASTERDICT
+    :param nn_sqi_list: list of sqi using nn_intervals as in 'HRV' MASTER_DICT
+    :param nn_sqi_arg_list:
+    :param sqi_arg_list:
+    :return:
+    """
+    s = sig.iloc[:,1]
+    sqi_score = {}
+    for sqi_ in sqi_list:
+        try:
+            sqi_score = {**sqi_score,**get_sqi(sqi_,s)}
+        except Exception as err:
+            print(err)
+            continue
+    for (sqi_,args_) in zip(nn_sqi_list, nn_sqi_arg_list):
+        try:
+            nn_intervals = get_nn(s)
+            sqi_score = {**sqi_score,**get_sqi(sqi_,nn_intervals,**args_)}
+        except Exception as err:
+            print(err)
+            continue
+    return pd.Series(sqi_score)
+
+def compute_SQI(signal, segment_length='30s', primary_peakdet=7, secondary_peakdet=6, wave_type='ppg', sampling_rate=100, template_type=1):
+    if wave_type == 'ppg':
+        try:
+            sqis = signal.groupby(pd.Grouper(freq=segment_length)).apply(segment_PPG_SQI_extraction)
+        except Exception as e:
+            return None
+    # elif wave_type == 'ecg':
+    #     sqis = signal.groupby(pd.Grouper(freq=segment_length)).apply(segment_ECG_SQI_extraction, sampling_rate, primary_peakdet, secondary_peakdet, (1, 1), (20, 4), template_type)
+    else:
+        raise Exception("Wrong type of waveform supplied. Only accepts 'ppg' or 'ecg'.")
+    return sqis
+
+# Example Pipeline to get sqi
+# def pipeline_sqi(file_name):
+#     out = PPG_reader(file_name,
+#                      timestamp_idx=['TIMESTAMP_MS'], signal_idx=['PLETH'], info_idx=['PULSE_BPM',
+#                                                                                      'SPO2_PCT', 'PERFUSION_INDEX'],
+#                      start_datetime='2020-04-12 10:00:00')
+#
+#     ppg_stable = out.signals
+#
+#     ppg_stable.index = pd.to_timedelta(ppg_stable.index / 100, unit='s')
+#     ppg_stable = ppg_stable[["timestamps", "PLETH"]]
+#
+#     sqis = compute_SQI(ppg_stable, '30s')
+#     print(sqis)
+#     return sqis
+
+
+def generate_rule(rule_name,rule_def):
+    rule_def, boundaries, label_list = update_rule(rule_def, is_update=False)
+    rule_detail = {'def': rule_def,
+                     'boundaries': boundaries,
+                     'labels': label_list}
+    rule = Rule(rule_name,rule_detail)
+    return rule
+
+
+def get_decision(df_sqi,selected_rule,json_rule_dict):
+    rule_list = {}
+    for (i, selected_sqi) in zip(range(len(selected_rule)), selected_rule):
+        rule = generate_rule(selected_sqi, json_rule_dict[selected_sqi]['def'])
+
+        rule_list[i + 1] = rule
+    ruleset = RuleSet(rule_list)
+
+    decision_list = []
+    for idx in range(len(df_sqi)):
+        row_data = pd.DataFrame(dict(df_sqi[selected_rule].iloc[idx]), index=[0])
+        decision_list.append(ruleset.execute(row_data))
+
+    return decision_list
+
+def example_rule_decision(df_sqi):
+    selected_rule = ['msq', 'entropy_std']
+    for single_rule in selected_rule:
+        boundary = np.around(np.quantile(df_sqi[single_rule], [0.05, 0.95]), decimals=2)
+        upper_bound = boundary[1]
+        lower_bound = boundary[0]
+        json_rule_dict = create_rule_def(single_rule,upper_bound, lower_bound)
+    decision_list = get_decision(df_sqi,selected_rule,json_rule_dict)
+    df_sqi['decision'] = decision_list
