@@ -184,6 +184,8 @@ def msq_sqi(s, peak_detector_1=7, peak_detector_2=6,wave_type='ppg'):
         peaks_2 = detector.ecg_detector(s, detector_type=peak_detector_2, preprocess=False)
     if len(peaks_1)==0 or len(peaks_2)==0:
         return 0.0
+    elif len(peaks_1) != len(peaks_2):
+        return -1.0
     peak1_dom = len(np.intersect1d(peaks_1,peaks_2))/len(peaks_1)
     peak2_dom = len(np.intersect1d(peaks_2,peaks_1))/len(peaks_2)
     return min(peak1_dom, peak2_dom)
