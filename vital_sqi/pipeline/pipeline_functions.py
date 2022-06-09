@@ -120,7 +120,7 @@ MASTER_SQI_DICT = {
     'relative_power_sqi':   sq.relative_power_sqi,
     'normalized_power_sqi': sq.normalized_power_sqi,
     'lf_hf_ratio_sqi':      sq.lf_hf_ratio_sqi,
-    'poincare_feature_sqi': sq.poincare_feature_sqi,
+    # 'poincare_feature_sqi': sq.poincare_feature_sqi,
     #Waveform SQI
     'be':       sq.band_energy_sqi,
     'lfe':      sq.lf_energy_sqi,
