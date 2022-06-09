@@ -9,6 +9,7 @@ A subpackage for signal quality index calculation, including:
 """
 
 from vital_sqi.sqi.dtw_sqi import (
+	euclidean_sqi,
 	dtw_sqi
 	)
 from vital_sqi.sqi.standard_sqi import (
@@ -21,5 +22,17 @@ from vital_sqi.sqi.standard_sqi import (
 	mean_crossing_rate_sqi
 	)
 from vital_sqi.sqi.rpeaks_sqi import (
-	correlogram_sqi
+	ectopic_sqi,
+	correlogram_sqi,
+	interpolation_sqi,
+	msq_sqi
 	)
+
+from vital_sqi.sqi.waveform_sqi import (
+	band_energy_sqi,
+	lf_energy_sqi,
+	qrs_energy_sqi,
+	hf_energy_sqi,
+	vhf_norm_power_sqi,
+	qrs_a_sqi
+)

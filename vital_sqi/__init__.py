@@ -11,13 +11,13 @@ from vital_sqi import (
 	preprocess,
 	sqi,
 	rule,
-	highlevel_functions
+	pipeline
 )
 
 from vital_sqi.rule.rule_class import Rule
 from vital_sqi.rule.ruleset_class import RuleSet
 from vital_sqi.data.signal_sqi_class import SignalSQI
 from vital_sqi.data.signal_io import *
-from vital_sqi.highlevel_functions import *
+from vital_sqi.pipeline import *
 
 __version__ = '0.1.0'
