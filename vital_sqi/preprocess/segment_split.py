@@ -1,19 +1,12 @@
 """ Splitting long recording into segments with overlapping options:
 - By duration
 - By beat
-
-To be revised: gom 4 functions cuoi vao split_segment, bo save_segment_image.
-
-- save_segment
-- split_segment
-
 """
 
 import pandas as pd
 from tqdm import tqdm
 import plotly.graph_objects as go
 import numpy as np
-import warnings
 import os
 from vital_sqi.common.utils import cut_segment, check_signal_format
 from vital_sqi.common.rpeak_detection import PeakDetector
@@ -64,11 +57,13 @@ def save_segment(segment_list, filename='segment', save_file_folder=None,
                 fig.add_traces(go.Scatter(x=np.arange(1, len(segment)),
                                           y=segment, mode="lines"))
                 fig.update_layout(autosize=True)
-                fig.write_image(os.path.join(save_img_folder, saved_filename + '.png'))
+                fig.write_image(os.path.join(save_img_folder,
+                                             saved_filename + '.png'))
 
-            np.savetxt(os.path.join(save_file_folder, saved_filename + '.csv'), segment, delimiter=',')  # as an array
+            np.savetxt(os.path.join(save_file_folder, saved_filename + '.csv'),
+                       segment, delimiter=',')  # as an array
         except Exception as e:
-            warnings.warn(e)
+            print(e)
         i = i+1
 
 
@@ -92,7 +87,6 @@ def split_segment(s, sampling_rate, split_type=1, duration=30.0,
         split_type = 1).
         (Default value = 30)
     overlapping : int
-
         (Default value = None)
     peak_detector : int
         The type of peak detector (split_type = 1). List of
@@ -104,8 +98,13 @@ def split_segment(s, sampling_rate, split_type=1, duration=30.0,
 
     Returns
     -------
-
-    
+    segments : list
+        List of pd.DataFrame segements.
+    milestones: pandas DataFrame
+        DataFrame of two columns containing start and end indexes of the
+        segments.
+    Examples
+    -------
     >>>from vital_sqi.common.utils import generate_timestamp
     >>>s = np.arange(100000)
     >>>timestamps = generate_timestamp(None,100,len(s))
@@ -124,17 +123,15 @@ def split_segment(s, sampling_rate, split_type=1, duration=30.0,
     else:
         if wave_type == 'ppg':
             detector = PeakDetector(wave_type='ppg')
-            peak_list, trough_list = detector.ppg_detector(s,detector_type=peak_detector)
+            peak_list, trough_list = \
+                detector.ppg_detector(s, detector_type=peak_detector)
         else:
             detector = PeakDetector(wave_type='ecg')
-            peak_list, trough_list = detector.ecg_detector(s, detector_type=peak_detector)
-        chunk_indices = [
-                [peak_list[i], peak_list[i+duration]] for i in range(0,
-                                                                     len(
-                                                                         peak_list),int(duration-overlapping))
-        ]
+            peak_list, trough_list = \
+                detector.ecg_detector(s, detector_type=peak_detector)
+        chunk_indices = [[peak_list[i], peak_list[i+duration]] for i in
+                         range(0, len(peak_list), int(duration-overlapping))]
         chunk_indices[0] = 0
     milestones = pd.DataFrame(chunk_indices)
     segments = cut_segment(s, milestones)
     return segments, milestones
-
