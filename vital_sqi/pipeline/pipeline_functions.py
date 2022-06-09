@@ -5,9 +5,10 @@ import heartpy as hp
 from heartpy.analysis import calc_ts_measures, calc_rr, calc_fd_measures,\
     clean_rr_intervals, calc_poincare, calc_breathing
 from heartpy.peakdetection import check_peaks
+from hrvanalysis import get_nn_intervals
 from vital_sqi.common.rpeak_detection import PeakDetector
-from vital_sqi.common.utils import get_nn,generate_rule,create_rule_def
-from vital_sqi.rule import RuleSet
+from vital_sqi.common.utils import create_rule_def
+from vital_sqi.rule import RuleSet,Rule,update_rule
 import warnings
 import inspect
 import vital_sqi.sqi as sq
@@ -293,6 +294,23 @@ def get_sqi(sqi_func, s, per_beat=False,
     return sqi_score_dict
 
 
+def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,remove_ectopic_beat=False):
+    if wave_type=='ppg':
+        detector = PeakDetector(wave_type='ppg')
+        peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
+    else:
+        detector = PeakDetector(wave_type='ecg')
+        peak_list, trough_list = detector.ecg_detector(s, detector_type=rpeak_method)
+
+    rr_list = np.diff(peak_list) * (1000 / sample_rate)
+    if not remove_ectopic_beat:
+        return rr_list
+    nn_list = get_nn_intervals(rr_list)
+    nn_list_non_na = np.copy(nn_list)
+    nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+    return nn_list_non_na
+
+
 def segment_PPG_SQI_extraction(sig,sqi_list,nn_sqi_list,nn_sqi_arg_list,sqi_arg_list):
     """
 
@@ -347,6 +365,15 @@ def compute_SQI(signal, segment_length='30s', primary_peakdet=7, secondary_peakd
 #     sqis = compute_SQI(ppg_stable, '30s')
 #     print(sqis)
 #     return sqis
+
+
+def generate_rule(rule_name,rule_def):
+    rule_def, boundaries, label_list = update_rule(rule_def, is_update=False)
+    rule_detail = {'def': rule_def,
+                     'boundaries': boundaries,
+                     'labels': label_list}
+    rule = Rule(rule_name,rule_detail)
+    return rule
 
 
 def get_decision(df_sqi,selected_rule,json_rule_dict):
