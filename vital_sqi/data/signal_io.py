@@ -392,7 +392,7 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
 #            '/vital_sqi/tests/test_data/ecg_test_write.csv'
 # ECG_writer(out, file_out, file_type = 'csv')
 
-import os
-file_name = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-                            '/vital_sqi/tests/test_data/ecg_test1.csv')
-out = ECG_reader(file_name, 'csv', channel_name=['Time', '1'])
+# import os
+# file_name = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
+#                             '/vital_sqi/tests/test_data/ecg_test1.csv')
+# out = ECG_reader(file_name, 'csv', channel_name=['Time', '1'])
