@@ -55,9 +55,9 @@ def euclidean_sqi(s, template_type, template_size = 100):
                     np.inf
     #first matching sample is set to zero
     dtw_distances[0, 0] = 0
+    cost=0
     for i in range(template_size):
-        for j in range(len(template_type)):
-            cost = euclidean(s[i], reference[j])
+        cost = cost + euclidean(s[i], reference[i])
 
     return cost
 

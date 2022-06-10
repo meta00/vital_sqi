@@ -1,3 +1,4 @@
+import numpy
 import numpy as np
 import pandas as pd
 import vital_sqi.preprocess.preprocess_signal as sqi_pre
@@ -188,7 +189,7 @@ def calculate_SQI(waveform_segment, trough_list, taper, sqi_dict):
     return pd.Series(SQI_dict)
 
 
-def per_beat_sqi(sqi_func, troughs, signal, taper, **kwargs):
+def per_beat_sqi(sqi_func, troughs, signal, taper=False, **kwargs):
     """
     Perform a per-beat application of the selected SQI function on the signal
     segment
@@ -249,12 +250,17 @@ def get_sqi_dict(sqis, sqi_name):
     if isinstance(sqis, (float, int)):
         return {sqi_name: sqis}
 
+    if isinstance(sqis,numpy.ndarray):
+        if len(sqis.shape) == 0:
+            return {sqi_name: -1}
+        return {sqi_name: sqis[0]}
+
     if isinstance(sqis, list):
         SQI_dict = {}
         variations_stats = ['_mean', '_median', '_std']
-        SQI_dict[sqi_name + variations_stats[1]] = np.mean(sqis)
-        SQI_dict[sqi_name + variations_stats[2]] = np.median(sqis)
-        SQI_dict[sqi_name + variations_stats[3]] = np.std(sqis)
+        SQI_dict[sqi_name + variations_stats[0]] = np.mean(sqis)
+        SQI_dict[sqi_name + variations_stats[1]] = np.median(sqis)
+        SQI_dict[sqi_name + variations_stats[2]] = np.std(sqis)
         return SQI_dict
 
     if sqi_name == 'correlogram':
@@ -289,7 +295,7 @@ def get_sqi(sqi_func, s, per_beat=False,
         if 'wave_type' in inspect.getfullargspec(sqi_func)[0]:
             kwargs['wave_type'] = wave_type
         sqi_scores = sqi_func(s,**kwargs)
-        sqi_name = sqi_func.__name__
+    sqi_name = sqi_func.__name__
     sqi_score_dict = get_sqi_dict(sqi_scores,sqi_name)
     return sqi_score_dict
 
@@ -321,12 +327,13 @@ def segment_PPG_SQI_extraction(sig,sqi_list,nn_sqi_list,nn_sqi_arg_list,sqi_arg_
     :param sqi_arg_list:
     :return:
     """
-    s = sig.iloc[:,1]
+    s = np.array(sig.iloc[:,1])
     sqi_score = {}
-    for sqi_ in sqi_list:
+    for (sqi_,args_) in zip(sqi_list,sqi_arg_list):
         try:
-            sqi_score = {**sqi_score,**get_sqi(sqi_,s)}
+            sqi_score = {**sqi_score,**get_sqi(sqi_,s,**args_)}
         except Exception as err:
+            print(sqi_)
             print(err)
             continue
     for (sqi_,args_) in zip(nn_sqi_list, nn_sqi_arg_list):

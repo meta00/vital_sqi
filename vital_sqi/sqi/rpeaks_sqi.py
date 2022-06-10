@@ -73,9 +73,9 @@ def ectopic_sqi(data_sample, rule_index=0, sample_rate=100, rpeak_detector=0,
                                           preprocess=False)[0]
     wd["peaklist"] = peak_list
     wd = calc_rr(peak_list, sample_rate, working_data=wd)
-    wd = check_peaks(wd['RR_list'], wd['peaklist'], wd['ybeat'],
-                         reject_segmentwise=False, working_data=wd)
-    wd = clean_rr_intervals(working_data=wd)
+    # wd = check_peaks(wd['RR_list'], wd['peaklist'], wd['ybeat'],
+    #                      reject_segmentwise=False, working_data=wd)
+    # wd = clean_rr_intervals(working_data=wd)
 
     rr_intervals = wd["RR_list"]
 

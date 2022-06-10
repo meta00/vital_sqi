@@ -47,8 +47,9 @@ from vital_sqi.sqi.hrv_sqi import (
 	log_power_sqi,
 	relative_power_sqi,
 	normalized_power_sqi,
-	lf_hf_ratio_sqi
-	# poincare_feature_sqi
+	lf_hf_ratio_sqi,
+	poincare_features_sqi,
+	get_all_features_hrva
 )
 from vital_sqi.sqi.waveform_sqi import (
 	band_energy_sqi,
