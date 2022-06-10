@@ -9,15 +9,18 @@ from vital_sqi.common.rpeak_detection import PeakDetector
 import warnings
 from ecgdetectors import Detectors,panPeakDetect
 
+
 class TestPeakDetector(object):
     def test_on_init(self):
         detector = PeakDetector()
         pass
 
+
 class TestECGDetector(object):
     def test_ecg_detector(self):
         detector = PeakDetector()
         pass
+
 
 class TestPPGDetector(object):
     def test_on_ppg_detector(self):

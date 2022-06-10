@@ -1,3 +1,5 @@
+import warnings
+
 from pyedflib import highlevel
 from wfdb import rdsamp, wrsamp
 import numpy as np
@@ -145,17 +147,32 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
         signals = pd.read_csv(file_name,
                           usecols=use_cols,
                           skipinitialspace=True)
-        timestamps = signals.iloc[:, 0].to_numpy()
-        if start_datetime is None:
-            try:
-                start_datetime = utils.parse_datetime(timestamps[0])
-            except Exception:
-                pass
-        if sampling_rate is None:
-            sampling_rate = utils.calculate_sampling_rate(timestamps)
-            assert sampling_rate is not None, 'Sampling rate not found nor ' \
-                                              'inferred'
+        try:
+            # start_datetime in datetime and column in second
+            if start_datetime is not None and isinstance(signals.iloc[:, 0],
+                                                         float):
+                start_datetime = pd.Timestamp(start_datetime)
+                timestamps[0] = start_datetime
+                for i in range(1, len(signals)):
+                    timestamps[i] = timestamps[i-1] + pd.Timedelta(
+                            timestamps[i], unit='s')
+            # no start_datetime and column in datetime
+            if start_datetime is None:
+                timestamps = signals.iloc[:, 0].apply(pd.Timestamp)
+            if sampling_rate is None:
+                sampling_rate = utils.calculate_sampling_rate(signals.iloc[:,
+                                                              0])
+        except ValueError:
+            assert sampling_rate is not None, \
+                    'Sampling rate is not found nor able to be inferred ' \
+                    'from the from the signal.'
+            # if first column does not contain datetime. start_datetime = now
+            # if none.
+            timestamps = generate_timestamp(start_datetime, sampling_rate,
+                                            len(signals))
+        start_datetime = timestamps[0]
         out = SignalSQI(signals=signals,
+                        info=[],
                         wave_type='ecg',
                         start_datetime=start_datetime,
                         sampling_rate=sampling_rate)
@@ -177,11 +194,11 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
 
     file_type : edf or mit or csv
 
-    info : list
+    info : list or dict
         In case of writing edf file: A list containing signal_headers and
-        header (in
-        order). signal_headers is a list of dict with one signal header for
-        each signal channel. header (dict) contain ecg file information.
+        header (in order). signal_headers is a list of dict with one signal
+        header for each signal channel. header (dict) contain ecg file
+        information.
         In case of writing wfdb record (mit file): A dict containing header
         as defined in .hea file.
         (Default value = None)
@@ -304,7 +321,7 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
     if sampling_rate is None:
         sampling_rate = utils.calculate_sampling_rate(timestamps)
     
-    info = tmp[info_idx].to_dict('list')
+    info = pd.DataFrame(tmp[info_idx])
     signals = tmp[signal_idx]
     signals.insert(0, 'timestamps', timestamps)
     out = SignalSQI(signals=signals, wave_type='ppg',
@@ -333,8 +350,7 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
         start_datetime=signal_sqi.start_datetime,
         sampling_rate=signal_sqi.sampling_rate,
         signal_length=len(signal_sqi.signals))
-    signals = signal_sqi.signals.iloc[:,1]
-    timestamps = np.array(timestamps)
+    signals = signal_sqi.signals.iloc[:, 1]
     out_df = pd.DataFrame({'time': timestamps, 'pleth': signals})
     if file_type == 'csv':
         out_df.to_csv(file_name, index=False, header=True)
@@ -342,10 +358,12 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
         out_df.to_excel(file_name, index=False, header=True)
     return os.path.isfile(file_name)
 
-import os, tempfile
+
+# import os, tempfile
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/example.edf')
 # out = ECG_reader(file_in, 'edf')
+# print(out)
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/out.edf')
 # out1 = ECG_reader(file_in, 'edf')
@@ -374,3 +392,7 @@ import os, tempfile
 #            '/vital_sqi/tests/test_data/ecg_test_write.csv'
 # ECG_writer(out, file_out, file_type = 'csv')
 
+# import os
+# file_name = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
+#                             '/vital_sqi/tests/test_data/ecg_test1.csv')
+# out = ECG_reader(file_name, 'csv', channel_name=['Time', '1'])

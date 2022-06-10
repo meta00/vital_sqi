@@ -7,19 +7,21 @@ Implementation of SQIs for waveform:
 import scipy.signal as sn
 import numpy as np
 from vital_sqi.common.rpeak_detection import *
+from vital_sqi.common.utils import *
 
 
-def band_energy_sqi(signal, sampling_rate=100, band=None):
+def band_energy_sqi(s, sampling_rate=100, band=None):
     """
     Compute the peak value of the time marginal of the energy distribution in a
     frequency band (DiMarco et al., 2012).
 
     Parameters
     ----------
-    signal : array_like
-        Time series of measurement values
+    s : pandas DataFrame
+        Signal, with first column as pandas Timestamp and second column as
+        float.
     sampling_rate : float, optional
-        Sampling rate of the `signal` time series.
+        Sampling rate of the signal.
         (Default value = 100)
     band : list
         Frequency band. If None, the whole spectrum is used.
@@ -35,8 +37,10 @@ def band_energy_sqi(signal, sampling_rate=100, band=None):
     AssertionError
         when invalid band
     """
-    assert np.isreal(sampling_rate), "Invalid sampling rate value."
-    f, t, spec = sn.stft(signal, fs=sampling_rate,
+    check_signal_format(s)
+    assert np.isreal(sampling_rate), 'Expected a numeric sampling rate value.'
+
+    f, t, spec = sn.stft(s.iloc[:, 1], fs=sampling_rate,
                          window='hann', nperseg=2048, noverlap=1838,
                          detrend=False, return_onesided=False,
                          boundary='zeros',
@@ -51,12 +55,14 @@ def band_energy_sqi(signal, sampling_rate=100, band=None):
     return max_time_marginal
 
 
-def lf_energy_sqi(signal, sampling_rate, band=[0, 0.5]):
+def lf_energy_sqi(s, sampling_rate, band=[0, 0.5]):
     """
 
     Parameters
     ----------
-    signal :
+    s : pandas DataFrame
+        Signal, with first column as pandas Timestamp and second column as
+        float.
 
     sampling_rate :
 
@@ -70,72 +76,73 @@ def lf_energy_sqi(signal, sampling_rate, band=[0, 0.5]):
 
 
     """
-    return band_energy_sqi(signal, sampling_rate, band)
+    return band_energy_sqi(s, sampling_rate, band)
 
 
-def qrs_energy_sqi(signal, sampling_rate, band=[5, 25]):
+def qrs_energy_sqi(s, sampling_rate, band=[5, 25]):
     """
 
     Parameters
     ----------
-    signal :
+    s : pandas DataFrame
+        Signal, with first column as pandas Timestamp and second column as
+        float.
 
     sampling_rate :
 
     band :
         (Default value = [5, 25] :
-    25] :
-
 
     Returns
     -------
 
 
     """
-    return band_energy_sqi(signal, sampling_rate, band)
+    return band_energy_sqi(s, sampling_rate, band)
 
 
-def hf_energy_sqi(signal, sampling_rate, band=[100, np.Inf]):
+def hf_energy_sqi(s, sampling_rate, band=[100, np.Inf]):
     """
 
     Parameters
     ----------
-    signal :
+    s : pandas DataFrame
+        Signal, with first column as pandas Timestamp and second column as
+        float.
 
     sampling_rate :
 
     band :
-         (Default value = [100)
-    np.Inf] :
-
+         (Default value = [100, np.Inf] :
 
     Returns
     -------
 
 
     """
-    return band_energy_sqi(signal, sampling_rate, band)
+    return band_energy_sqi(s, sampling_rate, band)
 
 
-def vhf_norm_power_sqi(signal, sampling_rate, band=[150, np.Inf]):
+def vhf_norm_power_sqi(s, sampling_rate, band=[150, np.Inf]):
     """
 
     Parameters
     ----------
-    signal :
+    s : pandas DataFrame
+        Signal, with first column as pandas Timestamp and second column as
+        float.
 
     sampling_rate :
 
     band :
          (Default value = [150, np.Inf] :
 
-
     Returns
     -------
 
 
     """
-    f, t, spec = sn.stft(signal, fs=sampling_rate,
+    f, t, spec = sn.stft(s.iloc[:, 1], fs=sampling_rate,
                          window='hann', nperseg=2048, noverlap=1838,
                          detrend=False, return_onesided=False,
                          boundary='zeros',
@@ -146,7 +153,7 @@ def vhf_norm_power_sqi(signal, sampling_rate, band=[150, np.Inf]):
     return np_vhf
 
 
-def qrs_a_sqi(signal, sampling_rate):
+def qrs_a_sqi(s, sampling_rate):
     """QRS_A or qrs amplitude is defined as the median value of the
     peak-to-nadir amplitude difference of the QRS complexes detected,
     in a segment of 10s. Beat detection is done by Pan and Tompkins's
@@ -156,18 +163,19 @@ def qrs_a_sqi(signal, sampling_rate):
 
     Parameters
     ----------
-    signal :
+    s : pandas DataFrame
+        Signal, with first column as pandas Timestamp and second column as
+        float.
 
     sampling_rate :
-
 
     Returns
     -------
 
     """
     detector = PeakDetector(wave_type='ecg', fs=sampling_rate)
-    peaks, troughs, nadirs = detector.ecg_detector(signal,
-                                            detector_type=7)
+    peaks, troughs, nadirs = detector.ecg_detector(s.iloc[:, 1],
+                                                   detector_type=7)
     peak_to_nadir = np.array(peaks) - np.array(nadirs)
     peak_to_nadir = np.delete(peak_to_nadir, np.where(peak_to_nadir > 5))
     qrs_a = np.median(peak_to_nadir)
