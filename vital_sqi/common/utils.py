@@ -60,6 +60,10 @@ def calculate_sampling_rate(timestamps):
     """
     if isinstance(timestamps[0], float):
         timestamps_second = timestamps
+    elif isinstance(timestamps[0], pd.Timestamp):
+        timestamps_second = []
+        for i in range(1, len(timestamps)):
+            timestamps_second = (timestamps[i] - timestamps[i-1]).total_sconds()
     else:
         try:
             v_parse_datetime = np.vectorize(parse_datetime)
@@ -73,7 +77,7 @@ def calculate_sampling_rate(timestamps):
             sampling_rate = None
             return sampling_rate
     steps = np.diff(timestamps_second)
-    sampling_rate = round(1 / np.min(steps[steps != 0]))
+    sampling_rate = round(1 / np.min(steps[steps != 0]), 3)
     return sampling_rate
 
 
@@ -93,11 +97,16 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
     -------
     list : list of timestamps with length equal to signal_length.
     """
+    assert np.isreal(sampling_rate), 'Sampling rate is expected to be a int ' \
+                                     'or float.'
     number_of_seconds = signal_length / sampling_rate
     if start_datetime is None:
         start_datetime = dt.datetime.now()
     timestamps = []
-    timestamps.append(dt.datetime.timestamp(start_datetime))
+    try:
+        timestamps.append(dt.datetime.timestamp(start_datetime))
+    except Exception as e:
+        print(e)
     # end_datetime = start_datetime + dt.timedelta(seconds=number_of_seconds)
     # time_range = DateTimeRange(start_datetime, end_datetime)
     # timestamps = []
