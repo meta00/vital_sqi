@@ -158,7 +158,8 @@ def pipeline(file_name):
         sqis = segment_PPG_SQI_extraction(ppg_stable, sqi_list.values(), nn_sqi_list.values(),
                                           nn_sqi_arg_list.values(), sqi_arg_list.values())
 
-        segment_name_list = [file_name.split("\\")[-1] + "_" + str(i) for i in range(len(sqis))]
+        # segment_name_list = [file_name.split("/")[-1] + "_" + str(i) for i in range(len(sqis))]
+        segment_name_list = file_name.split("/")[-1]
         sqis['id'] = segment_name_list
     except Exception as e:
         print(e)
@@ -166,17 +167,17 @@ def pipeline(file_name):
         return pd.DataFrame([e])
     return sqis
 
-all_ng_file_sqi_1 = pd.DataFrame()
-for file_name in tqdm(ng_1_files):
-    file_path = os.path.join(PPG_ALL_FOLDER,file_name)
-    sqis = pipeline(file_path)
-    if file_path is not None:
-        all_ng_file_sqi_1 = all_ng_file_sqi_1.append(sqis,ignore_index=True)
-        sqis.to_csv(os.path.join(NG_OUTPUT_FOLDER,"sqi_"+file_name))
-
-col = all_ng_file_sqi_1.pop("id")
-sqis = all_ng_file_sqi_1.insert(0, col.name, col)
-# all_ng_file_sqi_1.to_csv(os.path.join(NG_OUTPUT_FOLDER,"NG_sqi_1.csv"))
+# all_ng_file_sqi_1 = pd.DataFrame()
+# for file_name in tqdm(ng_1_files):
+#     file_path = os.path.join(PPG_ALL_FOLDER,file_name)
+#     sqis = pipeline(file_path)
+#     if file_path is not None:
+#         all_ng_file_sqi_1 = all_ng_file_sqi_1.append(sqis,ignore_index=True)
+#         # sqis.to_csv(os.path.join(NG_OUTPUT_FOLDER,"sqi_"+file_name))
+#
+# col = all_ng_file_sqi_1.pop("id")
+# sqis = all_ng_file_sqi_1.insert(0, col.name, col)
+# # all_ng_file_sqi_1.to_csv(os.path.join(NG_OUTPUT_FOLDER,"NG_sqi_1.csv"))
 
 all_ng_file_sqi_2 = pd.DataFrame()
 for file_name in tqdm(ng_2_files):
@@ -184,7 +185,7 @@ for file_name in tqdm(ng_2_files):
     sqis = pipeline(file_path)
     if file_path is not None:
         all_ng_file_sqi_2 = all_ng_file_sqi_2.append(sqis,ignore_index=True)
-        sqis.to_csv(os.path.join(NG_OUTPUT_FOLDER,"sqi_"+file_name))
+        # sqis.to_csv(os.path.join(NG_OUTPUT_FOLDER,"sqi_"+file_name))
 
 col = all_ng_file_sqi_2.pop("id")
 sqis = all_ng_file_sqi_2.insert(0, col.name, col)
