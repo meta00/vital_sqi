@@ -48,7 +48,7 @@ class PeakDetector:
         self.wave_type = wave_type
         self.fs = fs
 
-    def ecg_detector(self, s, detector_type=PAN_TOMPKINS):
+    def ecg_detector(self, s, detector_type=PAN_TOMPKINS, get_nadir = False):
         """Expose
 
         ECG peak detector from the github
@@ -120,6 +120,8 @@ class PeakDetector:
             mwa_peaks = detector.pan_tompkins_detector(s)
             # mwa_peaks = panPeakDetect(mwa, self.fs)
 
+        if len(mwa_peaks) == 0:
+            return [],[]
         # append the first and the last
         normal_beat_length = (self.fs * (60/100))/2
         if mwa_peaks[0] > normal_beat_length/2:
@@ -136,7 +138,9 @@ class PeakDetector:
             interval_diff = np.diff(interval,3)
             trough_list.append(np.argmin(interval_diff)+1+peak_idx)
             nadir_min_list.append(np.argmin(interval)+peak_idx)
-        return mwa_peaks,trough_list,nadir_min_list
+        if get_nadir:
+            return mwa_peaks,trough_list,nadir_min_list
+        return mwa_peaks,trough_list
 
     def ppg_detector(self, s, detector_type=ADAPTIVE_THRESHOLD,
                      clusterer="kmean", preprocess=False, cubing=False):
