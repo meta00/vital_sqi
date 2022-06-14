@@ -141,14 +141,16 @@ def split_segment(s, sampling_rate, split_type=1, duration=30.0,
         if wave_type == 'ppg':
             detector = PeakDetector(wave_type='ppg')
             peak_list, trough_list = \
-                detector.ppg_detector(s, detector_type=peak_detector)
+                detector.ppg_detector(s.iloc[:,1], detector_type=peak_detector)
         else:
             detector = PeakDetector(wave_type='ecg')
             peak_list, trough_list = \
-                detector.ecg_detector(s, detector_type=peak_detector)
-        chunk_indices = [[peak_list[i], peak_list[i+duration]] for i in
-                         range(0, len(peak_list), int(duration-overlapping))]
-        chunk_indices[0] = 0
+                detector.ecg_detector(s.iloc[:,1], detector_type=peak_detector)
+        chunk_indices =[]
+        for i in range(0, len(peak_list), int(duration-overlapping)):
+            if i+duration < len(peak_list):
+                chunk_indices.append([peak_list[int(i)],
+                                      peak_list[int(i+duration)]])
     milestones = pd.DataFrame(chunk_indices)
     segments = cut_segment(s, milestones)
     return segments, milestones
