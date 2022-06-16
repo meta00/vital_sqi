@@ -336,13 +336,13 @@ def segment_PPG_SQI_extraction(sig,sqi_list,nn_sqi_list,nn_sqi_arg_list,sqi_arg_
             print(sqi_)
             print(err)
             continue
-    for (sqi_,args_) in zip(nn_sqi_list, nn_sqi_arg_list):
-        try:
-            nn_intervals = get_nn(s)
-            sqi_score = {**sqi_score,**get_sqi(sqi_,nn_intervals,**args_)}
-        except Exception as err:
-            print(err)
-            continue
+    # for (sqi_,args_) in zip(nn_sqi_list, nn_sqi_arg_list):
+    #     try:
+    #         nn_intervals = get_nn(s)
+    #         sqi_score = {**sqi_score,**get_sqi(sqi_,nn_intervals,**args_)}
+    #     except Exception as err:
+    #         print(err)
+    #         continue
     return pd.Series(sqi_score)
 
 def compute_SQI(signal, segment_length='30s', primary_peakdet=7, secondary_peakdet=6, wave_type='ppg', sampling_rate=100, template_type=1):

@@ -133,12 +133,13 @@ nn_sqi_arg_list = {
 
 from vital_sqi.pipeline.pipeline_functions import *
 
-PPG_ALL_FOLDER = "/home/khoa/Downloads/classification/dataset/ppg_all"
-G_FOLDER = "/home/khoa/Downloads/classification/dataset/good"
-NG_1_FOLDER = "/home/khoa/Downloads/classification/dataset/NG_1"
-NG_2_FOLDER = "/home/khoa/Downloads/classification/dataset/NG_2"
-NG_OUTPUT_FOLDER = "/home/khoa/Downloads/classification/dataset/NG_output"
-G_OUTPUT_FOLDER = "/home/khoa/Downloads/classification/dataset/G_output"
+# D:\Workspace\oucru\classification_sqi
+PPG_ALL_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/ppg_all"
+G_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/good"
+NG_1_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/NG_1"
+NG_2_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/NG_2"
+NG_OUTPUT_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/NG_output"
+G_OUTPUT_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/G_output"
 
 good_files = [".".join(x.split(".")[:-1])+".csv" for x in next(os.walk(G_FOLDER), (None, None, []))[2]]
 ng_1_files = [".".join(x.split(".")[:-1])+".csv" for x in next(os.walk(NG_1_FOLDER), (None, None, []))[2]]
@@ -172,11 +173,11 @@ for file_name in tqdm(ng_1_files):
     sqis = pipeline(file_path)
     if file_path is not None:
         all_ng_file_sqi_1 = all_ng_file_sqi_1.append(sqis,ignore_index=True)
-        sqis.to_csv(os.path.join(NG_OUTPUT_FOLDER,"sqi_"+file_name))
+        # sqis.to_csv(os.path.join(NG_OUTPUT_FOLDER,"sqi_"+file_name))
 
 col = all_ng_file_sqi_1.pop("id")
 sqis = all_ng_file_sqi_1.insert(0, col.name, col)
-# all_ng_file_sqi_1.to_csv(os.path.join(NG_OUTPUT_FOLDER,"NG_sqi_1.csv"))
+all_ng_file_sqi_1.to_csv(os.path.join(NG_OUTPUT_FOLDER,"NG_sqi_1.csv"))
 
 all_ng_file_sqi_2 = pd.DataFrame()
 for file_name in tqdm(ng_2_files):
@@ -184,8 +185,8 @@ for file_name in tqdm(ng_2_files):
     sqis = pipeline(file_path)
     if file_path is not None:
         all_ng_file_sqi_2 = all_ng_file_sqi_2.append(sqis,ignore_index=True)
-        sqis.to_csv(os.path.join(NG_OUTPUT_FOLDER,"sqi_"+file_name))
+        # sqis.to_csv(os.path.join(NG_OUTPUT_FOLDER,"sqi_"+file_name))
 
 col = all_ng_file_sqi_2.pop("id")
 sqis = all_ng_file_sqi_2.insert(0, col.name, col)
-# all_ng_file_sqi_2.to_csv(os.path.join(NG_OUTPUT_FOLDER,"NG_sqi_2.csv"))
+all_ng_file_sqi_2.to_csv(os.path.join(NG_OUTPUT_FOLDER,"NG_sqi_2.csv"))
