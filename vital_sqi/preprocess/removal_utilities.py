@@ -221,7 +221,9 @@ def trim_signal(s, sampling_rate, duration_left=300, duration_right=300):
         'Expected a numeric value or None'
     assert np.isreal(duration_left) or duration_left is None, \
         'Expected a numeric value or None'
+
     assert np.isreal(sampling_rate), 'Expected a numeric value.'
+
     if duration_left is None:
         duration_left = 0
     if duration_right is None:
@@ -262,10 +264,12 @@ def interpolate_signal(s, missing_index, missing_len, method='arima',
     s : pandas DataFrame
         Signal, with the first column of pd.Timestamp type and the second
         column of float.
+
     missing_index :
         array of list of starting indices missing data
     missing_len :
         array of number of missing instances, matching with the index list
+
     method : str
         Interpolation method. Only 'arima' is supported at the moment.
         Example:
@@ -274,7 +278,9 @@ def interpolate_signal(s, missing_index, missing_len, method='arima',
                         df.TIMESTAMP_MS.iloc[i])/10-1) for i in missing]
         > filled_s = fill_missing_value(np.array(df1.PLETH),missing,missing_len)
     (Default value = 'arima')
+
     lag_ratio : float or int
+
         (Default value = 10)
 
     Returns
@@ -284,6 +290,7 @@ def interpolate_signal(s, missing_index, missing_len, method='arima',
 
     
     """
+
     # To check examples in docstring.
     check_signal_format(s)
     assert isinstance(missing_index, (list, tuple, np.array)), \

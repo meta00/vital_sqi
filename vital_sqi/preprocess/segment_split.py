@@ -52,6 +52,7 @@ def save_segment(segment_list, filename='segment', save_file_folder=None,
 
         try:
             saved_filename = filename + "-" + zero_adding + str(i)
+
             if save_image:
 
                 fig = go.Figure()
@@ -79,6 +80,7 @@ def split_segment(s, sampling_rate, split_type=1, duration=30.0,
         Signal, with the first column of pd.Timestamp type and the second
         column of float.
     sampling_rate : float or int
+
     split_type : int
         0: split by time
         1: split by beat

@@ -6,11 +6,9 @@ A subpackage for all waveform preprocessing such as filtering, detrend etc.
 edit, resample.
 """
 
-from vital_sqi.preprocess.band_filter import (
-	BandpassFilter
-	)
 from vital_sqi.preprocess.preprocess_signal import (
 	scale_pattern,
-	squeeze_template
 	)
-from vital_sqi.preprocess import *
+
+from vital_sqi.preprocess import segment_split
+from vital_sqi.preprocess import removal_utilities

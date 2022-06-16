@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.sparse import coo
-from vital_sqi.preprocess.band_filter import BandpassFilter
+from vital_sqi.common.band_filter import BandpassFilter
 from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
 

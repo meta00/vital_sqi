@@ -11,9 +11,7 @@ Data manipulation
 
 #%%
 
-import vital_sqi
 from vital_sqi.data.signal_io import ECG_reader,PPG_reader
-from vital_sqi.dataset import load_ppg,load_ecg
 import os
 file_name = os.path.abspath('../../tests/test_data/example.edf')
 ecg_data = ECG_reader(file_name, 'edf')
@@ -38,7 +36,6 @@ channel_1 = all_channels.iloc[:, 1]
 
 #%%
 
-import plotly.graph_objects as go
 import numpy as np
 import matplotlib.pyplot as plt
 
