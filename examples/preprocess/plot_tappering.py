@@ -35,15 +35,15 @@ w = list(wd.hann(len(s)))
 # The remaining will be scale according to the windows format. The default
 # tapering method shifts the segment by the value equal to the minimum value
 # to the zero baseline set shift_min_to_zero=False
-tap_zerobaseline_f = preprocess.taper_signal(s, shift_min_to_zero=False)
+tap_zerobaseline_f = preprocess.preprocess_signal.taper_signal(s, shift_min_to_zero=False)
 
 # Taper data into the zerobaseline to remove the edge effect
-tap_zerobaseline_t = preprocess.taper_signal(s, shift_min_to_zero=True)
 
 # Different windows format can be used to perform tapering process
 # window is imported from the scipy package (scipy.signal.window). Default
 # is using Tukey window
-tap_zerobaseline_w = preprocess.taper_signal(s, window=w, shift_min_to_zero=False)
+tap_zerobaseline_w = preprocess.preprocess_signal.taper_signal(s, window=w,
+                                              shift_min_to_zero=False)
 
 # -----------------------
 # Visualize

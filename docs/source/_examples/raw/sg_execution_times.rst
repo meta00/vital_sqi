@@ -5,12 +5,12 @@
 
 Computation times
 =================
-**00:05.497** total execution time for **_examples_raw** files:
+**00:02.944** total execution time for **_examples_raw** files:
 
 +---------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__examples_raw_plot_data_manipulation.py` (``plot_data_manipulation.py``)     | 00:05.178 | 0.0 MB |
+| :ref:`sphx_glr__examples_raw_plot_preprocess_signals.py` (``plot_preprocess_signals.py``)   | 00:01.509 | 0.0 MB |
 +---------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__examples_raw_plot_preprocess_signals.py` (``plot_preprocess_signals.py``)   | 00:00.319 | 0.0 MB |
+| :ref:`sphx_glr__examples_raw_plot_data_manipulation.py` (``plot_data_manipulation.py``)     | 00:01.434 | 0.0 MB |
 +---------------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr__examples_raw_plot_quality_control_ecg.py` (``plot_quality_control_ecg.py``) | 00:00.000 | 0.0 MB |
 +---------------------------------------------------------------------------------------------+-----------+--------+

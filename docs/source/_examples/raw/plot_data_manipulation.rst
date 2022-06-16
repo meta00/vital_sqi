@@ -26,15 +26,13 @@ Data manipulation
           The other option is to use the sphinx extension
           sphinx-nbexamples.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-30
+.. GENERATED FROM PYTHON SOURCE LINES 13-28
 
 .. code-block:: default
    :lineno-start: 14
 
 
-    import vital_sqi
     from vital_sqi.data.signal_io import ECG_reader,PPG_reader
-    from vital_sqi.dataset import load_ppg,load_ecg
     import os
     file_name = os.path.abspath('../../tests/test_data/example.edf')
     ecg_data = ECG_reader(file_name, 'edf')
@@ -58,19 +56,15 @@ Data manipulation
 
  .. code-block:: none
 
-    Importing the dtw module. When using in academic works please cite:
-      T. Giorgino. Computing and Visualizing Dynamic Time Warping Alignments in R: The dtw Package.
-      J. Stat. Soft., doi:10.18637/jss.v031.i07.
-
-    Reading Channels:   0%|          | 0/2 [00:00<?, ?it/s]    Reading Channels: 100%|##########| 2/2 [00:00<00:00, 34.59it/s]
+    Reading Channels:   0%|          | 0/2 [00:00<?, ?it/s]    Reading Channels: 100%|##########| 2/2 [00:00<00:00, 36.32it/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-35
+.. GENERATED FROM PYTHON SOURCE LINES 29-33
 
 .. code-block:: default
-   :lineno-start: 32
+   :lineno-start: 30
 
 
     all_channels = ecg_data.signals
@@ -83,10 +77,10 @@ Data manipulation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-39
+.. GENERATED FROM PYTHON SOURCE LINES 34-37
 
 .. code-block:: default
-   :lineno-start: 37
+   :lineno-start: 35
 
 
     ### Example of splitting the whole data into subsegment using time domain for ECG.
@@ -98,13 +92,12 @@ Data manipulation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-45
+.. GENERATED FROM PYTHON SOURCE LINES 38-42
 
 .. code-block:: default
-   :lineno-start: 41
+   :lineno-start: 39
 
 
-    import plotly.graph_objects as go
     import numpy as np
     import matplotlib.pyplot as plt
 
@@ -115,10 +108,10 @@ Data manipulation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-49
+.. GENERATED FROM PYTHON SOURCE LINES 43-46
 
 .. code-block:: default
-   :lineno-start: 47
+   :lineno-start: 44
 
 
     print(len(channel_1))
@@ -138,10 +131,10 @@ Data manipulation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-53
+.. GENERATED FROM PYTHON SOURCE LINES 47-50
 
 .. code-block:: default
-   :lineno-start: 51
+   :lineno-start: 48
 
 
     #The whole channel length will be splitted into each 30-second segment
@@ -153,30 +146,30 @@ Data manipulation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-57
+.. GENERATED FROM PYTHON SOURCE LINES 51-54
 
 .. code-block:: default
-   :lineno-start: 55
+   :lineno-start: 52
 
 
-    from vital_sqi.data.segment_split import split_to_segments
-
-
-
+    from vital_sqi.preprocess.segment_split import split_segment
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-69
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 55-66
 
 .. code-block:: default
-   :lineno-start: 59
+   :lineno-start: 56
 
 
     save_file_name = "example_file"
     save_file_folder = "subsegments_time"
-    split_to_segments(channel_1,
+    split_segment(channel_1,
                       filename=None,
                       sampling_rate=256,
                       segment_length_second=10.0,
@@ -186,23 +179,22 @@ Data manipulation
 
 
 
-
-
 .. rst-class:: sphx-glr-script-out
 
- Out:
+.. code-block:: pytb
 
- .. code-block:: none
+    Traceback (most recent call last):
+      File "/Users/haihb/Documents/Oucru/innovation/vital_sqi/examples/raw/plot_data_manipulation.py", line 64, in <module>
+        save_file_folder=save_file_folder)
+    TypeError: split_segment() got an unexpected keyword argument 'filename'
 
-      0%|          | 0/103 [00:00<?, ?it/s]     18%|#8        | 19/103 [00:00<00:00, 186.96it/s]     37%|###6      | 38/103 [00:00<00:00, 187.93it/s]     56%|#####6    | 58/103 [00:00<00:00, 191.71it/s]     76%|#######5  | 78/103 [00:00<00:00, 192.77it/s]     95%|#########5| 98/103 [00:00<00:00, 194.30it/s]    100%|##########| 103/103 [00:00<00:00, 192.81it/s]
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 70-75
+.. GENERATED FROM PYTHON SOURCE LINES 67-72
 
 .. code-block:: default
-   :lineno-start: 71
+   :lineno-start: 68
 
 
     #The function requires the sampling rate and the defined length (in seconds) of the split segment to calculate the cutting points. User also defined a location to save the output of cut files**
@@ -210,55 +202,29 @@ Data manipulation
     #The split_to_subsegments output the saved segment at the defined save folder. Save files takes the format of "[file_name]-[segment_number].csv"
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 76-79
+.. GENERATED FROM PYTHON SOURCE LINES 73-76
 
 .. code-block:: default
-   :lineno-start: 77
+   :lineno-start: 74
 
 
     print(os.listdir("subsegments_time/ecg/"))
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    ['segment-017.csv', 'segment-003.csv', 'segment-002.csv', 'segment-016.csv', 'segment-014.csv', 'segment-028.csv', 'segment-029.csv', 'segment-015.csv', 'segment-001.csv', 'segment-039.csv', 'segment-005.csv', 'segment-011.csv', 'segment-010.csv', 'segment-004.csv', 'segment-038.csv', 'segment-012.csv', 'segment-006.csv', 'segment-007.csv', 'segment-013.csv', 'segment-100.csv', 'segment-074.csv', 'segment-060.csv', 'segment-048.csv', 'segment-049.csv', 'segment-061.csv', 'segment-075.csv', 'segment-101.csv', 'segment-103.csv', 'segment-088.csv', 'segment-063.csv', 'segment-077.csv', 'segment-076.csv', 'segment-062.csv', 'segment-089.csv', 'segment-102.csv', 'segment-099.csv', 'segment-066.csv', 'segment-072.csv', 'segment-073.csv', 'segment-067.csv', 'segment-098.csv', 'segment-059.csv', 'segment-071.csv', 'segment-065.csv', 'segment-064.csv', 'segment-070.csv', 'segment-058.csv', 'segment-096.csv', 'segment-082.csv', 'segment-055.csv', 'segment-041.csv', 'segment-069.csv', 'segment-068.csv', 'segment-040.csv', 'segment-054.csv', 'segment-083.csv', 'segment-097.csv', 'segment-081.csv', 'segment-095.csv', 'segment-042.csv', 'segment-056.csv', 'segment-057.csv', 'segment-043.csv', 'segment-094.csv', 'segment-080.csv', 'segment-084.csv', 'segment-090.csv', 'segment-047.csv', 'segment-053.csv', 'segment-052.csv', 'segment-046.csv', 'segment-091.csv', 'segment-085.csv', 'segment-093.csv', 'segment-087.csv', 'segment-078.csv', 'segment-050.csv', 'segment-044.csv', 'segment-045.csv', 'segment-051.csv', 'segment-079.csv', 'segment-086.csv', 'segment-092.csv', 'segment-036.csv', 'segment-022.csv', 'segment-023.csv', 'segment-037.csv', 'segment-021.csv', 'segment-035.csv', 'segment-009.csv', 'segment-008.csv', 'segment-034.csv', 'segment-020.csv', 'segment-018.csv', 'segment-024.csv', 'segment-030.csv', 'segment-031.csv', 'segment-025.csv', 'segment-019.csv', 'segment-033.csv', 'segment-027.csv', 'segment-026.csv', 'segment-032.csv']
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 80-84
+.. GENERATED FROM PYTHON SOURCE LINES 77-81
 
 .. code-block:: default
-   :lineno-start: 81
+   :lineno-start: 78
 
 
     segment_51 = np.loadtxt("subsegments_time/ecg/segment-051.csv")
     segment_52 = np.loadtxt("subsegments_time/ecg/segment-052.csv")
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 85-106
+.. GENERATED FROM PYTHON SOURCE LINES 82-103
 
 .. code-block:: default
-   :lineno-start: 86
+   :lineno-start: 83
 
 
     #Uncomment the plotly code to use interactive plot
@@ -282,36 +248,19 @@ Data manipulation
     plt.show()
 
 
-
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_001.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_001.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 107-110
+.. GENERATED FROM PYTHON SOURCE LINES 104-107
 
 .. code-block:: default
-   :lineno-start: 108
+   :lineno-start: 105
 
 
     ### Example of splitting the whole data into subsegment using time domain for PPG.
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 111-124
+.. GENERATED FROM PYTHON SOURCE LINES 108-121
 
 .. code-block:: default
-   :lineno-start: 112
+   :lineno-start: 109
 
 
     save_file_name = "example_file"
@@ -327,63 +276,29 @@ Data manipulation
                       save_file_folder=save_file_folder)
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-      0%|          | 0/61 [00:00<?, ?it/s]     84%|########3 | 51/61 [00:00<00:00, 506.96it/s]    100%|##########| 61/61 [00:00<00:00, 506.65it/s]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 125-129
+.. GENERATED FROM PYTHON SOURCE LINES 122-126
 
 .. code-block:: default
-   :lineno-start: 125
+   :lineno-start: 122
 
     ppg_folder = os.path.join(save_file_folder, "ppg")
     file_list = os.listdir(ppg_folder)
     print(file_list)
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    ['segment-19.csv', 'segment-25.csv', 'segment-31.csv', 'segment-30.csv', 'segment-24.csv', 'segment-18.csv', 'segment-32.csv', 'segment-26.csv', 'segment-27.csv', 'segment-33.csv', 'segment-37.csv', 'segment-23.csv', 'segment-22.csv', 'segment-36.csv', 'segment-20.csv', 'segment-34.csv', 'segment-08.csv', 'segment-09.csv', 'segment-35.csv', 'segment-21.csv', 'segment-46.csv', 'segment-52.csv', 'segment-53.csv', 'segment-47.csv', 'segment-51.csv', 'segment-45.csv', 'segment-44.csv', 'segment-50.csv', 'segment-54.csv', 'segment-40.csv', 'segment-41.csv', 'segment-55.csv', 'segment-43.csv', 'segment-57.csv', 'segment-56.csv', 'segment-42.csv', 'segment-58.csv', 'segment-59.csv', 'segment-61.csv', 'segment-49.csv', 'segment-48.csv', 'segment-60.csv', 'segment-38.csv', 'segment-04.csv', 'segment-10.csv', 'segment-11.csv', 'segment-05.csv', 'segment-39.csv', 'segment-13.csv', 'segment-07.csv', 'segment-06.csv', 'segment-12.csv', 'segment-16.csv', 'segment-02.csv', 'segment-03.csv', 'segment-17.csv', 'segment-01.csv', 'segment-15.csv', 'segment-29.csv', 'segment-28.csv', 'segment-14.csv']
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 130-133
+.. GENERATED FROM PYTHON SOURCE LINES 127-130
 
 .. code-block:: default
-   :lineno-start: 130
+   :lineno-start: 127
 
     segment_1 = np.loadtxt(os.path.join(ppg_folder, file_list[0]))
     segment_2 = np.loadtxt(os.path.join(ppg_folder, file_list[0]))
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 134-153
+.. GENERATED FROM PYTHON SOURCE LINES 131-150
 
 .. code-block:: default
-   :lineno-start: 135
+   :lineno-start: 132
 
 
     # Uncomment the plotly code to use interactive plot
@@ -405,21 +320,10 @@ Data manipulation
     plt.show()
 
 
-
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_002.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_002.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 154-159
+.. GENERATED FROM PYTHON SOURCE LINES 151-156
 
 .. code-block:: default
-   :lineno-start: 155
+   :lineno-start: 152
 
 
     ### Example of splitting the whole data into subsegment using frequency domian for ECG.
@@ -427,16 +331,10 @@ Data manipulation
     ### Notes on the difference of splitting point as comparing with time domain splitting. Uncomment the plotly code - interactive plot - for better observation
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 160-170
+.. GENERATED FROM PYTHON SOURCE LINES 157-167
 
 .. code-block:: default
-   :lineno-start: 161
+   :lineno-start: 158
 
 
     save_file_name = "example_file"
@@ -449,147 +347,20 @@ Data manipulation
                       save_file_folder=save_file_folder)
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    /Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/vital_sqi/data/segment_split.py:107: VisibleDeprecationWarning:
-
-    Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
-
-      0%|          | 0/104 [00:00<?, ?it/s]     19%|#9        | 20/104 [00:00<00:00, 194.96it/s]     38%|###8      | 40/104 [00:00<00:00, 194.68it/s]     58%|#####7    | 60/104 [00:00<00:00, 190.15it/s]     77%|#######6  | 80/104 [00:00<00:00, 191.65it/s]     96%|#########6| 100/104 [00:00<00:00, 191.70it/s]    100%|##########| 104/104 [00:00<00:00, 192.57it/s]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 171-175
+.. GENERATED FROM PYTHON SOURCE LINES 168-172
 
 .. code-block:: default
-   :lineno-start: 172
+   :lineno-start: 169
 
 
     segment_51 = np.loadtxt("subsegments_frequency/ecg/segment-051.csv")
     segment_52 = np.loadtxt("subsegments_frequency/ecg/segment-052.csv")
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 176-195
+.. GENERATED FROM PYTHON SOURCE LINES 173-192
 
 .. code-block:: default
-   :lineno-start: 177
+   :lineno-start: 174
 
 
     # Uncomment the plotly code to use interactive plot
@@ -611,36 +382,19 @@ Data manipulation
     plt.show()
 
 
-
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_003.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_003.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 196-199
+.. GENERATED FROM PYTHON SOURCE LINES 193-196
 
 .. code-block:: default
-   :lineno-start: 197
+   :lineno-start: 194
 
 
     ### Example of splitting the whole data into subsegment using frequency domian for PPG.
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 200-211
+.. GENERATED FROM PYTHON SOURCE LINES 197-208
 
 .. code-block:: default
-   :lineno-start: 201
+   :lineno-start: 198
 
 
     save_file_name = "example_file"
@@ -654,67 +408,20 @@ Data manipulation
                       save_file_folder=save_file_folder)
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    0
-    /Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/vital_sqi/data/segment_split.py:107: VisibleDeprecationWarning:
-
-    Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
-
-      0%|          | 0/24 [00:00<?, ?it/s]     83%|########3 | 20/24 [00:00<00:00, 192.71it/s]    100%|##########| 24/24 [00:00<00:00, 193.03it/s]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 212-216
+.. GENERATED FROM PYTHON SOURCE LINES 209-213
 
 .. code-block:: default
-   :lineno-start: 213
+   :lineno-start: 210
 
 
     segment_1 = np.loadtxt("subsegments_frequency/ppg/segment-01.csv")
     segment_2 = np.loadtxt("subsegments_frequency/ppg/segment-02.csv")
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 217-236
+.. GENERATED FROM PYTHON SOURCE LINES 214-233
 
 .. code-block:: default
-   :lineno-start: 218
+   :lineno-start: 215
 
 
     # Uncomment to use interactive plot
@@ -736,100 +443,46 @@ Data manipulation
     plt.show()
 
 
-
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_004.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_004.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 237-240
+.. GENERATED FROM PYTHON SOURCE LINES 234-237
 
 .. code-block:: default
-   :lineno-start: 238
+   :lineno-start: 235
 
 
     ### Example of trimming the first and the last n-minute data.
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 241-244
+.. GENERATED FROM PYTHON SOURCE LINES 238-241
 
 .. code-block:: default
-   :lineno-start: 242
+   :lineno-start: 239
 
 
     from vital_sqi.data import trim_data
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 245-248
+.. GENERATED FROM PYTHON SOURCE LINES 242-245
 
 .. code-block:: default
-   :lineno-start: 246
+   :lineno-start: 243
 
 
     trimmed_data = trim_data(channel_1,minute_remove=10)
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 249-252
+.. GENERATED FROM PYTHON SOURCE LINES 246-249
 
 .. code-block:: default
-   :lineno-start: 250
+   :lineno-start: 247
 
 
     trimmed_data
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-
-    60000      64.759380
-    60001      75.782254
-    60002      84.049409
-    60003      86.805127
-    60004      89.560845
-                 ...    
-    205531    221.835325
-    205532    224.591043
-    205533    213.568170
-    205534    205.301015
-    205535    202.545296
-    Name: 0, Length: 145536, dtype: float64
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 253-274
+.. GENERATED FROM PYTHON SOURCE LINES 250-271
 
 .. code-block:: default
-   :lineno-start: 254
+   :lineno-start: 251
 
 
     # fig = go.Figure()
@@ -853,51 +506,28 @@ Data manipulation
     plt.show()
 
 
-
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_005.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_005.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 275-278
+.. GENERATED FROM PYTHON SOURCE LINES 272-275
 
 .. code-block:: default
-   :lineno-start: 276
+   :lineno-start: 273
 
 
     #The before and after trimming 5 minutes segment**
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 279-282
+.. GENERATED FROM PYTHON SOURCE LINES 276-279
 
 .. code-block:: default
-   :lineno-start: 280
+   :lineno-start: 277
 
 
     trimmed_data_ppg = trim_data(ppg_data.signals.iloc[:, 1], minute_remove=1)
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 283-305
+.. GENERATED FROM PYTHON SOURCE LINES 280-302
 
 .. code-block:: default
-   :lineno-start: 284
+   :lineno-start: 281
 
 
     # fig = go.Figure()
@@ -922,51 +552,28 @@ Data manipulation
     plt.show()
 
 
-
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_006.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_006.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 306-309
+.. GENERATED FROM PYTHON SOURCE LINES 303-306
 
 .. code-block:: default
-   :lineno-start: 307
+   :lineno-start: 304
 
 
     ### Example of before and after removing the unchanged value of the n-continuous second.
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 310-313
+.. GENERATED FROM PYTHON SOURCE LINES 307-310
 
 .. code-block:: default
-   :lineno-start: 311
+   :lineno-start: 308
 
 
     from vital_sqi.data.removal_utilities import remove_unchanged_squences
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 314-321
+.. GENERATED FROM PYTHON SOURCE LINES 311-318
 
 .. code-block:: default
-   :lineno-start: 315
+   :lineno-start: 312
 
 
     # create a series of unchanged value in the trimmed_data list
@@ -976,16 +583,10 @@ Data manipulation
     unchanged_data[idx:idx+sampling_rate*20] = max(trimmed_data)
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 322-334
+.. GENERATED FROM PYTHON SOURCE LINES 319-331
 
 .. code-block:: default
-   :lineno-start: 323
+   :lineno-start: 320
 
 
     # fig = go.Figure()
@@ -1000,21 +601,10 @@ Data manipulation
     plt.show()
 
 
-
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_007.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_007.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 335-342
+.. GENERATED FROM PYTHON SOURCE LINES 332-339
 
 .. code-block:: default
-   :lineno-start: 336
+   :lineno-start: 333
 
 
     start_list, end_list = \
@@ -1024,16 +614,10 @@ Data manipulation
                                   as_dataframe=False)
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 343-357
+.. GENERATED FROM PYTHON SOURCE LINES 340-354
 
 .. code-block:: default
-   :lineno-start: 344
+   :lineno-start: 341
 
 
     # fig = go.Figure()
@@ -1050,67 +634,38 @@ Data manipulation
     plt.show()
 
 
-
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_008.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_008.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 358-361
+.. GENERATED FROM PYTHON SOURCE LINES 355-358
 
 .. code-block:: default
-   :lineno-start: 359
+   :lineno-start: 356
 
 
     ### Example of removing invalid signal data (signal = 0 and other vital signs exceed the normal range)
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 362-365
+.. GENERATED FROM PYTHON SOURCE LINES 359-362
 
 .. code-block:: default
-   :lineno-start: 363
+   :lineno-start: 360
 
 
     from vital_sqi.data import remove_invalid
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 366-370
+.. GENERATED FROM PYTHON SOURCE LINES 363-367
 
 .. code-block:: default
-   :lineno-start: 367
+   :lineno-start: 364
 
 
     trimmed_data = trim_data(channel_1, minute_remove=10)
     error_data = trimmed_data.copy()
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 371-377
+.. GENERATED FROM PYTHON SOURCE LINES 368-374
 
 .. code-block:: default
-   :lineno-start: 372
+   :lineno-start: 369
 
 
     # create a series of unchanged value in the trimmed_data list
@@ -1119,31 +674,19 @@ Data manipulation
     error_data[idx:idx+sampling_rate*20] = 0
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 378-381
+.. GENERATED FROM PYTHON SOURCE LINES 375-378
 
 .. code-block:: default
-   :lineno-start: 379
+   :lineno-start: 376
 
 
     start_list, end_list = remove_invalid(error_data,as_dataframe=False)
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 382-395
+.. GENERATED FROM PYTHON SOURCE LINES 379-392
 
 .. code-block:: default
-   :lineno-start: 383
+   :lineno-start: 380
 
 
     # fig = go.Figure()
@@ -1159,51 +702,28 @@ Data manipulation
     plt.show()
 
 
-
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_009.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_009.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 396-399
+.. GENERATED FROM PYTHON SOURCE LINES 393-396
 
 .. code-block:: default
-   :lineno-start: 397
+   :lineno-start: 394
 
 
     ### One example of removing invalid signal data using the frequency domain
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 400-403
+.. GENERATED FROM PYTHON SOURCE LINES 397-400
 
 .. code-block:: default
-   :lineno-start: 401
+   :lineno-start: 398
 
 
     from vital_sqi.data import cut_by_frequency_partition
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 404-411
+.. GENERATED FROM PYTHON SOURCE LINES 401-408
 
 .. code-block:: default
-   :lineno-start: 405
+   :lineno-start: 402
 
 
     start_list, end_list = \
@@ -1213,16 +733,10 @@ Data manipulation
                                   lower_bound_threshold=2)
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 412-418
+.. GENERATED FROM PYTHON SOURCE LINES 409-415
 
 .. code-block:: default
-   :lineno-start: 413
+   :lineno-start: 410
 
 
     #Welch method is applied for the whole data to obtain the common frequency component.**
@@ -1231,16 +745,10 @@ Data manipulation
     #Any windows having its component exceeds the peak_threshold_ratio (the ratio between the number of subsegment's components and the number of whole data components) will be removed.**
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 419-439
+.. GENERATED FROM PYTHON SOURCE LINES 416-436
 
 .. code-block:: default
-   :lineno-start: 420
+   :lineno-start: 417
 
 
     # fig = go.Figure()
@@ -1263,21 +771,10 @@ Data manipulation
     plt.show()
 
 
-
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_010.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_010.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 440-445
+.. GENERATED FROM PYTHON SOURCE LINES 437-442
 
 .. code-block:: default
-   :lineno-start: 441
+   :lineno-start: 438
 
 
     out = PPG_reader(os.path.join(os.getcwd(),'../../', 'tests/test_data/ppg_smartcare.csv'),
@@ -1285,16 +782,10 @@ Data manipulation
                      info_idx = ['PULSE_BPM','SPO2_PCT','PERFUSION_INDEX'])
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 446-453
+.. GENERATED FROM PYTHON SOURCE LINES 443-450
 
 .. code-block:: default
-   :lineno-start: 447
+   :lineno-start: 444
 
 
     start_list, end_list = \
@@ -1304,16 +795,10 @@ Data manipulation
                                   lower_bound_threshold=2)
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 454-472
+.. GENERATED FROM PYTHON SOURCE LINES 451-469
 
 .. code-block:: default
-   :lineno-start: 455
+   :lineno-start: 452
 
 
     # fig = go.Figure()
@@ -1335,20 +820,9 @@ Data manipulation
     #plt.show()
 
 
-
-.. image-sg:: /_examples/raw/images/sphx_glr_plot_data_manipulation_011.png
-   :alt: plot data manipulation
-   :srcset: /_examples/raw/images/sphx_glr_plot_data_manipulation_011.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.178 seconds)
+   **Total running time of the script:** ( 0 minutes  1.434 seconds)
 
 
 .. _sphx_glr_download__examples_raw_plot_data_manipulation.py:
