@@ -1,13 +1,5 @@
-import pytest
-import numpy as np
-from sklearn.cluster import KMeans
-from scipy import signal
-
-from vital_sqi.preprocess.band_filter import BandpassFilter
-from vital_sqi.common.generate_template import ecg_dynamic_template
 from vital_sqi.common.rpeak_detection import PeakDetector
-import warnings
-from ecgdetectors import Detectors,panPeakDetect
+
 
 
 class TestPeakDetector(object):

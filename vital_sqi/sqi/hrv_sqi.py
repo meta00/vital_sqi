@@ -25,7 +25,7 @@ HRV frequency domain
 
 import numpy as np
 from vital_sqi.common.power_spectrum import calculate_psd
-from heartpy.datautils import rolling_mean
+import warnings
 from hrvanalysis import get_time_domain_features, \
     get_frequency_domain_features,  get_nn_intervals, get_csi_cvi_features, \
     get_geometrical_features
@@ -655,6 +655,10 @@ def get_all_features_hrva(s, sample_rate=100, rpeak_method=0,wave_type='ecg'):
     else:
         detector = PeakDetector(wave_type='ecg')
         peak_list, trough_list = detector.ecg_detector(s, detector_type=rpeak_method)
+
+    if len(peak_list) < 2:
+        warnings.warn("Peak Detector cannot find more than 2 peaks to process")
+        return [],[],[],[]
 
     rr_list = np.diff(peak_list) * (1000 / sample_rate)  # 1000 milisecond
 

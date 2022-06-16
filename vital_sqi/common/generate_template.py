@@ -7,8 +7,40 @@ from scipy import signal
 import scipy
 from scipy.signal import argrelextrema
 from scipy.integrate import solve_ivp
-from vital_sqi.preprocess.preprocess_signal import squeeze_template
 
+
+def squeeze_template(s, width):
+    """handy
+
+    Parameters
+    ----------
+    s :
+        param width:
+    width :
+
+
+    Returns
+    -------
+
+
+    """
+    s = np.array(s)
+    total_len = len(s)
+    span_unit = 2
+    out_res = []
+    for i in range(int(width)):
+        if i == 0:
+            centroid = (total_len / width) * i
+        else:
+            centroid = (total_len / width) * i
+        left_point = int(centroid) - span_unit
+        right_point = int(centroid + span_unit)
+        if left_point < 0:
+            left_point = 0
+        if right_point > len(s):
+            left_point = len(s)
+        out_res.append(np.mean(s[left_point:right_point]))
+    return np.array(out_res)
 
 def ppg_dual_double_frequency_template(width):
     """

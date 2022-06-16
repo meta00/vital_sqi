@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 # vitalSQI
-from vital_sqi.preprocess.band_filter import BandpassFilter
+from vital_sqi.common.band_filter import BandpassFilter
 
 
 # -----------------------

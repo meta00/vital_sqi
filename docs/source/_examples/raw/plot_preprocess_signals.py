@@ -104,7 +104,7 @@ ppg_sample_complex = ppg_data.signals.iloc[:, 1][
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
-                         y= ppg_sample_complex))
+                         y=ppg_sample_complex))
 #fig.show()
 fig
 
@@ -123,28 +123,30 @@ from vital_sqi import preprocess
 
 #%%
 
-ecg_sample_tapering_zerobaseline = preprocess.tapering(ecg_sample_complex,
-                                                       shift_min_to_zero=True)
-ppg_sample_tapering_zerobaseline = preprocess.tapering(ppg_sample_complex,
-                                                       shift_min_to_zero=True)
+ecg_sample_tapering_zerobaseline = preprocess.preprocess_signal.taper_signal(
+                                                        ecg_sample_complex,
+                                                        shift_min_to_zero=True)
+ppg_sample_tapering_zerobaseline = preprocess.preprocess_signal.taper_signal(
+                                                        ppg_sample_complex,
+                                                        shift_min_to_zero=True)
 
 #%%
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_complex,
+                         y=ecg_sample_complex,
                          name='original_signal'))
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_tapering_zerobaseline,
+                         y=ecg_sample_tapering_zerobaseline,
                          name='tapered signal'))
 #fig.show(title='ecg tapering')
 fig
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
-                         y= ppg_sample_complex,
+                         y=ppg_sample_complex,
                          name='original_signal'))
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_tapering_zerobaseline)),
-                         y= ppg_sample_tapering_zerobaseline,
+                         y=ppg_sample_tapering_zerobaseline,
                          name='tapered signal'))
 #fig.show()
 fig
@@ -158,27 +160,27 @@ fig
 #%%
 
 ecg_sample_tapering_zerobaseline = \
-    preprocess.tapering(ecg_sample_complex,shift_min_to_zero=False)
+    preprocess.taper_signal(ecg_sample_complex,shift_min_to_zero=False)
 ppg_sample_tapering_zerobaseline = \
-    preprocess.tapering(ppg_sample_complex,shift_min_to_zero=False)
+    preprocess.taper_signal(ppg_sample_complex,shift_min_to_zero=False)
 
 #%%
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_complex,
+                         y=ecg_sample_complex,
                          name='original_signal'))
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_tapering_zerobaseline,
+                         y=ecg_sample_tapering_zerobaseline,
                          name='tapered signal'))
 #fig.show(title='ECG')
 fig
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
-                         y= ppg_sample_complex,
+                         y=ppg_sample_complex,
                          name='original_signal'))
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
-                         y= ppg_sample_tapering_zerobaseline,
+                         y=ppg_sample_tapering_zerobaseline,
                          name='tapered signal'))
 #fig.show(itle='PPG')
 fig
@@ -214,13 +216,13 @@ ppg_sample_tapering_hann = preprocess.taper_signal(ppg_sample_complex,
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_complex,
+                         y=ecg_sample_complex,
                          name='original signal'))
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_tapering_zerobaseline,
+                         y=ecg_sample_tapering_zerobaseline,
                          name='tukey window tapering'))
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_tapering_hann,
+                         y=ecg_sample_tapering_hann,
                          name='hann window tapering'))
 
 fig.update_layout(
@@ -230,13 +232,13 @@ fig
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
-                         y= ppg_sample_complex,
+                         y=ppg_sample_complex,
                          name='original signal'))
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
-                         y= ppg_sample_tapering_zerobaseline,
+                         y=ppg_sample_tapering_zerobaseline,
                          name='tukey window tapering'))
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
-                         y= ppg_sample_tapering_hann,
+                         y=ppg_sample_tapering_hann,
                          name='hann window tapering'))
 fig.update_layout(
     title='PPG'
@@ -249,37 +251,39 @@ fig.update_layout(
 
 #%%
 
-ecg_sample_smoothing_5 = preprocess.smooth(ecg_sample_complex)
-ecg_sample_smoothing_9 = preprocess.smooth(ecg_sample_complex,window_len=9)
+ecg_sample_smoothing_5 = preprocess.smooth_signal(ecg_sample_complex)
+ecg_sample_smoothing_9 = preprocess.smooth_signal(ecg_sample_complex,
+                                                  window_len=9)
 
-ppg_sample_smoothing_5 = preprocess.smooth(ppg_sample_complex)
-ppg_sample_smoothing_9 = preprocess.smooth(ppg_sample_complex,window_len=9)
+ppg_sample_smoothing_5 = preprocess.smooth_signal(ppg_sample_complex)
+ppg_sample_smoothing_9 = preprocess.smooth_signal(ppg_sample_complex,
+                                                  window_len=9)
 
 #%%
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_complex,
+                         y=ecg_sample_complex,
                          name='original_signal'))
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_smoothing_5,
+                         y=ecg_sample_smoothing_5,
                          name='smoothing - sliding window length = 5'))
 fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
-                         y= ecg_sample_smoothing_9,
-                         name = 'smoothing - sliding window length = 9'))
+                         y=ecg_sample_smoothing_9,
+                         name='smoothing - sliding window length = 9'))
 #fig.show()
 fig
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
-                         y= ppg_sample_complex,
+                         y=ppg_sample_complex,
                          name='original_signal'))
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
-                         y= ppg_sample_smoothing_5,
+                         y=ppg_sample_smoothing_5,
                          name='smoothing - sliding window length = 5'))
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
-                         y= ppg_sample_smoothing_9,
-                         name = 'smoothing - sliding window length = 9'))
+                         y=ppg_sample_smoothing_9,
+                         name='smoothing - sliding window length = 9'))
 #fig.show()
 fig
 
@@ -358,7 +362,7 @@ fig
 
 #%%
 
-from vital_sqi.preprocess.band_filter import BandpassFilter
+from vital_sqi.common.band_filter import BandpassFilter
 
 #%%
 

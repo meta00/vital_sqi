@@ -54,8 +54,7 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
         'Start datetime must be None or a string.'
     assert isinstance(sampling_rate, float) or \
            isinstance(sampling_rate, int) or \
-           sampling_rate is None, \
-        'Sampling rate must be a number or None.'
+           sampling_rate is None, 'Sampling rate must be a number or None.'
 
     if isinstance(sampling_rate, float):
         sampling_rate = round(sampling_rate)
@@ -358,12 +357,18 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
         out_df.to_excel(file_name, index=False, header=True)
     return os.path.isfile(file_name)
 
-
 # import os, tempfile
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/example.edf')
 # out = ECG_reader(file_in, 'edf')
 # print(out)
+
+# import os, tempfile
+#
+# file_in = os.path.abspath('/Users/haihb/Documents/Oucru/innovation'
+#                           '/vital_sqi/tests/test_data/example.edf')
+# out = ECG_reader(file_in, 'edf')
+
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/out.edf')
 # out1 = ECG_reader(file_in, 'edf')
@@ -372,6 +377,10 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
 # out.info[0]['annotations'][0][1] = float(str(out.info[0]['annotations'][0][
 #                                                 1], 'utf-8'))
 # ECG_writer(out, file_out, file_type='edf', info=out.info)
+
+# file_in = os.path.abspath('/Users/haihb/Documents/Oucru/innovation'
+#                           '/vital_sqi/tests/test_data/a103l')
+# out = ECG_reader(file_in, 'mit')
 
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/a103l')

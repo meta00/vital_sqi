@@ -11,9 +11,7 @@ Data manipulation
 
 #%%
 
-import vital_sqi
 from vital_sqi.data.signal_io import ECG_reader,PPG_reader
-from vital_sqi.dataset import load_ppg,load_ecg
 import os
 file_name = os.path.abspath('../../tests/test_data/example.edf')
 ecg_data = ECG_reader(file_name, 'edf')
@@ -38,7 +36,6 @@ channel_1 = all_channels.iloc[:, 1]
 
 #%%
 
-import plotly.graph_objects as go
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -52,13 +49,13 @@ print(len(channel_1))
 
 #%%
 
-from vital_sqi.preprocess.segment_split import split_to_segments
+from vital_sqi.preprocess.segment_split import split_segment
 
 #%%
 
 save_file_name = "example_file"
 save_file_folder = "subsegments_time"
-split_to_segments(channel_1,
+split_segment(channel_1,
                   filename=None,
                   sampling_rate=256,
                   segment_length_second=10.0,

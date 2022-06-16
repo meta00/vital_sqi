@@ -123,10 +123,12 @@ from vital_sqi import preprocess
 
 #%%
 
-ecg_sample_tapering_zerobaseline = preprocess.taper_signal(ecg_sample_complex,
-                                                       shift_min_to_zero=True)
-ppg_sample_tapering_zerobaseline = preprocess.taper_signal(ppg_sample_complex,
-                                                       shift_min_to_zero=True)
+ecg_sample_tapering_zerobaseline = preprocess.preprocess_signal.taper_signal(
+                                                        ecg_sample_complex,
+                                                        shift_min_to_zero=True)
+ppg_sample_tapering_zerobaseline = preprocess.preprocess_signal.taper_signal(
+                                                        ppg_sample_complex,
+                                                        shift_min_to_zero=True)
 
 #%%
 
@@ -360,7 +362,7 @@ fig
 
 #%%
 
-from vital_sqi.preprocess.band_filter import BandpassFilter
+from vital_sqi.common.band_filter import BandpassFilter
 
 #%%
 

@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from scipy.signal import butter, lfilter, freqz
 from scipy import signal
-from vital_sqi.preprocess.band_filter import BandpassFilter
+from vital_sqi.common.band_filter import BandpassFilter
 
 class TestBandpassFilter:
     def test_on_init(self):

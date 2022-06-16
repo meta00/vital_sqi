@@ -112,6 +112,7 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
     # timestamps = []
     # for value in time_range.range(dt.timedelta(seconds=1 / sampling_rate)):
     for value in range(1, signal_length):
+
             timestamps.append(timestamps[value-1] + 1 /
                                            sampling_rate)
     for x in range(0, len(timestamps)):
@@ -378,6 +379,11 @@ def format_milestone(start_milestone, end_milestone):
 def check_signal_format(s):
     assert isinstance(s, pd.DataFrame), 'Expected a pd.DataFrame.'
     assert len(s.columns) is 2, 'Expect a datafram of only two columns.'
+    assert isinstance(s.iloc[:, 0][0], pd.Timestamp), \
+        'Expected type of the first column to be pd.Timestamp.'
+    assert isinstance(s.iloc[:, 1][0], float), \
+        'Expected type of the second column to be float'
+    return True
     assert isinstance(s.iloc[0, 0], pd.Timestamp), \
         'Expected type of the first column to be pd.Timestamp.'
     assert isinstance(s.iloc[0, 1], float), \

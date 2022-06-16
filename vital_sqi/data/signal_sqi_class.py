@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.lib.function_base import trim_zeros
-from vital_sqi.preprocess.band_filter import BandpassFilter
+from vital_sqi.common.band_filter import BandpassFilter
 from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
 
@@ -50,8 +50,8 @@ class SignalSQI:
                 'Expected a numeric value. Sampling rate is round up to the ' \
                 'nearest integer.'
         if name == 'info':
-            assert isinstance(value, (list, dict, pd.DataFrame)), \
-                'Expected info as a pd.DataFrame.'
+            assert isinstance(value, (list, dict, pd.DataFrame)),\
+                'Expected info as a list, dict, or pd.DataFrame.'
         # if name == 'start_datetime':
         #     assert isinstance(value, str) or \
         #            isinstance(value, dt.datetime) or \
