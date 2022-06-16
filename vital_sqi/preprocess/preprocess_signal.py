@@ -1,27 +1,32 @@
 
 import numpy as np
+import pandas as pd
 from scipy import signal
+from vital_sqi.common.utils import check_signal_format
 
 
 def taper_signal(s, window=None, shift_min_to_zero=True):
-    """Pin the leftmost and rightmost signal to the zero baseline
-    and amplify the remainder according to the window shape.
+    """Pinning the leftmost and rightmost signal to the zero baseline
+    and amplifying the remainder according to the window shape.
 
     Parameters
     ----------
-    s :
-        array-like signal
+    s : pandas DataFrame
+        Signal, with first column as pandas Timestamp and second column as
+        float.
     window :
         sequence, array of floats indicates the windows types
-        as described in scipy.windows (Default value = None)
-    shift_min_to_zero :
+        as described in scipy.windows.
+        (Default value = None)
+    shift_min_to_zero : bool
         (Default value = True)
 
     Returns
     -------
-
-    
+    processed_s : pandas DataFrame
+        Processed signal.
     """
+    check_signal_format(s)
     if shift_min_to_zero:
         s = s-np.min(s)
     if window is None:
@@ -32,23 +37,28 @@ def taper_signal(s, window=None, shift_min_to_zero=True):
 
 
 def smooth_signal(s, window_len=5, window='flat'):
-    """
-
+    """ Smoothing signal
     Parameters
     ----------
-    s :
-        
-    window_len :
-        int
+    s : pandas DataFrame
+        Signal, with first column as pandas Timestamp and second column as
+        float.
+    window_len : int
         (Default value = 5)
-    window :
+    window : str
          (Default value = 'flat')
-         Options are: 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
+         Options are: 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'.
 
     Returns
     -------
-
+    processed_s : pandas DataFrame
+        Processed signal.
     """
+    check_signal_format(s)
+    assert isinstance(window, int), 'Expected an integer value.'
+    assert window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman'], \
+        'Options are "flat", "hanning", "hamming", "bartlett", "blackman"'
+
     s = np.array(s)
     if s.ndim != 1:
         raise(ValueError, "smooth only accepts 1 dimension arrays.")
@@ -58,10 +68,6 @@ def smooth_signal(s, window_len=5, window='flat'):
 
     if window_len < 3:
         return s
-
-    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
-        raise(ValueError, "Window is on of 'flat', 'hanning', "
-                          "'hamming', 'bartlett', 'blackman'")
 
     s = np.r_[s[window_len - 1:0:-1], s, s[-2:-window_len - 1:-1]]
     # print(len(s))
@@ -76,31 +82,32 @@ def smooth_signal(s, window_len=5, window='flat'):
 
 
 def scale_pattern(s, window_size):
-    """expose
+    """
     This method is ONLY used for small segment to compare with the template.
     Please change to use scipy.signal.resample function for the purpose of
     resampling.
 
     Parameters
     ----------
-    s :
-        param window_size:
-    window_size :
-        
+    s : pandas DataFrame
+        Signal, with first column as pandas Timestamp and second column as
+        float.
+    window_size : int
 
     Returns
     -------
-
+    processed_s : pandas DataFrame
+        Processed signal.
     
     """
     scale_res = []
     if len(s) == window_size:
         return np.array(s)
-    if len(s)<window_size:
-        #spanning the signal
+    if len(s) < window_size:
+        # spanning the signal
         span_ratio = (window_size/len(s))
-        for idx in range(0,int(window_size)):
-            if idx-span_ratio<0:
+        for idx in range(0, int(window_size)):
+            if idx-span_ratio < 0:
                 scale_res.append(s[0])
             else:
                 scale_res.append(np.mean(s[int(idx/span_ratio)]))
@@ -110,23 +117,20 @@ def scale_pattern(s, window_size):
     # scale_res = smooth_window(scale_res, span_size=5)
     # scale_res = smooth(scale_res, span_size=5)
     smoothed_scale_res = smooth_signal(scale_res)
-    return np.array(smoothed_scale_res)
+    processed_s = pd.DataFrame(smoothed_scale_res)
+    return processed_s
 
 
 def squeeze_template(s, width):
-    """handy
-
+    """
     Parameters
     ----------
     s :
         param width:
     width :
-        
 
     Returns
     -------
-
-    
     """
     s = np.array(s)
     total_len = len(s)
@@ -139,9 +143,10 @@ def squeeze_template(s, width):
             centroid = (total_len/width)*i
         left_point = int(centroid)-span_unit
         right_point = int(centroid+span_unit)
-        if left_point <0:
-            left_point=0
-        if right_point >len(s):
-            left_point=len(s)
+        if left_point < 0:
+            left_point = 0
+        if right_point > len(s):
+            left_point = len(s)
         out_res.append(np.mean(s[left_point:right_point]))
     return np.array(out_res)
+

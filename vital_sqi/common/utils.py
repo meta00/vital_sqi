@@ -1,10 +1,7 @@
-import warnings
-
 import numpy as np
-import datetime as dt
 import os
+import datetime as dt
 import json
-
 import pandas as pd
 from datetimerange import DateTimeRange
 import dateparser
@@ -63,6 +60,10 @@ def calculate_sampling_rate(timestamps):
     """
     if isinstance(timestamps[0], float):
         timestamps_second = timestamps
+    elif isinstance(timestamps[0], pd.Timestamp):
+        timestamps_second = []
+        for i in range(1, len(timestamps)):
+            timestamps_second = (timestamps[i] - timestamps[i-1]).total_sconds()
     else:
         try:
             v_parse_datetime = np.vectorize(parse_datetime)
@@ -76,7 +77,7 @@ def calculate_sampling_rate(timestamps):
             sampling_rate = None
             return sampling_rate
     steps = np.diff(timestamps_second)
-    sampling_rate = round(1 / np.min(steps[steps != 0]))
+    sampling_rate = round(1 / np.min(steps[steps != 0]), 3)
     return sampling_rate
 
 
@@ -96,18 +97,27 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
     -------
     list : list of timestamps with length equal to signal_length.
     """
+    assert np.isreal(sampling_rate), 'Sampling rate is expected to be a int ' \
+                                     'or float.'
     number_of_seconds = signal_length / sampling_rate
     if start_datetime is None:
         start_datetime = dt.datetime.now()
     timestamps = []
-    timestamps.append(dt.datetime.timestamp(start_datetime))
+    try:
+        timestamps.append(dt.datetime.timestamp(start_datetime))
+    except Exception as e:
+        print(e)
     # end_datetime = start_datetime + dt.timedelta(seconds=number_of_seconds)
     # time_range = DateTimeRange(start_datetime, end_datetime)
     # timestamps = []
     # for value in time_range.range(dt.timedelta(seconds=1 / sampling_rate)):
     for value in range(1, signal_length):
-            timestamps.append(timestamps[value-1] + 1 / sampling_rate)
-    return pd.Timestamp(timestamps)
+
+            timestamps.append(timestamps[value-1] + 1 /
+                                           sampling_rate)
+    for x in range(0, len(timestamps)):
+        timestamps[x] = pd.Timestamp(timestamps[x], unit = 's')
+    return timestamps
 
 
 def parse_datetime(string, type='datetime'):
@@ -369,8 +379,31 @@ def format_milestone(start_milestone, end_milestone):
 def check_signal_format(s):
     assert isinstance(s, pd.DataFrame), 'Expected a pd.DataFrame.'
     assert len(s.columns) is 2, 'Expect a datafram of only two columns.'
+<<<<<<< HEAD
     assert isinstance(s.iloc[:, 0], pd.Timestamp), \
         'Expected type of the first column to be pd.Timestamp.'
     assert isinstance(s.iloc[:, 1], float), \
         'Expected type of the second column to be float'
     return True
+=======
+    assert isinstance(s.iloc[0, 0], pd.Timestamp), \
+        'Expected type of the first column to be pd.Timestamp.'
+    assert isinstance(s.iloc[0, 1], float), \
+        'Expected type of the second column to be float'
+    return True
+
+def create_rule_def(sqi_name, upper_bound=0, lower_bound=1):
+    json_rule_dict = {}
+    json_rule_dict[sqi_name] = {
+        "name": sqi_name,
+        "def": [
+            {"op": ">", "value": str(lower_bound), "label": "accept"},
+            {"op": "<=", "value": str(lower_bound), "label": "reject"},
+            {"op": ">=", "value": str(upper_bound), "label": "reject"},
+            {"op": "<", "value": str(upper_bound), "label": "accept"},
+        ],
+        "desc": "",
+        "ref": ""
+    }
+    return json_rule_dict
+>>>>>>> 77dc9740a320d9f3a12eb50a71199c57dcb9f0d2

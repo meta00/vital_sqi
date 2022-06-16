@@ -49,11 +49,12 @@ class TestECGReader(object):
     def test_on_csv_infer_sampling_rate(self):
         file_name = os.path.abspath('tests/test_data/ecg_test_w.csv')
         out = ECG_reader(file_name, 'csv', channel_name=['Time', '1'])
-        assert out.sampling_rate == 256
+        assert round(out.sampling_rate) == 256
         file_name = os.path.abspath('tests/test_data/ecg_test2.csv')
         with pytest.raises(Exception) as exc_info:
             out = ECG_reader(file_name, 'csv', channel_name=['Time', '1'])
-        assert exc_info.match("Sampling rate not found nor inferred")
+        assert exc_info.match('Sampling rate is not found nor able to be '
+                              'inferred from the from the signal.')
 
 
 class TestECGWriter(object):
