@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.lib.function_base import trim_zeros
-from vital_sqi.preprocess.band_filter import BandpassFilter
+from vital_sqi.common.band_filter import BandpassFilter
 from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
 

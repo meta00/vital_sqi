@@ -363,11 +363,19 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
         out_df.to_excel(file_name, index=False, header=True)
     return os.path.isfile(file_name)
 
+<<<<<<< Updated upstream
 # import os, tempfile
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/example.edf')
 # out = ECG_reader(file_in, 'edf')
 # print(out)
+=======
+import os, tempfile
+
+file_in = os.path.abspath('/Users/haihb/Documents/Oucru/innovation'
+                          '/vital_sqi/tests/test_data/example.edf')
+out = ECG_reader(file_in, 'edf')
+>>>>>>> Stashed changes
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/out.edf')
 # out1 = ECG_reader(file_in, 'edf')

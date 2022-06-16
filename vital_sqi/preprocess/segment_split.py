@@ -79,13 +79,8 @@ def split_segment(s, sampling_rate, split_type=1, duration=30.0,
     s : pandas DataFrame
         Signal, with the first column of pd.Timestamp type and the second
         column of float.
-<<<<<<< HEAD
-
     sampling_rate : float or int
 
-=======
-    sampling_rate : float or int
->>>>>>> 77dc9740a320d9f3a12eb50a71199c57dcb9f0d2
     split_type : int
         0: split by time
         1: split by beat

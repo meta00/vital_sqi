@@ -379,13 +379,11 @@ def format_milestone(start_milestone, end_milestone):
 def check_signal_format(s):
     assert isinstance(s, pd.DataFrame), 'Expected a pd.DataFrame.'
     assert len(s.columns) is 2, 'Expect a datafram of only two columns.'
-<<<<<<< HEAD
-    assert isinstance(s.iloc[:, 0], pd.Timestamp), \
+    assert isinstance(s.iloc[:, 0][0], pd.Timestamp), \
         'Expected type of the first column to be pd.Timestamp.'
-    assert isinstance(s.iloc[:, 1], float), \
+    assert isinstance(s.iloc[:, 1][0], float), \
         'Expected type of the second column to be float'
     return True
-=======
     assert isinstance(s.iloc[0, 0], pd.Timestamp), \
         'Expected type of the first column to be pd.Timestamp.'
     assert isinstance(s.iloc[0, 1], float), \
@@ -406,4 +404,3 @@ def create_rule_def(sqi_name, upper_bound=0, lower_bound=1):
         "ref": ""
     }
     return json_rule_dict
->>>>>>> 77dc9740a320d9f3a12eb50a71199c57dcb9f0d2

@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 from scipy import signal
 
-from vital_sqi.preprocess.band_filter import BandpassFilter
+from vital_sqi.common.band_filter import BandpassFilter
 from vital_sqi.common.generate_template import ecg_dynamic_template
 from vital_sqi.common.utils import get_moving_average
 import warnings

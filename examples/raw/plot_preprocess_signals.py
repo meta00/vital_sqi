@@ -360,7 +360,7 @@ fig
 
 #%%
 
-from vital_sqi.preprocess.band_filter import BandpassFilter
+from vital_sqi.common.band_filter import BandpassFilter
 
 #%%
 
