@@ -49,13 +49,13 @@ print(len(channel_1))
 
 #%%
 
-from vital_sqi.preprocess.segment_split import split_to_segments
+from vital_sqi.preprocess.segment_split import split_segment
 
 #%%
 
 save_file_name = "example_file"
 save_file_folder = "subsegments_time"
-split_to_segments(channel_1,
+split_segment(channel_1,
                   filename=None,
                   sampling_rate=256,
                   segment_length_second=10.0,
