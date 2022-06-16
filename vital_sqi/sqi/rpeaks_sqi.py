@@ -59,9 +59,7 @@ def ectopic_sqi(data_sample, rule_index=0, sample_rate=100, rpeak_detector=0,
         try:
             wd, m = hp.process(data_sample, sample_rate)
         except:
-            error_dict = {rule+"_error": np.nan for rule in rules}
-            error_dict["outlier_error"] = np.nan
-            return error_dict
+            return np.nan
 
     # if rpeak_detector in [1, 2, 3, 4]:
     if wave_type=='ecg':
@@ -73,9 +71,6 @@ def ectopic_sqi(data_sample, rule_index=0, sample_rate=100, rpeak_detector=0,
                                           preprocess=False)[0]
     wd["peaklist"] = peak_list
     wd = calc_rr(peak_list, sample_rate, working_data=wd)
-    # wd = check_peaks(wd['RR_list'], wd['peaklist'], wd['ybeat'],
-    #                      reject_segmentwise=False, working_data=wd)
-    # wd = clean_rr_intervals(working_data=wd)
 
     rr_intervals = wd["RR_list"]
 
@@ -85,9 +80,6 @@ def ectopic_sqi(data_sample, rule_index=0, sample_rate=100, rpeak_detector=0,
     outlier_ratio = number_outliers/(len(rr_intervals_cleaned)-number_outliers)
     if rule_index == 0:
         return outlier_ratio
-
-    # error_sqi = {}
-    # error_sqi['outlier_error'] = outlier_ratio
 
     interpolated_rr_intervals = interpolate_nan_values(rr_intervals_cleaned)
 
@@ -176,8 +168,8 @@ def msq_sqi(s, peak_detector_1=7, peak_detector_2=6,wave_type='ppg'):
     """
     if wave_type=='ppg':
         detector = PeakDetector(wave_type='ppg')
-        peaks_1, trough_list = detector.ppg_detector(s, detector_type=peak_detector_1)
-        peaks_2 = detector.ppg_detector(s, detector_type=peak_detector_2, preprocess=False)
+        peaks_1, trough_list_1 = detector.ppg_detector(s, detector_type=peak_detector_1)
+        peaks_2, trough_list_2 = detector.ppg_detector(s, detector_type=peak_detector_2, preprocess=False)
     else:
         detector = PeakDetector(wave_type='ecg')
         peaks_1, trough_list = detector.ecg_detector(s, detector_type=peak_detector_1)
@@ -185,7 +177,7 @@ def msq_sqi(s, peak_detector_1=7, peak_detector_2=6,wave_type='ppg'):
     if len(peaks_1)==0 or len(peaks_2)==0:
         return 0.0
     elif len(peaks_1) != len(peaks_2):
-        return -1.0
+        return np.abs(len(peaks_1)-len(peaks_2))/np.mean([len(peaks_1),len(peaks_2)])
     peak1_dom = len(np.intersect1d(peaks_1,peaks_2))/len(peaks_1)
     peak2_dom = len(np.intersect1d(peaks_2,peaks_1))/len(peaks_2)
     return min(peak1_dom, peak2_dom)

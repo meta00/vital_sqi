@@ -159,7 +159,8 @@ def pipeline(file_name):
         sqis = segment_PPG_SQI_extraction(ppg_stable, sqi_list.values(), nn_sqi_list.values(),
                                           nn_sqi_arg_list.values(), sqi_arg_list.values())
 
-        segment_name_list = [file_name.split("\\")[-1] + "_" + str(i) for i in range(len(sqis))]
+        # segment_name_list = [file_name.split("/")[-1] + "_" + str(i) for i in range(len(sqis))]
+        segment_name_list = file_name.split("/")[-1]
         sqis['id'] = segment_name_list
     except Exception as e:
         print(e)
