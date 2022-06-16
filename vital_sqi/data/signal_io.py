@@ -54,8 +54,7 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
         'Start datetime must be None or a string.'
     assert isinstance(sampling_rate, float) or \
            isinstance(sampling_rate, int) or \
-           sampling_rate is None, \
-        'Sampling rate must be a number or None.'
+           sampling_rate is None, 'Sampling rate must be a number or None.'
 
     if isinstance(sampling_rate, float):
         sampling_rate = round(sampling_rate)
@@ -88,7 +87,7 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
         timestamps = generate_timestamp(start_datetime, sampling_rate,
                                         len(signals))
         signals.insert(0, 'timestamps', timestamps)
-        info = pd.DataFrame[header, signal_headers]
+        info = [header, signal_headers]
         out = SignalSQI(signals=signals,
                         wave_type='ecg',
                         start_datetime=start_datetime,
@@ -101,7 +100,6 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
                                channel_names=channel_name,
                                warn_empty=True,
                                return_res=64)
-        info = pd.DataFrame(info)
         if sampling_rate is None:
             try:
                 sampling_rate = info['fs']
@@ -195,11 +193,7 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
 
     file_type : edf or mit or csv
 
-<<<<<<< HEAD
-    info : pd.DataFrame
-=======
     info : list or dict
->>>>>>> 77dc9740a320d9f3a12eb50a71199c57dcb9f0d2
         In case of writing edf file: A list containing signal_headers and
         header (in order). signal_headers is a list of dict with one signal
         header for each signal channel. header (dict) contain ecg file
@@ -223,8 +217,8 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
     if file_type == 'edf':
         signals = signals.transpose()
         if info is not None:
-            signal_headers = info.iloc[:, 1]
-            header = info.iloc[:, 0]
+            signal_headers = info[1]
+            header = info[0]
             annotations = header['annotations']
             # issue https://github.com/holgern/pyedflib/issues/119 - fixed to
             # be checked
@@ -363,19 +357,18 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
         out_df.to_excel(file_name, index=False, header=True)
     return os.path.isfile(file_name)
 
-<<<<<<< Updated upstream
 # import os, tempfile
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/example.edf')
 # out = ECG_reader(file_in, 'edf')
 # print(out)
-=======
-import os, tempfile
 
-file_in = os.path.abspath('/Users/haihb/Documents/Oucru/innovation'
-                          '/vital_sqi/tests/test_data/example.edf')
-out = ECG_reader(file_in, 'edf')
->>>>>>> Stashed changes
+# import os, tempfile
+#
+# file_in = os.path.abspath('/Users/haihb/Documents/Oucru/innovation'
+#                           '/vital_sqi/tests/test_data/example.edf')
+# out = ECG_reader(file_in, 'edf')
+
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/out.edf')
 # out1 = ECG_reader(file_in, 'edf')
@@ -384,6 +377,10 @@ out = ECG_reader(file_in, 'edf')
 # out.info[0]['annotations'][0][1] = float(str(out.info[0]['annotations'][0][
 #                                                 1], 'utf-8'))
 # ECG_writer(out, file_out, file_type='edf', info=out.info)
+
+# file_in = os.path.abspath('/Users/haihb/Documents/Oucru/innovation'
+#                           '/vital_sqi/tests/test_data/a103l')
+# out = ECG_reader(file_in, 'mit')
 
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/a103l')

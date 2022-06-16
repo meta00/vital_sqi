@@ -17,16 +17,11 @@ def band_energy_sqi(s, sampling_rate=100, band=None):
 
     Parameters
     ----------
-<<<<<<< Updated upstream
     s : pandas DataFrame
         Signal, with first column as pandas Timestamp and second column as
         float.
-=======
-    s : array_like
-        Time series of measurement values
->>>>>>> Stashed changes
-    sampling_rate : float, optional
-        Sampling rate of the signal.
+    sampling_rate : int, float
+        Sampling rate of the signal (optional).
         (Default value = 100)
     band : list
         Frequency band. If None, the whole spectrum is used.
@@ -42,7 +37,7 @@ def band_energy_sqi(s, sampling_rate=100, band=None):
     AssertionError
         when invalid band
     """
-    assert np.isreal(sampling_rate), "Invalid sampling rate value."
+    assert np.isreal(sampling_rate), "Expected a numeric sampling rate value."
     f, t, spec = sn.stft(s, fs=sampling_rate,
 
                          window='hann', nperseg=2048, noverlap=1838,
