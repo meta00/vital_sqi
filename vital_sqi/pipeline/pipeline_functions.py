@@ -13,7 +13,9 @@ import warnings
 import inspect
 import vital_sqi.sqi as sq
 
-
+def extract_sqi(segments, milestones, sqi_dict):
+    # return sqis pandas Dataframe with milestones info
+    return sqis
 def get_all_features_heartpy(data_sample, sample_rate=100, rpeak_detector=0):
     """
 
@@ -366,8 +368,8 @@ def compute_SQI(signal, segment_length='30s', primary_peakdet=7, secondary_peakd
 #     print(sqis)
 #     return sqis
 
-
-def generate_rule(rule_name,rule_def):
+# Trong ruleset class??
+def generate_rule(rule_name, rule_def):
     rule_def, boundaries, label_list = update_rule(rule_def, is_update=False)
     rule_detail = {'def': rule_def,
                      'boundaries': boundaries,
@@ -376,7 +378,7 @@ def generate_rule(rule_name,rule_def):
     return rule
 
 
-def get_decision(df_sqi,selected_rule,json_rule_dict):
+def get_decision(df_sqi, selected_rule, json_rule_dict):
     rule_list = {}
     for (i, selected_sqi) in zip(range(len(selected_rule)), selected_rule):
         rule = generate_rule(selected_sqi, json_rule_dict[selected_sqi]['def'])
@@ -556,55 +558,17 @@ def segment_ECG_SQI_extraction(signal_segment, sampling_rate=100,
     # TODO ECG highlevel SQI extraction
     return pd.Series(SQI_dict)
 
-
-def compute_multiple_SQIs():
-    """
-	This function takes input signal, computes a number of SQIs, and outputs
-	a table (row - signal segments, column SQI values.
-	"""
-    return
-
-
-def compute_all_SQI():
-    """
-	This function takes input signal, computes all SQIs, and outputs a table
-	(row - signal segments, column SQI values.
-	"""
-    return
-
-
-def make_rule_set():
+def make_rule_set(file):
     """
 	This function take a rule dictionary file and order of SQIs as input and
 	generate a RuleSet object.
 	"""
     return
+def classify_segments(sqis, ruleset):
+	return
 
 
-def get_cutpoints():
-    """
-	This function takes a list of segments and their called quality decisions
-	(both from SignalSQI object) and calculates cut-points for accepted
-	signal chunks.
-	"""
-
-    return
 
 
-def get_clean_signals():
-    """
-	This function takes raw signal file and cut-points to extract clean
-	signal files.
-	"""
-
-    return
 
 
-def basic_ppg_pipeline():
-    """ """
-    return
-
-
-def basic_ecg_pipeline():
-    """ """
-    return
