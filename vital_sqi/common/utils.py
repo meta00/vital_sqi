@@ -4,6 +4,7 @@ import datetime as dt
 import json
 import pandas as pd
 from datetimerange import DateTimeRange
+from pandas.core.dtypes.common import is_numeric_dtype,is_datetime64_any_dtype
 import dateparser
 
 OPERAND_MAPPING_DICT = {
@@ -376,13 +377,14 @@ def format_milestone(start_milestone, end_milestone):
     df_milestones['end'] = end_milestone
     return df_milestones
 
+
 def check_signal_format(s):
     assert isinstance(s, pd.DataFrame), 'Expected a pd.DataFrame.'
     assert len(s.columns) is 2, 'Expect a datafram of only two columns.'
-    assert isinstance(s.iloc[:, 0][0], pd.Timestamp), \
+    assert is_datetime64_any_dtype(s.iloc[:, 0]), \
         'Expected type of the first column to be pd.Timestamp.'
-    assert isinstance(s.iloc[:, 1][0], float), \
-        'Expected type of the second column to be float'
+    assert is_numeric_dtype(s.iloc[:, 1]), \
+        'Expected type of the second column to be numeric'
     return True
     assert isinstance(s.iloc[0, 0], pd.Timestamp), \
         'Expected type of the first column to be pd.Timestamp.'

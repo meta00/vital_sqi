@@ -322,7 +322,7 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
     
     info = pd.DataFrame(tmp[info_idx])
     signals = tmp[signal_idx]
-    signals.insert(0, 'timestamps', timestamps)
+    signals.insert(0, 'timestamps', pd.Series.apply((timestamps),dt.datetime.fromtimestamp))
     out = SignalSQI(signals=signals, wave_type='ppg',
                     sampling_rate=sampling_rate,
                     info=info)
