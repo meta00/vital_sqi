@@ -1,0 +1,216 @@
+{
+  "perf": {
+
+  },
+  "kurt": {
+    "axis": 0,
+    "fisher": true,
+    "bias": true,
+    "nan_policy": "propagate",
+    "per_beat": true
+  },
+  "skew": {
+    "axis": 0,
+    "bias": true,
+    "nan_policy": "propagate",
+    "per_beat": true
+  },
+  "entropy": {
+    "qk": null,
+    "base": null,
+    "per_beat": true
+  },
+  "kurt_seg": {
+    "axis": 0,
+    "fisher": true,
+    "bias": true,
+    "nan_policy": "propagate",
+    "per_beat": false
+  },
+  "skew_seg": {
+    "axis": 0,
+    "bias": true,
+    "nan_policy": "propagate",
+    "per_beat": false
+  },
+  "ent_seg": {
+    "qk": null,
+    "base": null,
+    "per_beat": false
+  },
+  "snr": {
+    "axis": 0,
+    "ddof": 0
+  },
+  "zc": {
+    "threshold": 1e-10,
+    "ref_magnitude": null,
+    "pad": true,
+    "zero_pos": true,
+    "axis": -1
+  },
+  "mc": {
+    "threshold": 1e-10,
+    "ref_magnitude": null,
+    "pad": true,
+    "zero_pos": true,
+    "axis": -1
+  },
+  "ect": {
+    "rule_index": 0,
+    "sample_rate": 100,
+    "rpeak_detector": 0,
+    "wave_type": "ppg",
+    "low_rri": 300,
+    "high_rri": 2000
+  },
+  "corr": {
+    "sample_rate": 100,
+    "time_lag": 3,
+    "n_selection": 3
+  },
+  "intp": {
+
+  },
+  "msq": {
+    "peak_detector_1": 7,
+    "peak_detector_2": 6,
+    "wave_type": "ppg"
+  },
+  "be": {
+    "sampling_rate": 100,
+    "band": null
+  },
+  "lfe": {
+    "sampling_rate": 100,
+    "band": [
+      0,
+      0.5
+    ]
+  },
+  "qrse": {
+    "sampling_rate": 100,
+    "band": [
+      5,
+      25
+    ]
+  },
+  "hfe": {
+    "sampling_rate": 100,
+    "band": [
+      100,
+      1000
+    ]
+  },
+  "vhfp": {
+    "sampling_rate": 100,
+    "band": [
+      150,
+      1000
+    ]
+  },
+  "qrsa": {
+    "sampling_rate": 100
+  },
+  "eucl": {
+    "template_type": 0,
+    "template_size": 100,
+    "per_beat": true
+  },
+  "dtw": {
+    "template_type": 0,
+    "template_size": 100,
+    "per_beat": true
+  },
+  "nn_mean_sqi": {
+
+  },
+  "sdnn_sqi": {
+
+  },
+  "sdsd_sqi": {
+
+  },
+  "rmssd_sqi": {
+
+  },
+  "cvsd_sqi": {
+
+  },
+  "cvnn_sqi": {
+
+  },
+  "mean_nn_sqi": {
+
+  },
+  "median_nn_sqi": {
+
+  },
+  "pnn_sqi": {
+
+  },
+  "hr_mean_sqi": {
+
+  },
+  "hr_median_sqi": {
+
+  },
+  "hr_min_sqi": {
+
+  },
+  "hr_max_sqi": {
+
+  },
+  "hr_range_sqi": {
+    "range_min": 40,
+    "range_max": 200
+  },
+  "peak_frequency_sqi": {
+    "freqs": null,
+    "pows": null,
+    "f_min": 0.04,
+    "f_max": 0.15
+  },
+  "absolute_power_sqi": {
+    "freqs": null,
+    "pows": null,
+    "f_min": 0.04,
+    "f_max": 0.15
+  },
+  "log_power_sqi": {
+    "freqs": null,
+    "pows": null,
+    "f_min": 0.04,
+    "f_max": 0.15
+  },
+  "relative_power_sqi": {
+    "freqs": null,
+    "pows": null,
+    "f_min": 0.04,
+    "f_max": 0.15
+  },
+  "normalized_power_sqi": {
+    "freqs": null,
+    "pows": null,
+    "lf_min": 0.04,
+    "lf_max": 0.15,
+    "hf_min": 0.15,
+    "hf_max": 0.4
+  },
+  "lf_hf_ratio_sqi": {
+    "freqs": null,
+    "pows": null,
+    "lf_min": 0.04,
+    "lf_max": 0.15,
+    "hf_min": 0.15,
+    "hf_max": 0.4
+  },
+  "poincare_sqi": {
+
+  },
+  "hrva": {
+    "sample_rate": 100,
+    "rpeak_method": 0,
+    "wave_type": "ecg"
+  }
+}

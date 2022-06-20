@@ -17,6 +17,7 @@ import numpy as np
 
 from vital_sqi import utils
 from datetime import datetime
+from vital_sqi.data.signal_io import PPG_reader
 
 sqi_list = {
     # Standard SQI
@@ -147,21 +148,22 @@ ng_2_files = [".".join(x.split(".")[:-1])+".csv" for x in next(os.walk(NG_2_FOLD
 
 def pipeline(file_name):
     try:
-        ppg_stable = pd.read_csv(os.path.join(os.getcwd(), file_name), header=None)
-        ppg_stable = pd.DataFrame(ppg_stable)
-        ppg_stable.index = pd.to_timedelta(ppg_stable.index / 100, unit='s')
-        ppg_stable["idx"] = pd.to_timedelta(ppg_stable.index / 100, unit='s')
-        ppg_stable = ppg_stable[["idx", 0]]
-
-        sqi_arg_list['perf'] = {'y':ppg_stable.iloc[:,1]}
-        # sqi_arg_list['zc'] = {'y': ppg_stable.iloc[:, 1]}
-        # sqi_arg_list['mc'] = {'y': ppg_stable.iloc[:, 1]}
-        sqis = segment_PPG_SQI_extraction(ppg_stable, sqi_list.values(), nn_sqi_list.values(),
-                                          nn_sqi_arg_list.values(), sqi_arg_list.values())
-
-        # segment_name_list = [file_name.split("/")[-1] + "_" + str(i) for i in range(len(sqis))]
-        segment_name_list = file_name.split("/")[-1]
-        sqis['id'] = segment_name_list
+        ppg_stable = PPG_reader(os.path.join(os.getcwd(), file_name))
+        # ppg_stable = pd.read_csv(os.path.join(os.getcwd(), file_name), header=None)
+        # ppg_stable = pd.DataFrame(ppg_stable)
+        # ppg_stable.index = pd.to_timedelta(ppg_stable.index / 100, unit='s')
+        # ppg_stable["idx"] = pd.to_timedelta(ppg_stable.index / 100, unit='s')
+        # ppg_stable = ppg_stable[["idx", 0]]
+        #
+        # sqi_arg_list['perf'] = {'y':ppg_stable.iloc[:,1]}
+        # # sqi_arg_list['zc'] = {'y': ppg_stable.iloc[:, 1]}
+        # # sqi_arg_list['mc'] = {'y': ppg_stable.iloc[:, 1]}
+        # sqis = segment_PPG_SQI_extraction(ppg_stable, sqi_list.values(), nn_sqi_list.values(),
+        #                                   nn_sqi_arg_list.values(), sqi_arg_list.values())
+        #
+        # # segment_name_list = [file_name.split("/")[-1] + "_" + str(i) for i in range(len(sqis))]
+        # segment_name_list = file_name.split("/")[-1]
+        # sqis['id'] = segment_name_list
     except Exception as e:
         print(e)
         print(file_name)
@@ -180,14 +182,14 @@ col = all_ng_file_sqi_1.pop("id")
 sqis = all_ng_file_sqi_1.insert(0, col.name, col)
 all_ng_file_sqi_1.to_csv(os.path.join(NG_OUTPUT_FOLDER,"NG_sqi_1.csv"))
 
-all_ng_file_sqi_2 = pd.DataFrame()
-for file_name in tqdm(ng_2_files):
-    file_path = os.path.join(PPG_ALL_FOLDER,file_name)
-    sqis = pipeline(file_path)
-    if file_path is not None:
-        all_ng_file_sqi_2 = all_ng_file_sqi_2.append(sqis,ignore_index=True)
-        # sqis.to_csv(os.path.join(NG_OUTPUT_FOLDER,"sqi_"+file_name))
-
-col = all_ng_file_sqi_2.pop("id")
-sqis = all_ng_file_sqi_2.insert(0, col.name, col)
-all_ng_file_sqi_2.to_csv(os.path.join(NG_OUTPUT_FOLDER,"NG_sqi_2.csv"))
+# all_ng_file_sqi_2 = pd.DataFrame()
+# for file_name in tqdm(ng_2_files):
+#     file_path = os.path.join(PPG_ALL_FOLDER,file_name)
+#     sqis = pipeline(file_path)
+#     if file_path is not None:
+#         all_ng_file_sqi_2 = all_ng_file_sqi_2.append(sqis,ignore_index=True)
+#         # sqis.to_csv(os.path.join(NG_OUTPUT_FOLDER,"sqi_"+file_name))
+#
+# col = all_ng_file_sqi_2.pop("id")
+# sqis = all_ng_file_sqi_2.insert(0, col.name, col)
+# all_ng_file_sqi_2.to_csv(os.path.join(NG_OUTPUT_FOLDER,"NG_sqi_2.csv"))
