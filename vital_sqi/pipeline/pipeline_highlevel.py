@@ -2,6 +2,9 @@ import vital_sqi
 from sklearn.metrics import auc,brier_score_loss,f1_score,roc_auc_score,fbeta_score,jaccard_score,hamming_loss
 import numpy as np
 import vital_sqi.sqi as sq
+from vital_sqi.data import *
+from vital_sqi.preprocess.segment_split import split_segment
+from vital_sqi.pipeline.pipeline_functions import *
 from vital_sqi import RuleSet,Rule
 import warnings
 import json
@@ -45,7 +48,6 @@ sqi_list = {
     'vhfp': sq.vhf_norm_power_sqi,
     'qrsa': sq.qrs_a_sqi,
     # DTW SQI
-    'eucl': sq.euclidean_sqi,
     'dtw': sq.dtw_sqi
 }
 nn_sqi_list = {
@@ -222,7 +224,6 @@ sqi_list = {
     'vhfp': sq.vhf_norm_power_sqi,
     'qrsa': sq.qrs_a_sqi,
     # DTW SQI
-    'eucl': sq.euclidean_sqi,
     'dtw': sq.dtw_sqi,
     #======================
     'nn_mean_sqi': sq.nn_mean_sqi,
@@ -276,10 +277,6 @@ nn_sqi_list = {
     'hrva': sq.get_all_features_hrva
 }
 
-from vital_sqi.data import *
-from vital_sqi.preprocess.segment_split import split_segment
-from vital_sqi.pipeline.pipeline_functions import *
-
 
 def get_ppg_sqis(file_name, signal_idx, timestamp_idx,info_idx,sqi_dict,
                  timestamp_unit='ms',sampling_rate=100, start_datetime=None,
@@ -317,16 +314,6 @@ def get_ppg_sqis(file_name, signal_idx, timestamp_idx,info_idx,sqi_dict,
     signal_obj.signals = pd.DataFrame()
     signal_obj.sqis = extract_sqi(segments, milestones, sqi_dict,file_name,None)
     return segments, signal_obj
-
-file_name = "../../tests/test_data/ppg_smartcare.csv"
-
-# PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/ppg_smartcare.csv',
-#                 timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
-#                                                         'SPO2_PCT','PERFUSION_INDEX'],
-
-segments, signal_obj = get_ppg_sqis(file_name,timestamp_idx = ['TIMESTAMP_MS'],
-                                    signal_idx = ['PLETH'],
-                                    info_idx = ['PULSE_BPM','SPO2_PCT','PERFUSION_INDEX'],sqi_dict=sqi_list)
 
 
 def get_ecg_sqis(file_name, file_type, channel_num, channel_name,
@@ -457,5 +444,16 @@ def signal_preprocess():
     return
 def write_ecg():
 	return
+
+
+file_name = "../../tests/test_data/ppg_smartcare.csv"
+
+# PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/ppg_smartcare.csv',
+#                 timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
+#                                                         'SPO2_PCT','PERFUSION_INDEX'],
+
+segments, signal_obj = get_ppg_sqis(file_name,timestamp_idx = ['TIMESTAMP_MS'],
+                                    signal_idx = ['PLETH'],
+                                    info_idx = ['PULSE_BPM','SPO2_PCT','PERFUSION_INDEX'],sqi_dict=sqi_list)
 
 

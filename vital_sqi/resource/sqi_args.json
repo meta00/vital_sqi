@@ -112,11 +112,6 @@
   "qrsa": {
     "sampling_rate": 100
   },
-  "eucl": {
-    "template_type": 0,
-    "template_size": 100,
-    "per_beat": true
-  },
   "dtw": {
     "template_type": 0,
     "template_size": 100,

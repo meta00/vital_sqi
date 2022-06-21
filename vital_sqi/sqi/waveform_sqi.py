@@ -10,7 +10,7 @@ from vital_sqi.common.rpeak_detection import *
 from vital_sqi.common.utils import *
 
 
-def band_energy_sqi(s, sampling_rate=100, band=None):
+def band_energy_sqi(s, sampling_rate=100, band=None,nperseg=2048):
     """
     Compute the peak value of the time marginal of the energy distribution in a
     frequency band (DiMarco et al., 2012).
@@ -38,9 +38,10 @@ def band_energy_sqi(s, sampling_rate=100, band=None):
         when invalid band
     """
     assert np.isreal(sampling_rate), "Expected a numeric sampling rate value."
+    if len(s) < nperseg:
+        nperseg = len(s)
     f, t, spec = sn.stft(s, fs=sampling_rate,
-
-                         window='hann', nperseg=2048, noverlap=1838,
+                         window='hann', nperseg=nperseg, noverlap=(nperseg/2),
                          detrend=False, return_onesided=False,
                          boundary='zeros',
                          padded=True)
@@ -49,7 +50,8 @@ def band_energy_sqi(s, sampling_rate=100, band=None):
     if band is not None:
         assert isinstance(band, list) and band[0] <= band[1], "Invalid band " \
                                                             "values"
-        idx = np.where(np.logical_and(f > band[0], f <= band[1]))
+        # idx = np.where(np.logical_and(f > band[0], f <= band[1]))
+        idx = np.where((f > band[0]) & (f <= band[1]))[0]
         max_time_marginal = max(np.sum(spec[idx], axis=0)).real
     return max_time_marginal
 
@@ -122,7 +124,7 @@ def hf_energy_sqi(s, sampling_rate, band=[100, np.Inf]):
     return band_energy_sqi(s, sampling_rate, band)
 
 
-def vhf_norm_power_sqi(s, sampling_rate, band=[150, np.Inf]):
+def vhf_norm_power_sqi(s, sampling_rate, band=[150, np.Inf],nperseg=2048):
     """
 
     Parameters
@@ -141,13 +143,16 @@ def vhf_norm_power_sqi(s, sampling_rate, band=[150, np.Inf]):
 
 
     """
-    f, t, spec = sn.stft(s.iloc[:, 1], fs=sampling_rate,
-                         window='hann', nperseg=2048, noverlap=1838,
+    if len(s) < nperseg:
+        nperseg = len(s)
+    f, t, spec = sn.stft(s, fs=sampling_rate,
+                         window='hann', nperseg=nperseg, noverlap=(nperseg/2),
                          detrend=False, return_onesided=False,
                          boundary='zeros',
                          padded=True)
-    idx = np.where(np.logical_and(spec > band[0], spec <= band[1]))
-    freq_marginal = np.sum(spec[idx], axis=0)[0, :]
+    # idx = np.where(np.logical_and(spec > band[0], spec <= band[1]))
+    idx = np.where((spec > band[0]) & (spec <= band[1]))[0]
+    freq_marginal = np.sum(spec[idx], axis=0)
     np_vhf = (np.median(freq_marginal)/max(freq_marginal)).real
     return np_vhf
 
@@ -173,9 +178,8 @@ def qrs_a_sqi(s, sampling_rate):
 
     """
     detector = PeakDetector(wave_type='ecg', fs=sampling_rate)
-    peaks, troughs, nadirs = detector.ecg_detector(s.iloc[:, 1],
-                                                   detector_type=7)
-    peak_to_nadir = np.array(peaks) - np.array(nadirs)
+    peaks, nadirs = detector.ecg_detector(s,detector_type=7)
+    peak_to_nadir = np.array(peaks)[:min(len(peaks),len(nadirs))] - np.array(nadirs)[:min(len(peaks),len(nadirs))]
     peak_to_nadir = np.delete(peak_to_nadir, np.where(peak_to_nadir > 5))
     qrs_a = np.median(peak_to_nadir)
     return qrs_a

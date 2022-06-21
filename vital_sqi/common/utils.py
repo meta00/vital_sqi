@@ -3,7 +3,6 @@ import os
 import datetime as dt
 import json
 import pandas as pd
-from datetimerange import DateTimeRange
 from pandas.core.dtypes.common import is_numeric_dtype,is_datetime64_any_dtype
 import dateparser
 
@@ -35,6 +34,7 @@ def check_valid_signal(x):
     if len(x) == 0:
         raise ValueError("Empty signal")
     types = []
+    x = np.array(x)
     for i in range(len(x)):
         types.append(str(type(x[i])))
     type_unique = np.unique(np.array(types))

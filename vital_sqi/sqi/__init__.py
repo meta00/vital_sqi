@@ -9,7 +9,6 @@ A subpackage for signal quality index calculation, including:
 """
 
 from vital_sqi.sqi.dtw_sqi import (
-	euclidean_sqi,
 	dtw_sqi
 	)
 from vital_sqi.sqi.standard_sqi import (

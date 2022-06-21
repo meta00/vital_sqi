@@ -16,18 +16,18 @@ from heartpy.peakdetection import check_peaks
 from hrvanalysis.preprocessing import remove_outliers, remove_ectopic_beats, interpolate_nan_values
 from statsmodels.tsa.stattools import acf
 from vital_sqi.common.rpeak_detection import PeakDetector
+from vital_sqi.pipeline.pipeline_functions import get_nn
 
-
-def ectopic_sqi(data_sample, rule_index=0, sample_rate=100, rpeak_detector=0,
-                            wave_type='ppg',low_rri=300,
-                            high_rri=2000,):
+def ectopic_sqi(s, rule_index=1, sample_rate=100, rpeak_detector=0,
+                wave_type='ppg', low_rri=300,
+                high_rri=2000, ):
     """
     Evaluate the invalid peaks (which exceeds normal range)
     base on HRV rules: Malik, Karlsson, Kamath, Acar
     Output the ratio of invalid
     Parameters
     ----------
-    data_sample :
+    s :
 
     rule_index:
         0: Default Outlier Peak
@@ -53,27 +53,28 @@ def ectopic_sqi(data_sample, rule_index=0, sample_rate=100, rpeak_detector=0,
     
     """
     rules = ["malik", "karlsson", "kamath", "acar"]
-    try:
-        wd, m = hp.process(data_sample, sample_rate, calc_freq=True)
-    except:
-        try:
-            wd, m = hp.process(data_sample, sample_rate)
-        except:
-            return np.nan
-
-    # if rpeak_detector in [1, 2, 3, 4]:
-    if wave_type=='ecg':
-        detector = PeakDetector(wave_type='ecg')
-        peak_list = detector.ecg_detector(data_sample, rpeak_detector)[0]
-    else:
-        detector = PeakDetector(wave_type='ppg')
-        peak_list = detector.ppg_detector(data_sample, rpeak_detector,
-                                          preprocess=False)[0]
-    wd["peaklist"] = peak_list
-    wd = calc_rr(peak_list, sample_rate, working_data=wd)
-
-    rr_intervals = wd["RR_list"]
-
+    # try:
+    #     wd, m = hp.process(s, sample_rate, calc_freq=True)
+    # except:
+    #     try:
+    #         wd, m = hp.process(s, sample_rate)
+    #     except:
+    #         return np.nan
+    #
+    # # if rpeak_detector in [1, 2, 3, 4]:
+    # if wave_type=='ecg':
+    #     detector = PeakDetector(wave_type='ecg')
+    #     peak_list = detector.ecg_detector(s, rpeak_detector)[0]
+    # else:
+    #     detector = PeakDetector(wave_type='ppg')
+    #     peak_list = detector.ppg_detector(s, rpeak_detector,
+    #                                       preprocess=False)[0]
+    # wd["peaklist"] = peak_list
+    # wd = calc_rr(peak_list, sample_rate, working_data=wd)
+    #
+    # rr_intervals = wd["RR_list"]
+    rr_intervals = get_nn(s,wave_type=wave_type,sample_rate=sample_rate,
+                          rpeak_method=rpeak_detector,remove_ectopic_beat=False)
     rr_intervals_cleaned = remove_outliers(rr_intervals, low_rri=low_rri,
                                            high_rri=high_rri)
     number_outliers = len(np.where(np.isnan(rr_intervals_cleaned))[0])
@@ -92,13 +93,13 @@ def ectopic_sqi(data_sample, rule_index=0, sample_rate=100, rpeak_detector=0,
     return ectopic_ratio
 
 
-def correlogram_sqi(data_sample, sample_rate=100, time_lag=3, n_selection=3):
+def correlogram_sqi(s, sample_rate=100, time_lag=3, n_selection=3):
     """The method is based on the paper 'Classification of the Quality of
     Wristband-based Photoplethysmography Signals'
 
     Parameters
     ----------
-    data_sample :
+    s :
         Raw data
     sample_rate :
         (Default value = 100)
@@ -113,7 +114,7 @@ def correlogram_sqi(data_sample, sample_rate=100, time_lag=3, n_selection=3):
     
     """
     nlags = time_lag*sample_rate
-    corr = acf(data_sample, nlags=nlags)
+    corr = acf(s, nlags=nlags)
     corr_peaks_idx = signal.find_peaks(corr)[0]
     corr_peaks_value = corr[corr_peaks_idx]
     if n_selection > len(corr_peaks_value):
@@ -124,20 +125,20 @@ def correlogram_sqi(data_sample, sample_rate=100, time_lag=3, n_selection=3):
     return corr_sqi
 
 
-def interpolation_sqi(sample_data):
+def interpolation_sqi(s):
     """
 
     Parameters
     ----------
-    sample_data :
+    s :
         
-
+    To be developed
     Returns
     -------
 
     """
 
-    return None
+    return 0
 
 
 def msq_sqi(s, peak_detector_1=7, peak_detector_2=6,wave_type='ppg'):

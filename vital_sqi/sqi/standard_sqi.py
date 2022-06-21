@@ -215,7 +215,7 @@ def zero_crossings_rate_sqi(y, threshold=1e-10, ref_magnitude=None,
     padding[axis] = (1, 0)
 
     crossings = np.pad(
-        (y_sign[tuple(slice_post)] != y_sign[tuple(slice_pre)]),
+        (np.array(y_sign[tuple(slice_post)]) != np.array(y_sign[tuple(slice_pre)])),
         padding,
         mode="constant",
         constant_values=pad,

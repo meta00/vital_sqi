@@ -2,8 +2,9 @@ import pytest
 import os
 from vital_sqi.data.signal_io import PPG_reader
 from vital_sqi.pipeline.pipeline_functions import \
-    compute_all_SQI, compute_multiple_SQIs,get_clean_signals, get_cutpoints,\
-    basic_ecg_pipeline, basic_ppg_pipeline
+    calculate_SQI,get_all_features_heartpy,\
+    per_beat_sqi,get_sqi_dict,get_sqi,segment_PPG_SQI_extraction,\
+    get_decision,compute_SQI
 
 class TestGetAllFeaturesHeartpy(object):
     def test_on_get_all_features_heartpy(self):
