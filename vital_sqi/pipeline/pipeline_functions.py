@@ -10,15 +10,33 @@ from heartpy.peakdetection import check_peaks
 from hrvanalysis import get_nn_intervals
 from vital_sqi.common.rpeak_detection import PeakDetector
 from vital_sqi.common.utils import create_rule_def
-from vital_sqi.rule import RuleSet,Rule,update_rule
+from vital_sqi.rule import RuleSet, Rule, update_rule
 import warnings
 import inspect
 import vital_sqi.sqi as sq
+
+
+def classify_segments(sqis, rule_dict, ruleset_order):
+    ruleset = {}
+    for i in ruleset_order:
+        rule = Rule(ruleset_order[i])
+    rule.load_def(rule_dict)
+    ruleset[i] = rule
+    sqis['decision'] = ruleset.execute(sqis)
+    return ruleset, sqis
+
+
+def get_decision_segments(segments, decision):
+    a_segments,r_segments = None
+    return a_segments, r_segments
+
 
 def extract_sqi(segments, milestones, sqi_dict):
     # return sqis pandas Dataframe with milestones info
     sqis = None
     return sqis
+
+
 def get_all_features_heartpy(data_sample, sample_rate=100, rpeak_detector=0):
     """
 
@@ -454,7 +472,3 @@ def example_rule_decision(df_sqi):
         json_rule_dict = create_rule_def(single_rule,upper_bound, lower_bound)
     decision_list = get_decision(df_sqi,selected_rule,json_rule_dict)
     df_sqi['decision'] = decision_list
-
-
-
-

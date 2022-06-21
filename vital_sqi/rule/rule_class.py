@@ -1,5 +1,5 @@
 """
-aClass Rule contains thresholds and its corresponding labels of an SQI. Labels
+Class Rule contains thresholds and its corresponding labels of an SQI. Labels
 are either 'accept' or 'reject'
 """
 import json
