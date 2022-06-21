@@ -34,7 +34,7 @@ def check_valid_signal(x):
     if len(x) == 0:
         raise ValueError("Empty signal")
     types = []
-    x = np.array(x)
+    x = list(x)
     for i in range(len(x)):
         types.append(str(type(x[i])))
     type_unique = np.unique(np.array(types))
