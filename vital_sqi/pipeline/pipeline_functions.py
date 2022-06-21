@@ -2,21 +2,14 @@ import numpy
 import numpy as np
 import pandas as pd
 import vital_sqi.preprocess.preprocess_signal as sqi_pre
-import heartpy as hp
 import os
 import  json
 from tqdm import tqdm
 from hrvanalysis import get_nn_intervals
-from vital_sqi.common.band_filter import BandpassFilter
-from heartpy.analysis import calc_ts_measures, calc_rr, calc_fd_measures,\
-    clean_rr_intervals, calc_poincare, calc_breathing
-from heartpy.peakdetection import check_peaks
 from vital_sqi.common.rpeak_detection import PeakDetector
 from vital_sqi.common.utils import create_rule_def
 from vital_sqi.rule import RuleSet, Rule, update_rule
-import warnings
 import inspect
-import vital_sqi.sqi as sq
 
 sqi_nn_list = ["nn_mean_sqi",
                "sdnn_sqi", "sdsd_sqi",
@@ -50,131 +43,6 @@ def extract_sqi(segments, milestones, sqi_dict):
     # return sqis pandas Dataframe with milestones info
     sqis = None
     return sqis
-
-
-def get_all_features_heartpy(data_sample, sample_rate=100, rpeak_detector=0):
-    """
-
-    Parameters
-    ----------
-    data_sample :
-        Raw signal
-
-    sample_rate :
-        (Default value = 100)
-    rpeak_detector :
-        (Default value = 0)
-
-    Returns
-    -------
-
-
-    """
-    # time domain features
-    td_features = ["bpm", "ibi", "sdnn", "sdsd", "rmssd", "pnn20", "pnn50",
-                   "hr_mad", "sd1", "sd2", "s", "sd1/sd2", "breathingrate"]
-    # frequency domain features
-    fd_features = ["lf", "hf", "lf/hf"]
-    try:
-        wd, m = hp.process(data_sample, sample_rate, calc_freq=True)
-    except Exception as e:
-        try:
-            wd, m = hp.process(data_sample, sample_rate)
-        except:
-            time_domain_features = {k: np.nan for k in td_features}
-            frequency_domain_features = {k: np.nan for k in fd_features}
-            return time_domain_features, frequency_domain_features
-    if rpeak_detector in [1, 2, 3, 4]:
-        detector = PeakDetector(wave_type='ecg')
-        peak_list = \
-        detector.ppg_detector(data_sample, rpeak_detector, preprocess=False)[0]
-        wd["peaklist"] = peak_list
-        wd = calc_rr(peak_list, sample_rate, working_data=wd)
-        wd = check_peaks(wd['RR_list'], wd['peaklist'], wd['ybeat'],
-                         reject_segmentwise=False, working_data=wd)
-        wd = clean_rr_intervals(working_data=wd)
-        rr_diff = wd['RR_list']
-        rr_sqdiff = np.power(rr_diff, 2)
-        wd, m = calc_ts_measures(wd['RR_list'], rr_diff, rr_sqdiff,
-                                 working_data=wd)
-        m = calc_poincare(wd['RR_list'], wd['RR_masklist'], measures=m,
-                          working_data=wd)
-        try:
-            measures, working_data = calc_breathing(wd['RR_list_cor'],
-                                                    data_sample, sample_rate,
-                                                    measures=m, working_data=wd)
-        except:
-            measures['breathingrate'] = np.nan
-
-        wd, m = calc_fd_measures(measures=measures, working_data=working_data)
-
-    time_domain_features = {k: m[k] for k in td_features}
-
-    frequency_domain_features = {}
-    for k in fd_features:
-        if k in m.keys():
-            frequency_domain_features[k] = m[k]
-        else:
-            frequency_domain_features[k] = np.nan
-    # frequency_domain_features = {k:m[k] for k in fd_features if k in m.keys}
-    # frequency_domain_features = {k:np.na for k in fd_features if k not in m.keys}
-
-    return time_domain_features, frequency_domain_features
-
-
-# #Expecting filtered signal
-# def calculate_SQI(waveform_segment, trough_list, taper, sqi_dict):
-#     """
-#     Calculate SQI function to calculate each SQI that is part of the VITAL SQI package.
-#     The functions that should be calculated are supplied in an input dictonary, including optional
-#     parameters. The main wrapper function around individual SQI functions.
-#
-#     Parameters
-#     ----------
-#     waveform_segment : array or dataframe
-#         Segment of PPG or ECG waveform on which we will perform SQI extraction
-#
-#     trough_list : array of int
-#         Idices of troughs in the signal provided by peak detector to be able to extract individual beats
-#
-#     taper : bool
-#         Enable tapering for per beat SQI extraction
-#
-#     sqi_dict : dict
-#         SQI dictonary where keys match with abbreviations of the SQI functions. Each key contains a 2 element touple.
-#         The first elemnt is a dictonary with additional parameters for SQI funciton, second element is string that
-#         describes if the given SQI function should be executed per beat, per segment or per both.
-#
-#     Returns
-#     -------
-#     calculated_SQI : dict
-#         A dictonary of all computed SQI values
-#
-#     """
-#     variations_stats = ['_list','_mean','_median','_std']
-#     SQI_dict = {}
-#     for sqi_func, args in sqi_dict.items():
-#     #sqi_func is the function handle extracted from dictonary
-#     # args[0] = function arguments to calculate SQI
-#     # args[1] = per segment, per beat or both
-#         if 'beat' in args[1]:
-#             #Do per beat calculation
-#             if args[0] != {}:
-#                 SQI_list = per_beat_sqi(MASTER_SQI_DICT[sqi_func], trough_list, waveform_segment, taper, **args[0])
-#             else:
-#                 SQI_list = per_beat_sqi(MASTER_SQI_DICT[sqi_func], trough_list, waveform_segment, taper)
-#             SQI_dict[sqi_func+variations_stats[0]] = SQI_list
-#             SQI_dict[sqi_func+variations_stats[1]] = np.mean(SQI_list)
-#             SQI_dict[sqi_func+variations_stats[2]] = np.median(SQI_list)
-#             SQI_dict[sqi_func+variations_stats[3]] = np.std(SQI_list)
-#         if 'segment' in args[1]:
-#             #Do per segment calculation
-#             if args[0] != {}:
-#                 SQI_dict[sqi_func] = MASTER_SQI_DICT[sqi_func](waveform_segment, **args[0])
-#             else:
-#                 SQI_dict[sqi_func] = MASTER_SQI_DICT[sqi_func](waveform_segment)
-#
-#     return pd.Series(SQI_dict)
 
 
 def per_beat_sqi(sqi_func, troughs, signal, taper=False, **kwargs):
@@ -389,7 +257,6 @@ def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,remove_ectopic_beat=
     nn_list_non_na = np.copy(nn_list)
     nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
     return nn_list_non_na
-
 
 
 def example_rule_decision(df_sqi):
