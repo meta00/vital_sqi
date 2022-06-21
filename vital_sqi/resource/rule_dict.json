@@ -21,6 +21,16 @@
         "op": "<",
         "value": "0.01",
         "label": "accept"
+      },
+      {
+        "op": "=",
+        "value": "NA",
+        "label": "accept"
+      },
+      {
+        "op": "=",
+        "value": "Inf",
+        "label": "accept"
       }
     ],
     "desc": "",
