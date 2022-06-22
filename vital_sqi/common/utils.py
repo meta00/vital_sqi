@@ -63,8 +63,9 @@ def calculate_sampling_rate(timestamps):
         timestamps_second = timestamps
     elif isinstance(timestamps[0], pd.Timestamp):
         timestamps_second = []
-        for i in range(1, len(timestamps)):
-            timestamps_second = (timestamps[i] - timestamps[i-1]).total_sconds()
+        for i in range(0, len(timestamps)):
+            timestamps_second.append((timestamps[i] -
+                                      timestamps[0]).total_seconds())
     else:
         try:
             v_parse_datetime = np.vectorize(parse_datetime)
@@ -113,7 +114,6 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
     # timestamps = []
     # for value in time_range.range(dt.timedelta(seconds=1 / sampling_rate)):
     for value in range(1, signal_length):
-
             timestamps.append(timestamps[value-1] + 1 /
                                            sampling_rate)
     for x in range(0, len(timestamps)):
