@@ -16,7 +16,7 @@ class TestCheckInvalidSignal(object):
     def test_on_invalid_signal(self):
         x = [[1, True], [1, '1'],
              np.array([1, '1']),
-             pd.Series([1, True], dtype = object)]
+             pd.Series([1, True], dtype=object)]
         for i in x:
             with pytest.raises(ValueError) as exec_info:
                 check_valid_signal(i)
