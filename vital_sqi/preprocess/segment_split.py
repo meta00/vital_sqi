@@ -69,7 +69,7 @@ def save_segment(segment_list, file_name='segment', save_file_folder=None,
         i = i+1
 
 
-def split_segment(s, sampling_rate, split_type=1, duration=30.0,
+def split_segment(s, sampling_rate, split_type=0, duration=30.0,
                   overlapping=None, peak_detector=7, wave_type='ppg'):
     """Save segment waveform and plot (optional) to csv and image file.
     Input is a segment with timestamps.
