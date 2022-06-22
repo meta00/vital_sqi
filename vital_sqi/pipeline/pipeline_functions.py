@@ -7,42 +7,32 @@ import  json
 from tqdm import tqdm
 from hrvanalysis import get_nn_intervals
 from vital_sqi.common.rpeak_detection import PeakDetector
+import vital_sqi.sqi as sq
 from vital_sqi.common.utils import create_rule_def
 from vital_sqi.rule import RuleSet, Rule, update_rule
 import inspect
 
-sqi_nn_list = ["nn_mean_sqi",
-               "sdnn_sqi", "sdsd_sqi",
-               "rmssd_sqi", "cvsd_sqi",
-               "cvnn_sqi", "pnn_sqi",
-               "mean_nn_sqi", "median_nn_sqi",
-               "hr_mean_sqi", "hr_median_sqi"
-                              "hr_min_sqi", "hr_max_sqi", "hr_range_sqi",
-               "peak_frequency_sqi", "absolute_power_sqi",
-               "log_power_sqi", "relative_power_sqi",
-               "normalized_power_sqi", "lf_hf_ratio_sqi",
-               "poincare_sqi", "hrva"
-               ]
+
 
 def classify_segments(sqis, rule_dict, ruleset_order):
-    ruleset = {}
-    for i in ruleset_order:
-        rule = Rule(ruleset_order[i])
-    rule.load_def(rule_dict)
-    ruleset[i] = rule
-    sqis['decision'] = ruleset.execute(sqis)
-    return ruleset, sqis
+    rule_list = {}
+    for rule_order,rule_name in ruleset_order.items():
+        rule = generate_rule(rule_name, rule_dict[rule_name]['def'])
+        rule_list[rule_order] = rule
+    ruleset = RuleSet(rule_list)
+    selected_sqi = list(ruleset_order.values())
+    decision_list = []
+    for idx in range(len(sqis)):
+        row_data = pd.DataFrame(dict(sqis[selected_sqi].iloc[idx]), index=[0])
+        decision_list.append(ruleset.execute(row_data))
+
+    sqis['decision'] = decision_list
+    return rule_list, sqis
 
 
 def get_decision_segments(segments, decision):
     a_segments,r_segments = None
     return a_segments, r_segments
-
-
-def extract_sqi(segments, milestones, sqi_dict):
-    # return sqis pandas Dataframe with milestones info
-    sqis = None
-    return sqis
 
 
 def per_beat_sqi(sqi_func, troughs, signal, taper=False, **kwargs):
@@ -172,8 +162,12 @@ def segment_SQI_extraction(sig,sqi_list,sqi_arg_list,wave_type):
     :return:
     """
     sqi_score = {}
-    for (sqi_,args_) in zip(sqi_list,sqi_arg_list):
+    sqi_names = list(sqi_arg_list.keys())
+    # for (sqi_,args_) in zip(sqi_list,sqi_arg_list):
+    for idx in range(len(sqi_list)):
         try:
+            args_ = sqi_arg_list[sqi_names[idx]]
+            sqi_ = sqi_list[idx]
             args_["wave_type"] = wave_type
             sqi_score = {**sqi_score, **get_sqi(sqi_, sig, **args_)}
         except Exception as err:
@@ -183,22 +177,75 @@ def segment_SQI_extraction(sig,sqi_list,sqi_arg_list,wave_type):
     return pd.Series(sqi_score)
 
 
-def extract_sqi(segments,sqi_list,file_name,arg_path=None,wave_type='ppg'):
-    if arg_path == None:
-        arg_path = os.path.join(os.getcwd(),"../resource/sqi_args.json")
+def extract_sqi(segments, milestones, sqi_dict_filename,wave_type='ppg'):
+    sqi_mapping_list = {
+        # Standard SQI
+        'perfusion_sqi': sq.perfusion_sqi,
+        'kurtosis_sqi': sq.kurtosis_sqi,
+        'skewness_sqi': sq.skewness_sqi,
+        'entropy_sqi': sq.entropy_sqi,
+        'signal_to_noise_sqi': sq.signal_to_noise_sqi,
+        'zero_crossings_rate_sqi': sq.zero_crossings_rate_sqi,
+        'mean_crossing_rate_sqi': sq.mean_crossing_rate_sqi,  # should be merged with zero crossing
+        # Peaks SQI
+        'ectopic_sqi': sq.ectopic_sqi,
+        'correlogram_sqi': sq.correlogram_sqi,
+        'interpolation_sqi': sq.interpolation_sqi,
+        'msq_sqi': sq.msq_sqi,
+        # 'poincare_feature_sqi': sq.poincare_feature_sqi,
+        # Waveform SQI
+        'band_energy_sqi': sq.band_energy_sqi,
+        'lfe_sqi': sq.lf_energy_sqi,
+        'qrse_sqi': sq.qrs_energy_sqi,
+        'hfe_sqi': sq.hf_energy_sqi,
+        'vhfp_sqi': sq.vhf_norm_power_sqi,
+        'qrsa_sqi': sq.qrs_a_sqi,
+        # DTW SQI
+        'dtw_sqi': sq.dtw_sqi,
+        # ======================
+        'nn_mean_sqi': sq.nn_mean_sqi,
+        'sdnn_sqi': sq.sdnn_sqi,
+        'sdsd_sqi': sq.sdsd_sqi,
+        'rmssd_sqi': sq.rmssd_sqi,
+        'cvsd_sqi': sq.cvsd_sqi,
+        'cvnn_sqi': sq.cvnn_sqi,
+        'mean_nn_sqi': sq.mean_nn_sqi,
+        'median_nn_sqi': sq.median_nn_sqi,
+        'pnn_sqi': sq.pnn_sqi,
+        'hr_mean_sqi': sq.hr_mean_sqi,
+        'hr_median_sqi': sq.hr_median_sqi,
+        'hr_min_sqi': sq.hr_min_sqi,
+        'hr_max_sqi': sq.hr_max_sqi,
+        'hr_range_sqi': sq.hr_range_sqi,
+        'peak_frequency_sqi': sq.peak_frequency_sqi,
+        'absolute_power_sqi': sq.absolute_power_sqi,
+        'log_power_sqi': sq.log_power_sqi,
+        'relative_power_sqi': sq.relative_power_sqi,
+        'normalized_power_sqi': sq.normalized_power_sqi,
+        'lf_hf_ratio_sqi': sq.lf_hf_ratio_sqi,
+        'poincare_sqi': sq.poincare_features_sqi,
+        'hrv_sqi': sq.get_all_features_hrva
+    }
+    if sqi_dict_filename == None:
+        arg_path = os.path.join(os.getcwd(),"../resource/sqi_dict.json")
     with open(arg_path, 'r') as arg_file:
-        sqi_arg_list = json.loads(arg_file.read())
-    # nn_sqi_arg_list = sqi_list
+        sqi_dict = json.loads(arg_file.read())
+    sqi_list = []
+    sqi_arg_list = {}
+    for item_key,item_value in sqi_dict.items():
+        # sqi_name, sqi_arg
+        sqi_list.append(sqi_mapping_list[item_value['sqi']])
+        sqi_arg_list[item_key] = item_value['args']
     df_sqi = pd.DataFrame()
     for segment_idx in tqdm(range(len(segments))):
         segment = segments[segment_idx]
-        sqi_arg_list['perf'] = {'y':segment.iloc[:,1]}
-        # sqi_arg_list['zc'] = {'y': ppg_stable.iloc[:, 1]}
-        # sqi_arg_list['mc'] = {'y': ppg_stable.iloc[:, 1]}
-        sqis = segment_SQI_extraction(segment, sqi_list.values(),sqi_arg_list.values(),wave_type)
-        segment_name_list = file_name.split("/")[-1] + "_" +str(segment_idx)
-        sqis['id'] = segment_name_list
+        sqi_arg_list['perfusion_sqi'] = {'y':segment.iloc[:,1]}
+        sqis = segment_SQI_extraction(segment, sqi_list,sqi_arg_list,wave_type)
+        # segment_name_list = file_name.split("/")[-1] + "_" +str(segment_idx)
+        # sqis['id'] = segment_name_list
         df_sqi = df_sqi.append(sqis, ignore_index=True)
+    df_sqi['start_idx'] = milestones.iloc[:,0]
+    df_sqi['end_idx'] = milestones.iloc[:, 1]
     return df_sqi
 
 
@@ -209,22 +256,6 @@ def generate_rule(rule_name, rule_def):
                      'labels': label_list}
     rule = Rule(rule_name,rule_detail)
     return rule
-
-
-def get_decision(df_sqi, selected_rule, json_rule_dict):
-    rule_list = {}
-    for (i, selected_sqi) in zip(range(len(selected_rule)), selected_rule):
-        rule = generate_rule(selected_sqi, json_rule_dict[selected_sqi]['def'])
-
-        rule_list[i + 1] = rule
-    ruleset = RuleSet(rule_list)
-
-    decision_list = []
-    for idx in range(len(df_sqi)):
-        row_data = pd.DataFrame(dict(df_sqi[selected_rule].iloc[idx]), index=[0])
-        decision_list.append(ruleset.execute(row_data))
-
-    return decision_list
 
 
 def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,remove_ectopic_beat=False):

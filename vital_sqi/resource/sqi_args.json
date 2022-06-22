@@ -1,62 +1,62 @@
 {
-  "perf": {
+  "perfusion_sqi": {
 
   },
-  "kurt": {
+  "kurtosis_sqi_1": {
     "axis": 0,
     "fisher": true,
     "bias": true,
     "nan_policy": "propagate",
     "per_beat": true
   },
-  "skew": {
+  "skewness_sqi": {
     "axis": 0,
     "bias": true,
     "nan_policy": "propagate",
     "per_beat": true
   },
-  "entropy": {
+  "entropy_sqi": {
     "qk": null,
     "base": null,
     "per_beat": true
   },
-  "kurt_seg": {
+  "kurtosis_sqi_2": {
     "axis": 0,
     "fisher": true,
     "bias": true,
     "nan_policy": "propagate",
     "per_beat": false
   },
-  "skew_seg": {
+  "skewness_sqi_2": {
     "axis": 0,
     "bias": true,
     "nan_policy": "propagate",
     "per_beat": false
   },
-  "ent_seg": {
+  "entropy_sqi_2": {
     "qk": null,
     "base": null,
     "per_beat": false
   },
-  "snr": {
+  "signal_to_noise_sqi": {
     "axis": 0,
     "ddof": 0
   },
-  "zc": {
+  "zero_crossings_rate_sqi": {
     "threshold": 1e-10,
     "ref_magnitude": null,
     "pad": true,
     "zero_pos": true,
     "axis": -1
   },
-  "mc": {
+  "mean_crossing_rate_sqi": {
     "threshold": 1e-10,
     "ref_magnitude": null,
     "pad": true,
     "zero_pos": true,
     "axis": -1
   },
-  "ect": {
+  "ectopic_sqi": {
     "rule_index": 0,
     "sample_rate": 100,
     "rpeak_detector": 0,
@@ -64,55 +64,55 @@
     "low_rri": 300,
     "high_rri": 2000
   },
-  "corr": {
+  "correlogram_sqi": {
     "sample_rate": 100,
     "time_lag": 3,
     "n_selection": 3
   },
-  "intp": {
+  "interpolation_sqi": {
 
   },
-  "msq": {
+  "msq_sqi": {
     "peak_detector_1": 7,
     "peak_detector_2": 6,
     "wave_type": "ppg"
   },
-  "be": {
+  "band_energy_sqi": {
     "sampling_rate": 100,
     "band": null
   },
-  "lfe": {
+  "lfe_sqi": {
     "sampling_rate": 100,
     "band": [
       0,
       0.5
     ]
   },
-  "qrse": {
+  "qrse_sqi": {
     "sampling_rate": 100,
     "band": [
       5,
       25
     ]
   },
-  "hfe": {
+  "hfe_sqi": {
     "sampling_rate": 100,
     "band": [
       100,
       1000
     ]
   },
-  "vhfp": {
+  "vhfp_sqi": {
     "sampling_rate": 100,
     "band": [
       150,
       1000
     ]
   },
-  "qrsa": {
+  "qrsa_sqi": {
     "sampling_rate": 100
   },
-  "dtw": {
+  "dtw_sqi": {
     "template_type": 0,
     "template_size": 100,
     "per_beat": true
@@ -203,7 +203,7 @@
   "poincare_sqi": {
 
   },
-  "hrva": {
+  "hrv_sqi": {
     "sample_rate": 100,
     "rpeak_method": 0,
     "wave_type": "ecg"
