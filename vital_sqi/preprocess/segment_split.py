@@ -13,7 +13,7 @@ from vital_sqi.common.utils import cut_segment, check_signal_format
 from vital_sqi.common.rpeak_detection import PeakDetector
 
 
-def save_segment(segment_list, file_name='segment', save_file_folder=None,
+def save_segment(segment_list, segment_name=None, save_file_folder=None,
                  save_image=False, save_img_folder=None):
     """Save segment waveform to .csv and plot (optional) to image files.
     Input is a segment with timestamps.
@@ -22,7 +22,7 @@ def save_segment(segment_list, file_name='segment', save_file_folder=None,
     ----------
     segment_list : list
         list of segments
-    file_name : str
+    segment_name : str
         Output filename.
         (Default value = 'segment')
     save_file_folder :
@@ -38,12 +38,14 @@ def save_segment(segment_list, file_name='segment', save_file_folder=None,
     
     """
     assert isinstance(segment_list, list), 'Expected a list of signal segments.'
-    assert isinstance(file_name, str), 'Expected a string.'
+    assert isinstance(segment_name, str), 'Expected a string.'
 
     if save_file_folder is None:
         save_file_folder = os.getcwd()
-    if save_image is None:
+    if save_img_folder is None:
         save_img_folder = os.getcwd()
+    if segment_name is None:
+        segment_name = "segment"
 
     extension_len = len(str(len(segment_list)))
     i = 1
@@ -51,7 +53,7 @@ def save_segment(segment_list, file_name='segment', save_file_folder=None,
         zero_adding = "".join(["0"] * (extension_len - len(str(i))))
 
         try:
-            saved_filename = file_name + "-" + zero_adding + str(i)
+            saved_filename = segment_name + "-" + zero_adding + str(i)
 
             if save_image:
 

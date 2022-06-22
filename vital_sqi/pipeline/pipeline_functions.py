@@ -24,6 +24,7 @@ sqi_nn_list = ["nn_mean_sqi",
                "poincare_sqi", "hrva"
                ]
 
+
 def classify_segments(sqis, rule_dict, ruleset_order):
     ruleset = {}
     for i in ruleset_order:
@@ -34,15 +35,33 @@ def classify_segments(sqis, rule_dict, ruleset_order):
     return ruleset, sqis
 
 
-def get_decision_segments(segments, decision):
-    a_segments,r_segments = None
+# Khoa
+def get_reject_segments(segments, wave_type, milestones=None, info=None):
+    if wave_type == 'ppg':
+        out = pd.Series()
+    if wave_type == 'ecg':
+        out = pd.Series()
+    return out
+
+
+def map_decision(i):
+    if i == 'accept':
+        return 0
+    if i == 'reject':
+        return 1
+
+
+def get_decision_segments(segments, decision, reject_decision):
+    decision = map(map_decision, decision)
+    reject_decision = map(map_decision, reject_decision)
+    decision = [a + b for a, b in zip(decision + reject_decision)]
+    a_segments, r_segments = []
+    for i in decision:
+        if decision[i] == 0:
+            a_segments.append(segments[i])
+        if decision[i] == 1:
+            r_segments.append(segments[i])
     return a_segments, r_segments
-
-
-def extract_sqi(segments, milestones, sqi_dict):
-    # return sqis pandas Dataframe with milestones info
-    sqis = None
-    return sqis
 
 
 def per_beat_sqi(sqi_func, troughs, signal, taper=False, **kwargs):
@@ -183,7 +202,7 @@ def segment_SQI_extraction(sig,sqi_list,sqi_arg_list,wave_type):
     return pd.Series(sqi_score)
 
 
-def extract_sqi(segments,sqi_list,file_name,arg_path=None,wave_type='ppg'):
+def extract_sqi(segments, sqi_list, file_name,arg_path=None,wave_type='ppg'):
     if arg_path == None:
         arg_path = os.path.join(os.getcwd(),"../resource/sqi_args.json")
     with open(arg_path, 'r') as arg_file:
