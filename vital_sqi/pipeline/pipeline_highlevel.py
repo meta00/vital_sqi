@@ -265,6 +265,6 @@ file_name = "../../tests/test_data/ppg_smartcare.csv"
 
 segments, signal_obj = get_ppg_sqis(file_name,timestamp_idx = ['TIMESTAMP_MS'],
                                     signal_idx = ['PLETH'],
-                                    info_idx = ['PULSE_BPM','SPO2_PCT','PERFUSION_INDEX'],sqi_dict=sqi_list)
+                                    sqi_dict=sqi_list,info_idx = ['PULSE_BPM','SPO2_PCT','PERFUSION_INDEX'])
 
 
