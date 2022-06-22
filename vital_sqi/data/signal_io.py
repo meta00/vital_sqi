@@ -296,7 +296,15 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx=[],
                       usecols=cols,
                       skipinitialspace=True,
                       skip_blank_lines=True)
-    timestamps = tmp.iloc[timestamp_idx[0]]
+    for i in range(0, len(info_idx)):
+        if isinstance(cols[i], str):
+            info_idx[i] = tmp.columns.get_loc(info_idx[i])
+    if isinstance(signal_idx[0], str):
+        signal_idx[0] = tmp.columns.get_loc(signal_idx[0])
+    if isinstance(timestamp_idx[0], str):
+        timestamp_idx[0] = tmp.columns.get_loc(timestamp_idx[0])
+
+    timestamps = tmp.iloc[:, timestamp_idx[0]]
     if isinstance(start_datetime, str):
         try:
             start_datetime = pd.Timestamp(start_datetime)
@@ -313,13 +321,16 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx=[],
         timestamps = timestamps / 1000
     elif timestamp_unit != 's':
         raise Exception("Timestamp unit must be either second (s) or "
-                            "millisecond (ms)")
-    timestamps = start_datetime + pd.Timedelta(seconds=timestamps)
+                        "millisecond (ms)")
+
+    for i in range(0, len(timestamps)):
+        timestamps[i] = start_datetime + pd.Timedelta(timestamps[i],
+                                                      unit='seconds')
     if sampling_rate is None:
         sampling_rate = utils.calculate_sampling_rate(timestamps)
     
-    info = pd.DataFrame(tmp.iloc[info_idx])
-    signals = tmp.iloc[signal_idx]
+    info = pd.DataFrame(tmp.iloc[:, info_idx])
+    signals = tmp.iloc[:, signal_idx]
     signals.insert(0, 'timestamps', timestamps)
     out = SignalSQI(signals=signals, wave_type='ppg',
                     sampling_rate=sampling_rate,
@@ -387,10 +398,10 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
 # file_out = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/out_mit')
 # ECG_writer(out, file_out, file_type='mit', info=out.info)
-# out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/ppg_smartcare.csv',
-#                 timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
-#                                                         'SPO2_PCT','PERFUSION_INDEX'],
-# start_datetime = '2020-04-12 10:00:00')
+out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/ppg_smartcare.csv',
+                timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
+                                                        'SPO2_PCT','PERFUSION_INDEX'],
+                 start_datetime = '2020-04-12 10:00:00')
 # out.sampling_rate = 2
 #PPG_writer(out, 'D:/Workspace/oucru/medical_signal/Github/vital_sqi/vital_sqi/dataset/ppg_smartcare_w.csv')
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
