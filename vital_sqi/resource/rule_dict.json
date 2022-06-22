@@ -1,6 +1,6 @@
 {
-  "snr": {
-    "name": "snr",
+  "snr_sqi": {
+    "name": "snr_sqi",
     "def": [
       {
         "op": ">",
@@ -36,8 +36,8 @@
     "desc": "",
     "ref": ""
   },
-  "perfusion": {
-    "name": "perfusion",
+  "perfusion_sqi": {
+    "name": "perfusion_sqi",
     "def": [
       {
         "op": ">",
@@ -63,8 +63,8 @@
     "desc": "",
     "ref": ""
   },
-  "mean_cross": {
-    "name": "mean_cross",
+  "mean_cross_sqi": {
+    "name": "mean_cross_sqi",
     "def": [
       {
         "op": ">",
@@ -90,8 +90,8 @@
     "desc": "",
     "ref": ""
   },
-  "zero_cross": {
-    "name": "zero_cross",
+  "zero_cross_sqi": {
+    "name": "zero_cross_sqi",
     "def": [
       {
         "op": ">",
@@ -117,8 +117,8 @@
     "desc": "",
     "ref": ""
   },
-  "msq": {
-    "name": "msq",
+  "msq_sqi": {
+    "name": "msq_sqi",
     "def": [
       {
         "op": ">",
@@ -144,8 +144,8 @@
     "desc": "",
     "ref": ""
   },
-  "dtw_mean": {
-    "name": "dtw_mean",
+  "dtw_mean_sqi": {
+    "name": "dtw_mean_sqi",
     "def": [
       {
         "op": ">",
@@ -171,8 +171,8 @@
     "desc": "",
     "ref": ""
   },
-  "dtw_std": {
-    "name": "dtw_std",
+  "dtw_std_sqi": {
+    "name": "dtw_std_sqi",
     "def": [
       {
         "op": ">",
@@ -198,8 +198,8 @@
     "desc": "",
     "ref": ""
   },
-  "correlogram_peak1": {
-    "name": "correlogram_peak1",
+  "correlogram_peak1_sqi": {
+    "name": "correlogram_peak1_sqi",
     "def": [
       {
         "op": ">",
@@ -225,8 +225,8 @@
     "desc": "",
     "ref": ""
   },
-  "correlogram_peak2": {
-    "name": "correlogram_peak2",
+  "correlogram_peak2_sqi": {
+    "name": "correlogram_peak2_sqi",
     "def": [
       {
         "op": ">",
@@ -252,8 +252,8 @@
     "desc": "",
     "ref": ""
   },
-  "correlogram_peak3": {
-    "name": "correlogram_peak3",
+  "correlogram_peak3_sqi": {
+    "name": "correlogram_peak3_sqi",
     "def": [
       {
         "op": ">",
@@ -279,8 +279,8 @@
     "desc": "",
     "ref": ""
   },
-  "correlogram_value1": {
-    "name": "correlogram_value1",
+  "correlogram_value1_sqi": {
+    "name": "correlogram_value1_sqi",
     "def": [
       {
         "op": ">",
@@ -306,8 +306,8 @@
     "desc": "",
     "ref": ""
   },
-  "correlogram_value2": {
-    "name": "correlogram_value2",
+  "correlogram_value2_sqi": {
+    "name": "correlogram_value2_sqi",
     "def": [
       {
         "op": ">",
@@ -333,8 +333,8 @@
     "desc": "",
     "ref": ""
   },
-  "correlogram_value3": {
-    "name": "correlogram_value3",
+  "correlogram_value3_sqi": {
+    "name": "correlogram_value3_sqi",
     "def": [
       {
         "op": ">",
@@ -360,8 +360,8 @@
     "desc": "",
     "ref": ""
   },
-  "skewness": {
-    "name": "skewness",
+  "skewness_sqi": {
+    "name": "skewness_sqi",
     "def": [
       {
         "op": ">",
@@ -387,8 +387,8 @@
     "desc": "",
     "ref": ""
   },
-  "skewness_mean": {
-    "name": "skewness_mean",
+  "skewness_mean_sqi": {
+    "name": "skewness_mean_sqi",
     "def": [
       {
         "op": ">",
@@ -414,8 +414,8 @@
     "desc": "",
     "ref": ""
   },
-  "skewness_median": {
-    "name": "skewness_median",
+  "skewness_median_sqi": {
+    "name": "skewness_median_sqi",
     "def": [
       {
         "op": ">",
@@ -441,8 +441,8 @@
     "desc": "",
     "ref": ""
   },
-  "skewness_std": {
-    "name": "skewness_std",
+  "skewness_std_sqi": {
+    "name": "skewness_std_sqi",
     "def": [
       {
         "op": ">",
@@ -468,8 +468,8 @@
     "desc": "",
     "ref": ""
   },
-  "kurtosis": {
-    "name": "kurtosis",
+  "kurtosis_sqi": {
+    "name": "kurtosis_sqi",
     "def": [
       {
         "op": ">",
@@ -495,8 +495,8 @@
     "desc": "",
     "ref": ""
   },
-  "kurtosis_mean": {
-    "name": "kurtosis_mean",
+  "kurtosis_mean_sqi": {
+    "name": "kurtosis_mean_sqi",
     "def": [
       {
         "op": ">",
@@ -522,8 +522,8 @@
     "desc": "",
     "ref": ""
   },
-  "kurtosis_median": {
-    "name": "kurtosis_median",
+  "kurtosis_median_sqi": {
+    "name": "kurtosis_median_sqi",
     "def": [
       {
         "op": ">",
@@ -549,8 +549,8 @@
     "desc": "",
     "ref": ""
   },
-  "kurtosis_std": {
-    "name": "kurtosis_std",
+  "kurtosis_std_sqi": {
+    "name": "kurtosis_std_sqi",
     "def": [
       {
         "op": ">",
@@ -576,8 +576,8 @@
     "desc": "",
     "ref": ""
   },
-  "entropy": {
-    "name": "entropy",
+  "entropy_sqi": {
+    "name": "entropy_sqi",
     "def": [
       {
         "op": ">",
@@ -603,8 +603,8 @@
     "desc": "",
     "ref": ""
   },
-  "entropy_mean": {
-    "name": "entropy_mean",
+  "entropy_mean_sqi": {
+    "name": "entropy_mean_sqi",
     "def": [
       {
         "op": ">",
@@ -630,8 +630,8 @@
     "desc": "",
     "ref": ""
   },
-  "entropy_median": {
-    "name": "entropy_median",
+  "entropy_median_sqi": {
+    "name": "entropy_median_sqi",
     "def": [
       {
         "op": ">",
@@ -657,8 +657,8 @@
     "desc": "",
     "ref": ""
   },
-  "entropy_std": {
-    "name": "entropy_std",
+  "entropy_std_sqi": {
+    "name": "entropy_std_sqi",
     "def": [
       {
         "op": ">",
@@ -684,8 +684,8 @@
     "desc": "",
     "ref": ""
   },
-  "mean_nni": {
-    "name": "mean_nni",
+  "mean_nni_sqi": {
+    "name": "mean_nni_sqi",
     "def": [
       {
         "op": ">",
@@ -711,8 +711,8 @@
     "desc": "",
     "ref": ""
   },
-  "sdnn": {
-    "name": "sdnn",
+  "sdnn_sqi": {
+    "name": "sdnn_sqi",
     "def": [
       {
         "op": ">",
@@ -738,8 +738,8 @@
     "desc": "",
     "ref": ""
   },
-  "sdsd": {
-    "name": "sdsd",
+  "sdsd_sqi": {
+    "name": "sdsd_sqi",
     "def": [
       {
         "op": ">",
@@ -765,8 +765,8 @@
     "desc": "",
     "ref": ""
   },
-  "nni_50": {
-    "name": "nni_50",
+  "nni_50_sqi": {
+    "name": "nni_50_sqi",
     "def": [
       {
         "op": ">",
@@ -792,8 +792,8 @@
     "desc": "",
     "ref": ""
   },
-  "pnni_50": {
-    "name": "pnni_50",
+  "pnni_50_sqi": {
+    "name": "pnni_50_sqi",
     "def": [
       {
         "op": ">",
@@ -819,8 +819,8 @@
     "desc": "",
     "ref": ""
   },
-  "nni_20": {
-    "name": "nni_20",
+  "nni_20_sqi": {
+    "name": "nni_20_sqi",
     "def": [
       {
         "op": ">",
@@ -846,8 +846,8 @@
     "desc": "",
     "ref": ""
   },
-  "pnni_20": {
-    "name": "pnni_20",
+  "pnni_20_sqi": {
+    "name": "pnni_20_sqi",
     "def": [
       {
         "op": ">",
@@ -873,8 +873,8 @@
     "desc": "",
     "ref": ""
   },
-  "rmssd": {
-    "name": "rmssd",
+  "rmssd_sqi": {
+    "name": "rmssd_sqi",
     "def": [
       {
         "op": ">",
@@ -900,8 +900,8 @@
     "desc": "",
     "ref": ""
   },
-  "median_nni": {
-    "name": "median_nni",
+  "median_nni_sqi": {
+    "name": "median_nni_sqi",
     "def": [
       {
         "op": ">",
@@ -927,8 +927,8 @@
     "desc": "",
     "ref": ""
   },
-  "range_nni": {
-    "name": "range_nni",
+  "range_nni_sqi": {
+    "name": "range_nni_sqi",
     "def": [
       {
         "op": ">",
@@ -954,8 +954,8 @@
     "desc": "",
     "ref": ""
   },
-  "cvsd": {
-    "name": "cvsd",
+  "cvsd_sqi": {
+    "name": "cvsd_sqi",
     "def": [
       {
         "op": ">",
@@ -981,8 +981,8 @@
     "desc": "",
     "ref": ""
   },
-  "cvnni": {
-    "name": "cvnni",
+  "cvnni_sqi": {
+    "name": "cvnni_sqi",
     "def": [
       {
         "op": ">",
@@ -1008,8 +1008,8 @@
     "desc": "",
     "ref": ""
   },
-  "mean_hr": {
-    "name": "mean_hr",
+  "mean_hr_sqi": {
+    "name": "mean_hr_sqi",
     "def": [
       {
         "op": ">",
@@ -1035,8 +1035,8 @@
     "desc": "",
     "ref": ""
   },
-  "max_hr": {
-    "name": "max_hr",
+  "max_hr_sqi": {
+    "name": "max_hr_sqi",
     "def": [
       {
         "op": ">",
@@ -1062,8 +1062,8 @@
     "desc": "",
     "ref": ""
   },
-  "min_hr": {
-    "name": "min_hr",
+  "min_hr_sqi": {
+    "name": "min_hr_sqi",
     "def": [
       {
         "op": ">",
@@ -1089,8 +1089,8 @@
     "desc": "",
     "ref": ""
   },
-  "std_hr": {
-    "name": "std_hr",
+  "std_hr_sqi": {
+    "name": "std_hr_sqi",
     "def": [
       {
         "op": ">",
@@ -1116,8 +1116,8 @@
     "desc": "",
     "ref": ""
   },
-  "lf": {
-    "name": "lf",
+  "lf_sqi": {
+    "name": "lf_sqi",
     "def": [
       {
         "op": ">",
@@ -1143,8 +1143,8 @@
     "desc": "",
     "ref": ""
   },
-  "hf": {
-    "name": "hf",
+  "hf_sqi": {
+    "name": "hf_sqi",
     "def": [
       {
         "op": ">",
@@ -1170,8 +1170,8 @@
     "desc": "",
     "ref": ""
   },
-  "lf_hf_ratio": {
-    "name": "lf_hf_ratio",
+  "lf_hf_ratio_sqi": {
+    "name": "lf_hf_ratio_sqi",
     "def": [
       {
         "op": ">",
@@ -1197,8 +1197,8 @@
     "desc": "",
     "ref": ""
   },
-  "lfnu": {
-    "name": "lfnu",
+  "lfnu_sqi": {
+    "name": "lfnu_sqi",
     "def": [
       {
         "op": ">",
@@ -1224,8 +1224,8 @@
     "desc": "",
     "ref": ""
   },
-  "hfnu": {
-    "name": "hfnu",
+  "hfnu_sqi": {
+    "name": "hfnu_sqi",
     "def": [
       {
         "op": ">",
@@ -1251,8 +1251,8 @@
     "desc": "",
     "ref": ""
   },
-  "total_power": {
-    "name": "total_power",
+  "total_power_sqi": {
+    "name": "total_power_sqi",
     "def": [
       {
         "op": ">",
