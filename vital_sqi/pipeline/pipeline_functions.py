@@ -161,7 +161,7 @@ def get_sqi(sqi_func, s, per_beat=False,
     return sqi_score_dict
 
 
-def segment_PPG_SQI_extraction(sig,sqi_list,sqi_arg_list):
+def segment_SQI_extraction(sig,sqi_list,sqi_arg_list,wave_type):
     """
 
     :param sig:
@@ -174,6 +174,7 @@ def segment_PPG_SQI_extraction(sig,sqi_list,sqi_arg_list):
     sqi_score = {}
     for (sqi_,args_) in zip(sqi_list,sqi_arg_list):
         try:
+            args_["wave_type"] = wave_type
             sqi_score = {**sqi_score, **get_sqi(sqi_, sig, **args_)}
         except Exception as err:
             print(sqi_)
@@ -182,21 +183,7 @@ def segment_PPG_SQI_extraction(sig,sqi_list,sqi_arg_list):
     return pd.Series(sqi_score)
 
 
-def compute_SQI(signal, segment_length='30s', primary_peakdet=7, secondary_peakdet=6, wave_type='ppg', sampling_rate=100, template_type=1):
-    if wave_type == 'ppg':
-        try:
-            sqis = signal.groupby(pd.Grouper(freq=segment_length)).apply(segment_PPG_SQI_extraction)
-        except Exception as e:
-            return None
-    # elif wave_type == 'ecg':
-    #     sqis = signal.groupby(pd.Grouper(freq=segment_length)).apply(segment_ECG_SQI_extraction, sampling_rate, primary_peakdet, secondary_peakdet, (1, 1), (20, 4), template_type)
-    else:
-        raise Exception("Wrong type of waveform supplied. Only accepts 'ppg' or 'ecg'.")
-    return sqis
-
-
-
-def extract_sqi(segments,milestones,sqi_list,file_name,arg_path=None):
+def extract_sqi(segments,sqi_list,file_name,arg_path=None,wave_type='ppg'):
     if arg_path == None:
         arg_path = os.path.join(os.getcwd(),"../resource/sqi_args.json")
     with open(arg_path, 'r') as arg_file:
@@ -208,15 +195,13 @@ def extract_sqi(segments,milestones,sqi_list,file_name,arg_path=None):
         sqi_arg_list['perf'] = {'y':segment.iloc[:,1]}
         # sqi_arg_list['zc'] = {'y': ppg_stable.iloc[:, 1]}
         # sqi_arg_list['mc'] = {'y': ppg_stable.iloc[:, 1]}
-        sqis = segment_PPG_SQI_extraction(segment, sqi_list.values(),sqi_arg_list.values())
-
-        # segment_name_list = [file_name.split("/")[-1] + "_" + str(i) for i in range(len(sqis))]
+        sqis = segment_SQI_extraction(segment, sqi_list.values(),sqi_arg_list.values(),wave_type)
         segment_name_list = file_name.split("/")[-1] + "_" +str(segment_idx)
         sqis['id'] = segment_name_list
         df_sqi = df_sqi.append(sqis, ignore_index=True)
     return df_sqi
 
-# Trong ruleset class??
+
 def generate_rule(rule_name, rule_def):
     rule_def, boundaries, label_list = update_rule(rule_def, is_update=False)
     rule_detail = {'def': rule_def,
@@ -257,14 +242,3 @@ def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,remove_ectopic_beat=
     nn_list_non_na = np.copy(nn_list)
     nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
     return nn_list_non_na
-
-
-def example_rule_decision(df_sqi):
-    selected_rule = ['msq', 'entropy_std']
-    for single_rule in selected_rule:
-        boundary = np.around(np.quantile(df_sqi[single_rule], [0.05, 0.95]), decimals=2)
-        upper_bound = boundary[1]
-        lower_bound = boundary[0]
-        json_rule_dict = create_rule_def(single_rule,upper_bound, lower_bound)
-    decision_list = get_decision(df_sqi,selected_rule,json_rule_dict)
-    df_sqi['decision'] = decision_list
