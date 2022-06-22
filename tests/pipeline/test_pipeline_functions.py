@@ -2,8 +2,8 @@ import pytest
 import os
 from vital_sqi.data.signal_io import PPG_reader
 from vital_sqi.pipeline.pipeline_functions import \
-    per_beat_sqi,get_sqi_dict,get_sqi,segment_SQI_extraction,\
-    get_decision
+    per_beat_sqi,get_sqi_dict,get_sqi,segment_SQI_extraction, \
+    get_decision_segments
 
 
 class TestCalculateSQI(object):
