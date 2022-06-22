@@ -1,5 +1,3 @@
-import warnings
-
 from pyedflib import highlevel
 from wfdb import rdsamp, wrsamp
 import numpy as np
@@ -12,7 +10,7 @@ from vital_sqi.common.utils import generate_timestamp
 from vital_sqi.data.signal_sqi_class import SignalSQI
 
 
-def ECG_reader(file_name, file_type=None, channel_num=None,
+def ECG_reader(file_name, file_type, channel_num=None,
                channel_name=None, sampling_rate=None,
                start_datetime=None):
     """
@@ -20,22 +18,26 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
     Parameters
     ----------
     file_name : str
-
-    file_type :
+        Path to ECG file.
+    file_type : str
+       Supported types include 'edf', 'mit' or 'csv'.
+    channel_num : list
+        List of channel ids to read, starting from 0.
         (Default value = None)
-    channel_num : from 0
+    channel_name : list
+        List of channel names to read.
         (Default value = None)
-    channel_name :
+    sampling_rate : int or float
         (Default value = None)
-    sampling_rate :
-        (Default value = None)
-    start_datetime : optional
+    start_datetime : str
+        In '%Y-%m-%d '%H:%M:%S.%f' format. If none or not convertible
+        to datetime, it is assigned to now.
         (Default value = None)
 
     Returns
     -------
-    object of SignalSQI class
-
+        out: SignalSQI
+            SignalSQI object.
     """
     if file_type == 'mit':
         assert file_type == 'mit' and glob.glob(file_name + '.*'), \
@@ -153,8 +155,8 @@ def ECG_reader(file_name, file_type=None, channel_num=None,
                 start_datetime = pd.Timestamp(start_datetime)
                 timestamps[0] = start_datetime
                 for i in range(1, len(signals)):
-                    timestamps[i] = timestamps[i-1] + pd.Timedelta(
-                            timestamps[i], unit='s')
+                    timestamps[i] = timestamps[i-1] + \
+                                    pd.Timedelta(seconds=timestamps[i])
             # no start_datetime and column in datetime
             if start_datetime is None:
                 timestamps = signals.iloc[:, 0].apply(pd.Timestamp)
@@ -184,15 +186,15 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
     Parameters
     ----------
     signal_sqi : SignalSQI object containing signals, sampling rate and sqi
-
+        
     file_name : name of file to write, with extension. For edf file_type,
-
+        
     possible extensions are edf, edf+, bdf, bdf+. For mit file_type, :
-
+        
     possible extensions are... :
-
+        
     file_type : edf or mit or csv
-
+        
     info : list or dict
         In case of writing edf file: A list containing signal_headers and
         header (in order). signal_headers is a list of dict with one signal
@@ -205,7 +207,7 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
     Returns
     -------
 
-
+    
     """
     signals = signal_sqi.signals.loc[:, signal_sqi.signals.columns !=
                                 'timestamps'].to_numpy()
@@ -255,7 +257,7 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
         return os.path.isfile(file_name)
 
 
-def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
+def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx=[],
                timestamp_unit='ms', sampling_rate=None,
                start_datetime=None):
     """
@@ -263,51 +265,47 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
     Parameters
     ----------
     file_name : str
-        absolute path to ppg file
-
+        Path to ppg file.
     signal_idx : list
-        name of one column containing signal
-
+        Name or index of the signal column.
     timestamp_idx : list
-        name of one column containing timestamps
-
+        Name or index of the timestamp column.
     info_idx : list
-        name of the columns for other info
-
+        Name or indexes of the columns for other information.
+        (Default value = [])
     timestamp_unit : str
-        unit of timestamp, only 'ms' or 's' accepted
-         (Default value = 'ms')
-    sampling_rate : float
+        Unit of timestamp, only 'ms' or 's' accepted.
+        (Default value = 'ms')
+    sampling_rate : int or float
         if None, sampling_rate can be inferred from the
-        timestamps
-         (Default value = None)
+        timestamps.
+        (Default value = None)
     start_datetime : str
-        in '%Y-%m-%d '%H:%M:%S.%f' format
-         (Default value = None)
+        In '%Y-%m-%d '%H:%M:%S.%f' format. If none or not convertible
+        to datetime, it is assigned to now.
+        (Default value = None)
 
     Returns
     -------
-    object of class SignalSQI
-
+        out: SignalSQI
+            SignalSQI object.
+    
     """
     cols = timestamp_idx + signal_idx + info_idx
     tmp = pd.read_csv(file_name,
                       usecols=cols,
                       skipinitialspace=True,
                       skip_blank_lines=True)
-    timestamps = tmp[timestamp_idx[0]]
+    timestamps = tmp.iloc[timestamp_idx[0]]
     if isinstance(start_datetime, str):
         try:
-            start_datetime = dt.datetime.strptime(start_datetime, '%Y-%m-%d '
-                                                                  '%H:%M:%S')
+            start_datetime = pd.Timestamp(start_datetime)
         except Exception:
             start_datetime = None
             pass
-    else:
-        start_datetime = None
     if start_datetime is None:
-        start_datetime = dt.datetime.now()
-    start_datetime = dt.datetime.timestamp(start_datetime)
+        start_datetime = pd.Timestamp.now()
+
     if timestamp_unit is None:
         raise Exception("Missing sampling_rate, not able to infer "
                         "sampling_rate without timestamp_unit")
@@ -316,13 +314,13 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx,
     elif timestamp_unit != 's':
         raise Exception("Timestamp unit must be either second (s) or "
                             "millisecond (ms)")
-    timestamps = start_datetime + timestamps
+    timestamps = start_datetime + pd.Timedelta(seconds=timestamps)
     if sampling_rate is None:
         sampling_rate = utils.calculate_sampling_rate(timestamps)
     
-    info = pd.DataFrame(tmp[info_idx])
-    signals = tmp[signal_idx]
-    signals.insert(0, 'timestamps', pd.Series.apply((timestamps),dt.datetime.fromtimestamp))
+    info = pd.DataFrame(tmp.iloc[info_idx])
+    signals = tmp.iloc[signal_idx]
+    signals.insert(0, 'timestamps', timestamps)
     out = SignalSQI(signals=signals, wave_type='ppg',
                     sampling_rate=sampling_rate,
                     info=info)
@@ -335,15 +333,16 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
     Parameters
     ----------
     signal_sqi : object of class SignalSQI
-
+        
     file_name : str
         absolute path
-
     file_type : str
-        file type to write, either 'csv' or 'xlsx'
+         (Default value = 'csv')
+
     Returns
     -------
-    bool
+
+    
     """
     timestamps = utils.generate_timestamp(
         start_datetime=signal_sqi.start_datetime,
