@@ -9,7 +9,6 @@ Class containing signal, header and sqi
 """
 import numpy as np
 import pandas as pd
-import datetime as dt
 
 
 class SignalSQI:
@@ -19,7 +18,6 @@ class SignalSQI:
                  sampling_rate=None,
                  start_datetime=None,
                  info=None,
-                 # segments=None,
                  sqis=None,
                  rules=None,
                  ruleset=None):
@@ -29,13 +27,8 @@ class SignalSQI:
         self.wave_type = wave_type
         self.info = info
         self.sqis = sqis
-        # self.segments = segments
         self.rules = rules
         self.ruleset = ruleset
-        self.isSplit = False
-        self.isFiltered = False
-        self.SQIComputed = False
-        # self.unfilteredsignal = None
 
     def __setattr__(self, name, value):
         if name == 'wave_type':
@@ -58,8 +51,9 @@ class SignalSQI:
         #            isinstance(value, dt.date) or value is None, \
         #         'Expected str or datetime object, or None'
         if name == 'sqis':
-            assert isinstance(value, pd.DataFrame) or value is None, \
-                'Expected SQI table as a pd.DataFrame or None'
+            assert isinstance(value, (pd.DataFrame, list)) or value is None, \
+                'Expected SQI table as a pd.DataFrame, list of DataFrame or ' \
+                'None'
         if name == 'rules':
             assert isinstance(value, list) or \
                    value is None, 'Expected rules as a list of Rule objects.'
@@ -85,7 +79,7 @@ class SignalSQI:
         self.info = info
         return self
 
-    def update_signal(self, signals):
+    def update_signals(self, signals):
         """
 
         Parameters
@@ -100,23 +94,6 @@ class SignalSQI:
 
         """
         self.signals = signals
-        return self
-
-    def update_sqi_indexes(self, sqi_indexes):
-        """
-
-        Parameters
-        ----------
-        sqi_indexes : numpy.ndarray of shape (m, n)
-        m is the number of signal segments, n is the number of SQIs.
-
-
-        Returns
-        -------
-        object of class SignalSQI
-
-        """
-        self.sqi_indexes = sqi_indexes
         return self
 
     def update_sampling_rate(self, sampling_rate):
@@ -151,17 +128,3 @@ class SignalSQI:
         """
         self.start_datetime = start_datetime
         return self
-    #
-    # def update_segment_indices(self, segments):
-    #     """
-    #
-    #     Parameters
-    #     ----------
-    #     segments : ndarray of indices
-    #
-    #     Returns
-    #     -------
-    #     object of si
-    #     """
-    #     self.segments = segments
-    #     return self

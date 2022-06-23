@@ -3,7 +3,6 @@ import pytest
 
 from vital_sqi.data.signal_io import *
 
-
 class TestECGReader(object):
 
     def test_on_filename(self):

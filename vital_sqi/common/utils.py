@@ -3,7 +3,7 @@ import os
 import datetime as dt
 import json
 import pandas as pd
-from datetimerange import DateTimeRange
+from pandas.core.dtypes.common import is_numeric_dtype
 import dateparser
 
 OPERAND_MAPPING_DICT = {
@@ -13,6 +13,25 @@ OPERAND_MAPPING_DICT = {
     "<=": 2,
     "<": 1
 }
+
+
+def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,
+           remove_ectopic_beat=False):
+
+    if wave_type=='ppg':
+        detector = PeakDetector(wave_type='ppg')
+        peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
+    else:
+        detector = PeakDetector(wave_type='ecg')
+        peak_list, trough_list = detector.ecg_detector(s, detector_type=rpeak_method)
+
+    rr_list = np.diff(peak_list) * (1000 / sample_rate)
+    if not remove_ectopic_beat:
+        return rr_list
+    nn_list = get_nn_intervals(rr_list)
+    nn_list_non_na = np.copy(nn_list)
+    nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+    return nn_list_non_na
 
 
 def check_valid_signal(x):
@@ -34,6 +53,7 @@ def check_valid_signal(x):
     if len(x) == 0:
         raise ValueError("Empty signal")
     types = []
+    x = list(x)
     for i in range(len(x)):
         types.append(str(type(x[i])))
     type_unique = np.unique(np.array(types))
@@ -62,8 +82,9 @@ def calculate_sampling_rate(timestamps):
         timestamps_second = timestamps
     elif isinstance(timestamps[0], pd.Timestamp):
         timestamps_second = []
-        for i in range(1, len(timestamps)):
-            timestamps_second = (timestamps[i] - timestamps[i-1]).total_sconds()
+        for i in range(0, len(timestamps)):
+            timestamps_second.append((timestamps[i] -
+                                      timestamps[0]).total_seconds())
     else:
         try:
             v_parse_datetime = np.vectorize(parse_datetime)
@@ -112,7 +133,6 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
     # timestamps = []
     # for value in time_range.range(dt.timedelta(seconds=1 / sampling_rate)):
     for value in range(1, signal_length):
-
             timestamps.append(timestamps[value-1] + 1 /
                                            sampling_rate)
     for x in range(0, len(timestamps)):
@@ -376,17 +396,13 @@ def format_milestone(start_milestone, end_milestone):
     df_milestones['end'] = end_milestone
     return df_milestones
 
+
 def check_signal_format(s):
     assert isinstance(s, pd.DataFrame), 'Expected a pd.DataFrame.'
     assert len(s.columns) is 2, 'Expect a datafram of only two columns.'
-    assert isinstance(s.iloc[:, 0][0], pd.Timestamp), \
-        'Expected type of the first column to be pd.Timestamp.'
-    assert isinstance(s.iloc[:, 1][0], float), \
-        'Expected type of the second column to be float'
-    return True
     assert isinstance(s.iloc[0, 0], pd.Timestamp), \
         'Expected type of the first column to be pd.Timestamp.'
-    assert isinstance(s.iloc[0, 1], float), \
+    assert is_numeric_dtype(s.iloc[0, 1]), \
         'Expected type of the second column to be float'
     return True
 

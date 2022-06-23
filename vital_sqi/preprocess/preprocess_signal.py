@@ -6,6 +6,7 @@ from vital_sqi.common.utils import check_signal_format
 from vital_sqi.common.generate_template import squeeze_template
 
 
+
 def taper_signal(s, window=None, shift_min_to_zero=True):
     """Pinning the leftmost and rightmost signal to the zero baseline
     and amplifying the remainder according to the window shape.
@@ -121,4 +122,22 @@ def scale_pattern(s, window_size):
     processed_s = pd.DataFrame(smoothed_scale_res)
     return processed_s
 
+
+def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,
+           remove_ectopic_beat=False):
+
+    if wave_type=='ppg':
+        detector = PeakDetector(wave_type='ppg')
+        peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
+    else:
+        detector = PeakDetector(wave_type='ecg')
+        peak_list, trough_list = detector.ecg_detector(s, detector_type=rpeak_method)
+
+    rr_list = np.diff(peak_list) * (1000 / sample_rate)
+    if not remove_ectopic_beat:
+        return rr_list
+    nn_list = get_nn_intervals(rr_list)
+    nn_list_non_na = np.copy(nn_list)
+    nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+    return nn_list_non_na
 

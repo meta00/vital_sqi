@@ -29,7 +29,7 @@ import warnings
 from hrvanalysis import get_time_domain_features, \
     get_frequency_domain_features,  get_nn_intervals, get_csi_cvi_features, \
     get_geometrical_features
-from heartpy.peakdetection import check_peaks, detect_peaks
+import sys,os
 from vital_sqi.common.rpeak_detection import PeakDetector
 
 
@@ -353,9 +353,10 @@ def peak_frequency_sqi(nn_intervals, freqs=None, pows=None, f_min=0.04, f_max=0.
     """
     if freqs is None or pows is None:
         freqs, pows = calculate_psd(nn_intervals)
-    assert len(freqs) != len(pows), \
+    assert len(freqs) == len(pows), \
         "Length of the frequencies and the relevant powers must be the same"
-    f_power = (pows[f_min <= freqs < f_max])
+    # f_power = (pows[f_min <= freqs < f_max])
+    f_power = pows[np.where((f_min <= freqs) & (freqs < f_max))[0]]
     f_peak = f_power[np.argmax(f_power)]
     return f_peak
 
@@ -396,9 +397,9 @@ def absolute_power_sqi(nn_intervals, freqs=None, pows=None, f_min=0.04, f_max=0.
     """
     if freqs is None or pows is None:
         freqs, pows = calculate_psd(nn_intervals)
-    assert len(freqs) != len(pows), \
+    assert len(freqs) == len(pows), \
         "Length of the frequencies and the relevant powers must be the same"
-    filtered_pows = pows[f_min <= freqs < f_max]
+    filtered_pows = pows[np.where((f_min <= freqs) & (freqs < f_max))[0]]
     abs_pow = np.sum(filtered_pows)
     return abs_pow
 
@@ -439,9 +440,9 @@ def log_power_sqi(nn_intervals, freqs=None, pows=None, f_min=0.04, f_max=0.15):
     """
     if freqs is None or pows is None:
         freqs, pows = calculate_psd(nn_intervals)
-    assert len(freqs) != len(pows), \
+    assert len(freqs) == len(pows), \
         "Length of the frequencies and the relevant powers must be the same"
-    filtered_pows = pows[f_min <= freqs < f_max]
+    filtered_pows = pows[np.where((f_min <= freqs) & (freqs < f_max))[0]]
     log_pow = np.sum(np.log(filtered_pows))
     return log_pow
 
@@ -482,9 +483,9 @@ def relative_power_sqi(nn_intervals, freqs=None, pows=None, f_min=0.04, f_max=0.
     """
     if freqs is None or pows is None:
         freqs, pows = calculate_psd(nn_intervals)
-    assert len(freqs) != len(pows), \
+    assert len(freqs) == len(pows), \
         "Length of the frequencies and the relevant powers must be the same"
-    filtered_pows = pows[f_min <= freqs < f_max]
+    filtered_pows = pows[np.where((f_min <= freqs) & (freqs < f_max))[0]]
     relative_pow = np.sum(np.log(filtered_pows))/np.sum(pows)
     return relative_pow
 
@@ -528,13 +529,15 @@ def normalized_power_sqi(nn_intervals, freqs=None, pows=None,
     """
     if freqs is None or pows is None:
         freqs, pows = calculate_psd(nn_intervals)
-    assert len(freqs) != len(pows), \
+    assert len(freqs) == len(pows), \
         "Length of the frequencies and the relevant powers must be the same"
-    lf_filtered_pows = pows[freqs >= lf_min & freqs < lf_max]
-    hf_filtered_pows = pows[freqs >= hf_min & freqs < hf_max]
+    # lf_filtered_pows = pows[freqs >= lf_min & freqs < lf_max]
+    lf_filtered_pows = pows[np.where((freqs >= lf_min) & (freqs < lf_max))[0]]
+    # hf_filtered_pows = pows[freqs >= hf_min & freqs < hf_max]
+    hf_filtered_pows = pows[np.where((freqs >= hf_min) & (freqs < hf_max))[0]]
     lf_power = np.sum(lf_filtered_pows)
     hf_power = np.sum(hf_filtered_pows)
-    return np.linalg.norm(lf_power, hf_power)
+    return np.linalg.norm([lf_power, hf_power])
 
 
 def lf_hf_ratio_sqi(nn_intervals, freqs=None, pows=None,
@@ -576,10 +579,10 @@ def lf_hf_ratio_sqi(nn_intervals, freqs=None, pows=None,
     """
     if freqs is None or pows is None:
         freqs, pows = calculate_psd(nn_intervals)
-    assert len(freqs) != len(pows), \
+    assert len(freqs) == len(pows), \
         "Length of the frequencies and the relevant powers must be the same"
-    lf_filtered_pows = pows[freqs >= lf_min & freqs < lf_max]
-    hf_filtered_pows = pows[freqs >= hf_min & freqs < hf_max]
+    lf_filtered_pows = pows[np.where((freqs >= lf_min) & (freqs < lf_max))[0]]
+    hf_filtered_pows = pows[np.where((freqs >= hf_min) & (freqs < hf_max))[0]]
     ratio = np.sum(lf_filtered_pows)/np.sum(hf_filtered_pows)
     return ratio
 
@@ -620,7 +623,14 @@ def poincare_features_sqi(nn_intervals):
     area = np.pi * sd1 * sd2
     ratio = sd1/sd2
 
-    return sd1, sd2, area, ratio
+    poincare_features_dict = {
+        "poincare_features_sd1_sqi":sd1,
+        "poincare_features_sd2_sqi": sd2,
+        "poincare_features_area_sqi": area,
+        "poincare_features_ratio_sqi": ratio,
+    }
+
+    return poincare_features_dict
 
 
 def get_all_features_hrva(s, sample_rate=100, rpeak_method=0,wave_type='ecg'):
@@ -662,7 +672,11 @@ def get_all_features_hrva(s, sample_rate=100, rpeak_method=0,wave_type='ecg'):
 
     rr_list = np.diff(peak_list) * (1000 / sample_rate)  # 1000 milisecond
 
+    old_stdout = sys.stdout
+    sys.stdout = open(os.devnull, 'w')
     nn_list = get_nn_intervals(rr_list)
+    sys.stdout = old_stdout
+
     nn_list_non_na = np.copy(nn_list)
     nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
 
