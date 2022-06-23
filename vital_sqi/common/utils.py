@@ -3,7 +3,7 @@ import os
 import datetime as dt
 import json
 import pandas as pd
-from pandas.core.dtypes.common import is_numeric_dtype,is_datetime64_any_dtype
+from pandas.core.dtypes.common import is_numeric_dtype
 import dateparser
 
 OPERAND_MAPPING_DICT = {
@@ -13,6 +13,25 @@ OPERAND_MAPPING_DICT = {
     "<=": 2,
     "<": 1
 }
+
+
+def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,
+           remove_ectopic_beat=False):
+
+    if wave_type=='ppg':
+        detector = PeakDetector(wave_type='ppg')
+        peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
+    else:
+        detector = PeakDetector(wave_type='ecg')
+        peak_list, trough_list = detector.ecg_detector(s, detector_type=rpeak_method)
+
+    rr_list = np.diff(peak_list) * (1000 / sample_rate)
+    if not remove_ectopic_beat:
+        return rr_list
+    nn_list = get_nn_intervals(rr_list)
+    nn_list_non_na = np.copy(nn_list)
+    nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+    return nn_list_non_na
 
 
 def check_valid_signal(x):
@@ -381,14 +400,9 @@ def format_milestone(start_milestone, end_milestone):
 def check_signal_format(s):
     assert isinstance(s, pd.DataFrame), 'Expected a pd.DataFrame.'
     assert len(s.columns) is 2, 'Expect a datafram of only two columns.'
-    assert is_datetime64_any_dtype(s.iloc[:, 0]), \
-        'Expected type of the first column to be pd.Timestamp.'
-    assert is_numeric_dtype(s.iloc[:, 1]), \
-        'Expected type of the second column to be numeric'
-    return True
     assert isinstance(s.iloc[0, 0], pd.Timestamp), \
         'Expected type of the first column to be pd.Timestamp.'
-    assert isinstance(s.iloc[0, 1], float), \
+    assert is_numeric_dtype(s.iloc[0, 1]), \
         'Expected type of the second column to be float'
     return True
 

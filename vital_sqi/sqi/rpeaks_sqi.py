@@ -16,7 +16,7 @@ from heartpy.peakdetection import check_peaks
 from hrvanalysis.preprocessing import remove_outliers, remove_ectopic_beats, interpolate_nan_values
 from statsmodels.tsa.stattools import acf
 from vital_sqi.common.rpeak_detection import PeakDetector
-from vital_sqi.pipeline.pipeline_functions import get_nn
+from vital_sqi.common.utils import get_nn
 
 def ectopic_sqi(s, rule_index=1, sample_rate=100, rpeak_detector=0,
                 wave_type='ppg', low_rri=300,

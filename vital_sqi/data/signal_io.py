@@ -398,10 +398,10 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
 # file_out = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
 #                           '/vital_sqi/tests/test_data/out_mit')
 # ECG_writer(out, file_out, file_type='mit', info=out.info)
-out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/ppg_smartcare.csv',
-                timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
-                                                        'SPO2_PCT','PERFUSION_INDEX'],
-                 start_datetime = '2020-04-12 10:00:00')
+# out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/ppg_smartcare.csv',
+#                 timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
+#                                                         'SPO2_PCT','PERFUSION_INDEX'],
+#                  start_datetime = '2020-04-12 10:00:00')
 # out.sampling_rate = 2
 #PPG_writer(out, 'D:/Workspace/oucru/medical_signal/Github/vital_sqi/vital_sqi/dataset/ppg_smartcare_w.csv')
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'

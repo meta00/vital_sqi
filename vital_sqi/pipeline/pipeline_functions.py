@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import vital_sqi.preprocess.preprocess_signal as sqi_pre
 import os
-import  json
+import json
 from tqdm import tqdm
 from hrvanalysis import get_nn_intervals
 from vital_sqi.common.rpeak_detection import PeakDetector
@@ -13,11 +13,9 @@ from vital_sqi.rule import RuleSet, Rule, update_rule
 import inspect
 
 
-
-
 def classify_segments(sqis, rule_dict, ruleset_order):
     rule_list = {}
-    for rule_order,rule_name in ruleset_order.items():
+    for rule_order, rule_name in ruleset_order.items():
         rule = generate_rule(rule_name, rule_dict[rule_name]['def'])
         rule_list[rule_order] = rule
     ruleset = RuleSet(rule_list)
@@ -128,7 +126,7 @@ def get_sqi_dict(sqis, sqi_name):
     if isinstance(sqis, (float, int)):
         return {sqi_name: sqis}
 
-    if isinstance(sqis,numpy.ndarray):
+    if isinstance(sqis, numpy.ndarray):
         if len(sqis.shape) == 0:
             return {sqi_name: -1}
         return {sqi_name: sqis[0]}
@@ -150,13 +148,13 @@ def get_sqi_dict(sqis, sqi_name):
 
 
 def get_sqi(sqi_func, s, per_beat=False,
-            wave_type='ppg',peak_detector=7,
+            wave_type='ppg', peak_detector=7,
             **kwargs):
     signal_arg = inspect.getfullargspec(sqi_func)[0][0]
     if signal_arg == 'nn_intervals':
         s = get_nn(s.iloc[:, 1])
     else:
-        s = s.iloc[:,1]
+        s = s.iloc[:, 1]
     if per_beat:
         # Prepare primary peak detector and perform peak detection
         detector = PeakDetector()
@@ -170,16 +168,16 @@ def get_sqi(sqi_func, s, per_beat=False,
     else:
         if 'wave_type' in inspect.getfullargspec(sqi_func)[0]:
             kwargs['wave_type'] = wave_type
-        sqi_scores = sqi_func(s,**kwargs)
+        sqi_scores = sqi_func(s, **kwargs)
     sqi_name = sqi_func.__name__
-    sqi_score_dict = get_sqi_dict(sqi_scores,sqi_name)
+    sqi_score_dict = get_sqi_dict(sqi_scores, sqi_name)
     return sqi_score_dict
 
 
-def segment_SQI_extraction(sig,sqi_list,sqi_arg_list,wave_type):
+def extract_segment_sqi(s, sqi_list, sqi_arg_list, wave_type):
     """
 
-    :param sig:
+    :param s:
     :param sqi_list: list of sqi as in MASTERDICT
     :param nn_sqi_list: list of sqi using nn_intervals as in 'HRV' MASTER_DICT
     :param nn_sqi_arg_list:
@@ -194,7 +192,7 @@ def segment_SQI_extraction(sig,sqi_list,sqi_arg_list,wave_type):
             args_ = sqi_arg_list[sqi_names[idx]]
             sqi_ = sqi_list[idx]
             args_["wave_type"] = wave_type
-            sqi_score = {**sqi_score, **get_sqi(sqi_, sig, **args_)}
+            sqi_score = {**sqi_score, **get_sqi(sqi_, s, **args_)}
         except Exception as err:
             print(sqi_)
             print(err)
@@ -202,8 +200,7 @@ def segment_SQI_extraction(sig,sqi_list,sqi_arg_list,wave_type):
     return pd.Series(sqi_score)
 
 
-
-def extract_sqi(segments, milestones, sqi_dict_filename,wave_type='ppg'):
+def extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg'):
     sqi_mapping_list = {
         # Standard SQI
         'perfusion_sqi': sq.perfusion_sqi,
@@ -252,25 +249,30 @@ def extract_sqi(segments, milestones, sqi_dict_filename,wave_type='ppg'):
         'poincare_sqi': sq.poincare_features_sqi,
         'hrv_sqi': sq.get_all_features_hrva
     }
-    if sqi_dict_filename == None:
-        arg_path = os.path.join(os.getcwd(),"../resource/sqi_dict.json")
+    assert sqi_dict_filename is not None,  'Expected an sqi_dict json file. ' \
+                                            'Template could be found in ' \
+                                            'vita_sqi/resource.'
+    assert segments is not None, 'Expected a list of segments.'
+    assert milestones is not None, 'Expected milestones of split segments.'
+
+    arg_path = sqi_dict_filename
     with open(arg_path, 'r') as arg_file:
         sqi_dict = json.loads(arg_file.read())
     sqi_list = []
     sqi_arg_list = {}
-    for item_key,item_value in sqi_dict.items():
+    for item_key, item_value in sqi_dict.items():
         # sqi_name, sqi_arg
         sqi_list.append(sqi_mapping_list[item_value['sqi']])
         sqi_arg_list[item_key] = item_value['args']
     df_sqi = pd.DataFrame()
     for segment_idx in tqdm(range(len(segments))):
         segment = segments[segment_idx]
-        sqi_arg_list['perfusion_sqi'] = {'y':segment.iloc[:,1]}
-        sqis = segment_SQI_extraction(segment, sqi_list,sqi_arg_list,wave_type)
+        sqi_arg_list['perfusion_sqi'] = {'y':segment.iloc[:, 1]}
+        sqis = extract_segment_sqi(segment, sqi_list,sqi_arg_list,wave_type)
         # segment_name_list = file_name.split("/")[-1] + "_" +str(segment_idx)
         # sqis['id'] = segment_name_list
         df_sqi = df_sqi.append(sqis, ignore_index=True)
-    df_sqi['start_idx'] = milestones.iloc[:,0]
+    df_sqi['start_idx'] = milestones.iloc[:, 0]
     df_sqi['end_idx'] = milestones.iloc[:, 1]
     return df_sqi
 
@@ -280,23 +282,5 @@ def generate_rule(rule_name, rule_def):
     rule_detail = {'def': rule_def,
                      'boundaries': boundaries,
                      'labels': label_list}
-    rule = Rule(rule_name,rule_detail)
+    rule = Rule(rule_name, rule_detail)
     return rule
-
-
-def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,remove_ectopic_beat=False):
-
-    if wave_type=='ppg':
-        detector = PeakDetector(wave_type='ppg')
-        peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
-    else:
-        detector = PeakDetector(wave_type='ecg')
-        peak_list, trough_list = detector.ecg_detector(s, detector_type=rpeak_method)
-
-    rr_list = np.diff(peak_list) * (1000 / sample_rate)
-    if not remove_ectopic_beat:
-        return rr_list
-    nn_list = get_nn_intervals(rr_list)
-    nn_list_non_na = np.copy(nn_list)
-    nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
-    return nn_list_non_na

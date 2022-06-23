@@ -1,15 +1,13 @@
 import vital_sqi
-from sklearn.metrics import auc,brier_score_loss,f1_score,roc_auc_score,fbeta_score,jaccard_score,hamming_loss
-import numpy as np
-import vital_sqi.sqi as sq
-from vital_sqi.data import *
-from vital_sqi.preprocess.segment_split import split_segment
+# from sklearn.metrics import auc,brier_score_loss,f1_score,roc_auc_score,fbeta_score,jaccard_score,hamming_loss
+# import numpy as np
+# import vital_sqi.sqi as sq
+from vital_sqi.data.signal_io import PPG_reader, ECG_reader
+from vital_sqi.preprocess.segment_split import split_segment, save_segment
 from vital_sqi.pipeline.pipeline_functions import *
-import json
+# import json
 import os
 import pandas as pd
-
-from vital_sqi.data.signal_io import PPG_reader
 
 # D:\Workspace\oucru\classification_sqi
 
@@ -24,8 +22,10 @@ from vital_sqi.data.signal_io import PPG_reader
 # ng_1_files = [".".join(x.split(".")[:-1])+".csv" for x in next(os.walk(NG_1_FOLDER), (None, None, []))[2]]
 # ng_2_files = [".".join(x.split(".")[:-1])+".csv" for x in next(os.walk(NG_2_FOLDER), (None, None, []))[2]]
 
-def get_ppg_sqis(file_name, signal_idx, timestamp_idx,sqi_dict,info_idx=[],
-                 timestamp_unit='ms',sampling_rate=100, start_datetime=None,
+
+def get_ppg_sqis(file_name, signal_idx, timestamp_idx, sqi_dict_filename,
+                 info_idx=[],
+                 timestamp_unit='ms', sampling_rate=None, start_datetime=None,
                  split_type=0, duration=30, overlapping=None, peak_detector=7):
     """This function takes input signal, computes a number of SQIs, and outputs
     a table (row - signal segments, column SQI values.
@@ -88,12 +88,19 @@ def get_ppg_sqis(file_name, signal_idx, timestamp_idx,sqi_dict,info_idx=[],
                                     peak_detector=peak_detector,
                                     wave_type='ppg')
     signal_obj.signals = pd.DataFrame()
-    signal_obj.sqis = extract_sqi(segments, milestones, sqi_dict,wave_type='ppg')
-    # signal_obj.sqis = extract_sqi(segments, sqi_dict,file_name,None)
+    signal_obj.sqis = extract_sqi(segments, milestones, sqi_dict_filename,
+                                  wave_type='ppg')
     return segments, signal_obj
 
+# file_in = os.path.abspath('../../tests/test_data/ppg_smartcare.csv')
+#
+#
+# segments, signal_sqi_obj = get_ppg_sqis(file_in,
+# 												timestamp_idx=['TIMESTAMP_MS'],
+# 												signal_idx=['PLETH'])
 
-def get_qualified_ppg(file_name, sqi_dict, signal_idx, timestamp_idx,
+
+def get_qualified_ppg(file_name, sqi_dict_filename, signal_idx, timestamp_idx,
                       rule_dict, ruleset_order,
                       predefined_reject=False, info_idx=[],
                       timestamp_unit='ms', sampling_rate=None,
@@ -124,7 +131,7 @@ def get_qualified_ppg(file_name, sqi_dict, signal_idx, timestamp_idx,
     ----------
     file_name :
         
-    sqi_dict :
+    sqi_dict_filename :
         
     signal_idx :
         
@@ -164,7 +171,7 @@ def get_qualified_ppg(file_name, sqi_dict, signal_idx, timestamp_idx,
 
     """
     assert(os.path.exists(output_dir)) is True
-    segments, signal_obj = get_ppg_sqis(file_name, sqi_dict, signal_idx,
+    segments, signal_obj = get_ppg_sqis(file_name, sqi_dict_filename, signal_idx,
                                         timestamp_idx, info_idx,
                                         timestamp_unit, sampling_rate,
                                         start_datetime, split_type, duration,
@@ -199,7 +206,7 @@ def get_qualified_ppg(file_name, sqi_dict, signal_idx, timestamp_idx,
     return signal_obj
 
 
-def get_ecg_sqis(file_name, sqi_dict, file_type, channel_num=None,
+def get_ecg_sqis(file_name, sqi_dict_filename, file_type, channel_num=None,
                  channel_name=None, sampling_rate=None, start_datetime=None,
                  split_type=0, duration=30, overlapping=None, peak_detector=7):
     """multiple channels ecgs: signals  = df multiple columns
@@ -212,7 +219,7 @@ def get_ecg_sqis(file_name, sqi_dict, file_type, channel_num=None,
     ----------
     file_name :
         
-    sqi_dict :
+    sqi_dict_filename :
         
     file_type :
         
@@ -258,11 +265,11 @@ def get_ecg_sqis(file_name, sqi_dict, file_type, channel_num=None,
     signal_obj.signals = None
     signal_obj.sqis = []
     for i in range(0, len(segments_lst)):
-        signal_obj.sqis.append(extract_sqi(segments, milestones, sqi_dict))
+        signal_obj.sqis.append(extract_sqi(segments, milestones, sqi_dict_filename))
     return segments_lst, signal_obj
 
 
-def get_qualified_ecg(file_name, file_type, sqi_dict, ruleset_order, rule_dict,
+def get_qualified_ecg(file_name, file_type, sqi_dict_filename, ruleset_order, rule_dict,
                       channel_num=None, channel_name=None,
                       predefined_reject=False,
                       sampling_rate=None, start_datetime=None, split_type=0,
@@ -281,7 +288,7 @@ def get_qualified_ecg(file_name, file_type, sqi_dict, ruleset_order, rule_dict,
         
     file_type :
         
-    sqi_dict :
+    sqi_dict_filename :
         
     ruleset_order :
         
@@ -318,7 +325,7 @@ def get_qualified_ecg(file_name, file_type, sqi_dict, ruleset_order, rule_dict,
     
     """
     assert(os.path.exists(output_dir)) is True
-    segment_lst, signal_obj = get_ecg_sqis(file_name, sqi_dict, file_type,
+    segment_lst, signal_obj = get_ecg_sqis(file_name, sqi_dict_filename, file_type,
                                            channel_num, channel_name,
                                            sampling_rate, start_datetime,
                                            split_type, duration, overlapping,
@@ -365,23 +372,5 @@ def signal_preprocess():
 def write_ecg():
     """ """
     return
-
-
-file_name = "../../tests/test_data/ppg_smartcare.csv"
-json_rule_file_name = "../resource/rule_dict.json"
-with open(json_rule_file_name) as rule_file:
-    json_rule_dict = json.loads(rule_file.read())
-rule_set_order={
-    2:'sdsd_sqi',
-    1:'sdnn_sqi'
-}
-
-get_qualified_ppg(file_name,timestamp_idx = ['TIMESTAMP_MS'],
-                                    signal_idx = ['PLETH'],
-                                    sqi_dict=None,
-                                    rule_dict=json_rule_dict,
-                                    ruleset_order = rule_set_order
-                                    )
-                                    # info_idx = ['PULSE_BPM','SPO2_PCT','PERFUSION_INDEX'])
 
 
