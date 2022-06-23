@@ -92,13 +92,6 @@ def get_ppg_sqis(file_name, signal_idx, timestamp_idx, sqi_dict_filename,
                                   wave_type='ppg')
     return segments, signal_obj
 
-# file_in = os.path.abspath('../../tests/test_data/ppg_smartcare.csv')
-#
-#
-# segments, signal_sqi_obj = get_ppg_sqis(file_in,
-# 												timestamp_idx=['TIMESTAMP_MS'],
-# 												signal_idx=['PLETH'])
-
 
 def get_qualified_ppg(file_name, sqi_dict_filename, signal_idx, timestamp_idx,
                       rule_dict, ruleset_order,
@@ -256,18 +249,24 @@ def get_ecg_sqis(file_name, sqi_dict_filename, file_type, channel_num=None,
     for i in range(1, len(signal_obj.signals.columns) - 1):
         signals = signal_obj.signals.iloc[:, [0, i]]
         segments, milestones = split_segment(signals, split_type=split_type,
+                                             sampling_rate=
+                                             signal_obj.sampling_rate,
                                              duration=duration,
                                              overlapping=overlapping,
                                              peak_detector=peak_detector,
                                              wave_type='ecg')
         segments_lst.append(segments)
         milestones_lst.append(milestones)
-    signal_obj.signals = None
+    signal_obj.signals = pd.DataFrame()
     signal_obj.sqis = []
     for i in range(0, len(segments_lst)):
         signal_obj.sqis.append(extract_sqi(segments, milestones, sqi_dict_filename))
     return segments_lst, signal_obj
 
+
+# file_in = os.path.abspath('../../tests/test_data/example.edf')
+# sqi_dict = os.path.abspath('../../tests/test_data/sqi_dict.json')
+# segments, signal_sqi_obj = get_ecg_sqis(file_in, sqi_dict, 'edf')
 
 def get_qualified_ecg(file_name, file_type, sqi_dict_filename, ruleset_order, rule_dict,
                       channel_num=None, channel_name=None,
