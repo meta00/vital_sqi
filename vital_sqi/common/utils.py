@@ -4,6 +4,8 @@ import datetime as dt
 import json
 import pandas as pd
 from pandas.core.dtypes.common import is_numeric_dtype
+from vital_sqi.common.rpeak_detection import PeakDetector
+from hrvanalysis import get_nn_intervals
 import dateparser
 
 OPERAND_MAPPING_DICT = {
@@ -192,12 +194,6 @@ def parse_datetime(string, type='datetime'):
         raise ValueError('Datetime string must be of standard Python format '
                          '(https://docs.python.org/3/library/time.html), '
                          'e.g., `%d-%m-%Y`, eg. `24-01-2020`')
-
-
-def get_moving_average(q, w):
-    q_padded = np.pad(q, (w // 2, w - 1 - w // 2), mode='edge')
-    convole = np.convolve(q_padded, np.ones(w) / w, 'valid')
-    return convole
 
 
 def parse_rule(name, source):

@@ -9,7 +9,6 @@ from scipy import signal
 
 from vital_sqi.common.band_filter import BandpassFilter
 from vital_sqi.common.generate_template import ecg_dynamic_template
-from vital_sqi.common.utils import get_moving_average
 import warnings
 from ecgdetectors import Detectors, panPeakDetect
 
@@ -28,6 +27,12 @@ SWT = 4
 MVA = 5
 MTEMP = 6
 PAN_TOMPKINS = 7
+
+
+def get_moving_average(q, w):
+    q_padded = np.pad(q, (w // 2, w - 1 - w // 2), mode='edge')
+    convole = np.convolve(q_padded, np.ones(w) / w, 'valid')
+    return convole
 
 
 class PeakDetector:

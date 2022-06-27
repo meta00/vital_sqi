@@ -5,7 +5,7 @@ import vital_sqi.preprocess.preprocess_signal as sqi_pre
 import os
 import json
 from tqdm import tqdm
-from hrvanalysis import get_nn_intervals
+
 from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
 from vital_sqi.common.utils import create_rule_def
