@@ -10,10 +10,13 @@ from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
 from vital_sqi.common.utils import create_rule_def
 from vital_sqi.rule import RuleSet, Rule, update_rule
+from vital_sqi.common.utils import get_nn
 import inspect
 
 
-def classify_segments(sqis, rule_dict, ruleset_order):
+def classify_segments(sqis, rule_dict_filename, ruleset_order):
+    with open(rule_dict_filename) as rule_file:
+        rule_dict = json.loads(rule_file.read())
     rule_list = {}
     for rule_order, rule_name in ruleset_order.items():
         rule = generate_rule(rule_name, rule_dict[rule_name]['def'])
@@ -32,9 +35,9 @@ def classify_segments(sqis, rule_dict, ruleset_order):
 # Khoa
 def get_reject_segments(segments, wave_type, milestones=None, info=None):
     if wave_type == 'ppg':
-        out = pd.Series()
+        out = pd.Series(['accept']*len(segments))
     if wave_type == 'ecg':
-        out = pd.Series()
+        out = pd.Series(['accept']*len(segments))
     return out
 
 
@@ -46,10 +49,11 @@ def map_decision(i):
 
 
 def get_decision_segments(segments, decision, reject_decision):
-    decision = map(map_decision, decision)
-    reject_decision = map(map_decision, reject_decision)
-    decision = [a + b for a, b in zip(decision + reject_decision)]
-    a_segments, r_segments = []
+    decision = list(map(map_decision,decision))
+    reject_decision = list(map(map_decision, reject_decision))
+    decision = [a + b for a, b in zip(decision,reject_decision)]
+    a_segments= []
+    r_segments = []
     for i in decision:
         if decision[i] == 0:
             a_segments.append(segments[i])
@@ -194,6 +198,7 @@ def extract_segment_sqi(s, sqi_list, sqi_arg_list, wave_type):
             args_["wave_type"] = wave_type
             sqi_score = {**sqi_score, **get_sqi(sqi_, s, **args_)}
         except Exception as err:
+            print('Error')
             print(sqi_)
             print(err)
             continue

@@ -6,7 +6,7 @@ Implementation of SQIs for waveform:
 """
 import scipy.signal as sn
 import numpy as np
-from vital_sqi.common.rpeak_detection import *
+from vital_sqi.common.rpeak_detection import PeakDetector
 from vital_sqi.common.utils import *
 
 
