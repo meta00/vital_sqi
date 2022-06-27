@@ -23,12 +23,16 @@ def classify_segments(sqis, rule_dict_filename, ruleset_order):
         rule_list[rule_order] = rule
     ruleset = RuleSet(rule_list)
     selected_sqi = list(ruleset_order.values())
-    decision_list = []
-    for idx in range(len(sqis)):
-        row_data = pd.DataFrame(dict(sqis[selected_sqi].iloc[idx]), index=[0])
-        decision_list.append(ruleset.execute(row_data))
+    for i in range(len(sqis)):
+        sqi_df = sqis[i]
+        decision_list = []
+        for idx in range(len(sqi_df)):
+            row_data = pd.DataFrame(dict(sqi_df[selected_sqi].iloc[idx]),
+                                    index=[0])
+            decision_list.append(ruleset.execute(row_data))
+        sqi_df['decision'] = decision_list
+        sqis[i] = sqi_df
 
-    sqis['decision'] = decision_list
     return rule_list, sqis
 
 

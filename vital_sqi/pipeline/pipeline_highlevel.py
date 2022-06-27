@@ -90,8 +90,9 @@ def get_ppg_sqis(file_name, signal_idx, timestamp_idx, sqi_dict_filename,
                                     peak_detector=peak_detector,
                                     wave_type='ppg')
     signal_obj.signals = pd.DataFrame()
-    signal_obj.sqis = extract_sqi(segments, milestones, sqi_dict_filename,
-                                  wave_type='ppg')
+    sqi_lst = [
+        extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg')]
+    signal_obj.sqis = sqi_lst
     return segments, signal_obj
 
 
@@ -176,14 +177,14 @@ def get_qualified_ppg(file_name, sqi_dict_filename, signal_idx, timestamp_idx,
                                                             rule_dict_filename,
                                                             ruleset_order)
     if predefined_reject is True:
-        milestones = signal_obj.sqis.iloc['start', 'end']
+        milestones = signal_obj.sqis[0].iloc['start', 'end']
         reject_decision = get_reject_segments(segments, wave_type='ppg',
                                               milestones=milestones,
                                               info=signal_obj.info)
     else:
-        reject_decision = ['accept']*len(signal_obj.sqis)
+        reject_decision = ['accept']*len(signal_obj.sqis[0])
     a_segments, r_segments = get_decision_segments(segments,
-                                        signal_obj.sqis['decision'],
+                                        signal_obj.sqis[0]['decision'],
                                         reject_decision)
     if save_image:
         os.makedirs(os.path.join(output_dir, 'accept', 'img'),exist_ok=True)
@@ -200,24 +201,6 @@ def get_qualified_ppg(file_name, sqi_dict_filename, signal_idx, timestamp_idx,
                  save_image=save_image,
                  save_img_folder=os.path.join(output_dir, 'reject', 'img'))
     return signal_obj
-
-import tempfile
-file_in = os.path.abspath('../../tests/test_data/ppg_smartcare.csv')
-sqi_dict = os.path.abspath('../../tests/test_data/sqi_dict.json')
-rule_dict_filename = os.path.abspath(
-    '../../tests/test_data/rule_dict_test.json')
-ruleset_order = {3: 'skewness_sqi',
-						2: 'kurtosis_sqi',
-						1: 'perfusion_sqi'}
-timestamp_idx = ['TIMESTAMP_MS']
-signal_idx = ['PLETH']
-output_dir = tempfile.gettempdir()
-signal_obj = get_qualified_ppg(file_in, sqi_dict_filename=sqi_dict, signal_idx=signal_idx,
-									timestamp_idx=timestamp_idx,
-									rule_dict_filename=rule_dict_filename,
-									ruleset_order=ruleset_order,
-									output_dir=output_dir,
-									save_image=True)
 
 
 def get_ecg_sqis(file_name, sqi_dict_filename, file_type, channel_num=None,
@@ -267,7 +250,7 @@ def get_ecg_sqis(file_name, sqi_dict_filename, file_type, channel_num=None,
 
     segments_lst = []
     milestones_lst = []
-    for i in range(1, len(signal_obj.signals.columns) - 1):
+    for i in range(1, len(signal_obj.signals.columns)):
         signals = signal_obj.signals.iloc[:, [0, i]]
         segments, milestones = split_segment(signals, split_type=split_type,
                                              sampling_rate=
@@ -284,10 +267,6 @@ def get_ecg_sqis(file_name, sqi_dict_filename, file_type, channel_num=None,
         signal_obj.sqis.append(extract_sqi(segments, milestones, sqi_dict_filename))
     return segments_lst, signal_obj
 
-
-# file_in = os.path.abspath('../../tests/test_data/example.edf')
-# sqi_dict = os.path.abspath('../../tests/test_data/sqi_dict.json')
-# segments, signal_sqi_obj = get_ecg_sqis(file_in, sqi_dict, 'edf')
 
 def get_qualified_ecg(file_name, file_type, sqi_dict_filename,
                       rule_dict_filename, ruleset_order,
@@ -354,16 +333,16 @@ def get_qualified_ecg(file_name, file_type, sqi_dict_filename,
     sqi_lst = []
     for i in range(0, len(segment_lst)):
         signal_obj.ruleset, sqis = classify_segments(signal_obj.sqis,
-                                                     rule_dict_filename, ruleset_order)
+                                                     rule_dict_filename,
+                                                     ruleset_order)
         if predefined_reject is True:
             reject_decision = get_reject_segments(segment_lst[i],
                                                   wave_type='ecg')
         else:
             reject_decision = []
         a_segments, r_segments = get_decision_segments(segment_lst[i],
-                                                sqis.iloc[:, 'decision'],
+                                                sqis[i].loc[:, 'decision'],
                                                 reject_decision)
-        sqi_lst.append(sqis)
         if save_image:
             os.makedirs(os.path.join(output_dir, str(i), 'accept', 'img'))
             os.makedirs(os.path.join(output_dir, str(i), 'reject', 'img'))
@@ -382,8 +361,29 @@ def get_qualified_ecg(file_name, file_type, sqi_dict_filename,
                      save_image=save_image,
                      save_img_folder=os.path.join(output_dir, str(i),
                                                   'reject', 'img'))
+    signal_obj.sqis = sqi_lst
     return signal_obj
 
+
+import tempfile
+file_in = os.path.abspath('../../tests/test_data/example.edf')
+sqi_dict = os.path.abspath('../../tests/test_data/sqi_dict.json')
+rule_dict_filename = os.path.abspath(
+    '../../tests/test_data/rule_dict_test.json')
+ruleset_order = {3: 'skewness_sqi',
+                  2: 'kurtosis_sqi',
+                  1: 'perfusion_sqi'}
+timestamp_idx = ['TIMESTAMP_MS']
+signal_idx = ['PLETH']
+output_dir = tempfile.gettempdir()
+signal_obj = get_qualified_ecg(file_name=file_in,
+									sqi_dict_filename=sqi_dict,
+									file_type='edf', duration=30,
+						 			rule_dict_filename=rule_dict_filename,
+									ruleset_order=ruleset_order,
+									output_dir=output_dir)
+
+print(signal_obj)
 
 def signal_preprocess():
     """ """
