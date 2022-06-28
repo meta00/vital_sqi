@@ -659,7 +659,7 @@ def get_all_features_hrva(s, sample_rate=100, rpeak_method=0,wave_type='ecg'):
     #     peaks_wd = detect_peaks(data_sample, rol_mean, ma_perc=20,
     #                             sample_rate=100.0)
     #     peak_list = peaks_wd["peaklist"]
-    if wave_type=='ppg':
+    if wave_type =='ppg':
         detector = PeakDetector(wave_type='ppg')
         peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
     else:

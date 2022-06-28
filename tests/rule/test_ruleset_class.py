@@ -4,9 +4,9 @@ import os
 
 
 class TestRuleSet(object):
-    r1 = Rule("sqi1")
-    r2 = Rule("sqi2")
-    r3 = Rule("sqi3")
+    r1 = Rule("perfusion_sqi")
+    r2 = Rule("kurtosis_sqi")
+    r3 = Rule("skewness_sqi")
     source = os.path.abspath('tests/test_data/rule_dict_test.json')
     r1.load_def(source)
     r2.load_def(source)
@@ -39,24 +39,31 @@ class TestRuleSet(object):
         assert exc_info.match('Order must start with 1')
 
     def test_on_export(self):
-        assert isinstance(self.s.export_rules(),str)
+        assert isinstance(self.s.export_rules(), str)
 
     def test_on_execute(self):
-        dat = pd.DataFrame([[6, 100, 0]], columns = ['sqi1', 'sqi2', 'sqi3'])
+        dat = pd.DataFrame([[6, 100, 1]], columns=['perfusion_sqi',
+                                                   'kurtosis_sqi',
+                                                   'skewness_sqi'])
         assert self.s.execute(dat) == 'accept'
-        dat = pd.DataFrame([[10, 100, 0]], columns = ['sqi1', 'sqi2', 'sqi3'])
+        dat = pd.DataFrame([[10, 100, 0]], columns=['perfusion_sqi',
+                                                    'kurtosis_sqi',
+                                                    'skewness_sqi'])
         assert self.s.execute(dat) == 'reject'
         with pytest.raises(AssertionError) as exc_info:
             self.s.execute([])
         assert exc_info.match('Expected data frame')
         with pytest.raises(AssertionError) as exc_info:
             dat = [[6, 1, 1], [1, 100, 3], [0, 0, 0]]
-            dat = pd.DataFrame(dat, columns = ['sqi1', 'sqi2', 'sqi3'])
+            dat = pd.DataFrame(dat, columns=['perfusion_sqi',
+                                             'kurtosis_sqi',
+                                             'skewness_sqi'])
             self.s.execute(dat)
         assert exc_info.match('Expected data frame of 1 row')
         with pytest.raises(KeyError) as exc_info:
-            dat = pd.DataFrame([[6, 100, 0]], columns = ['sqi1', 'sqi2',
-                                                         'sqi4'])
+            dat = pd.DataFrame([[6, 100, 1]], columns=['perfusion_sqi',
+                                                       'kurtosis_sqi',
+                                                       'sqi4'])
             self.s.execute(dat)
         assert exc_info.match('not found in input data frame')
 

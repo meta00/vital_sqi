@@ -1,6 +1,6 @@
 {
-"sqi1": {
-  "name": "sqi1",
+"perfusion_sqi": {
+  "name": "perfusion_sqi",
   "def": [
       {"op": ">=", "value": "10", "label": "reject"},
       {"op": ">=", "value": "3", "label": "accept"},
@@ -8,19 +8,19 @@
   "desc": "",
   "ref": ""
   },
-"sqi2": {
-   "name": "sqi2",
+"kurtosis_sqi": {
+   "name": "kurtosis_sqi",
    "def": [
       {"op": ">", "value": "0", "label": "accept"},
       {"op": "<=", "value": "0", "label": "reject"}],
    "desc": "",
    "ref": ""
   },
-"sqi3": {
-   "name": "sqi3",
+"skewness_sqi": {
+   "name": "skewness_sqi",
    "def": [
-      {"op": "=", "value": "0", "label": "accept"},
-      {"op": ">", "value": "0", "label": "reject"},
+      {"op": "=", "value": "0", "label": "reject"},
+      {"op": ">", "value": "0", "label": "accept"},
       {"op": "<", "value": "0", "label": "reject"}],
    "desc": "",
    "ref": ""

@@ -38,7 +38,8 @@ def save_segment(segment_list, segment_name=None, save_file_folder=None,
     
     """
     assert isinstance(segment_list, list), 'Expected a list of signal segments.'
-    assert isinstance(segment_name, str), 'Expected a string.'
+    assert isinstance(segment_name, str)  or (segment_name is None), \
+        'Expected a string.'
 
     if save_file_folder is None:
         save_file_folder = os.getcwd()
