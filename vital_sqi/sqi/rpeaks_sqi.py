@@ -18,6 +18,7 @@ from statsmodels.tsa.stattools import acf
 from vital_sqi.common.rpeak_detection import PeakDetector
 from vital_sqi.common.utils import get_nn
 
+
 def ectopic_sqi(s, rule_index=1, sample_rate=100, rpeak_detector=0,
                 wave_type='ppg', low_rri=300,
                 high_rri=2000, ):
