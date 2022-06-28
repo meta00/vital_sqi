@@ -42,7 +42,7 @@ class TestRuleSet(object):
         assert isinstance(self.s.export_rules(), str)
 
     def test_on_execute(self):
-        dat = pd.DataFrame([[6, 100, 0]], columns=['perfusion_sqi',
+        dat = pd.DataFrame([[6, 100, 1]], columns=['perfusion_sqi',
                                                    'kurtosis_sqi',
                                                    'skewness_sqi'])
         assert self.s.execute(dat) == 'accept'
@@ -61,7 +61,7 @@ class TestRuleSet(object):
             self.s.execute(dat)
         assert exc_info.match('Expected data frame of 1 row')
         with pytest.raises(KeyError) as exc_info:
-            dat = pd.DataFrame([[6, 100, 0]], columns=['perfusion_sqi',
+            dat = pd.DataFrame([[6, 100, 1]], columns=['perfusion_sqi',
                                                        'kurtosis_sqi',
                                                        'sqi4'])
             self.s.execute(dat)
