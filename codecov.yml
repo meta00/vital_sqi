@@ -18,5 +18,8 @@ coverage:
     patch:
       default:
         target: 0%  # new contributions should have a coverage at least equal to target:
+    ignore:
+      - "vital_sqi/app"
  comment:
   after_n_builds: 3
+ 
