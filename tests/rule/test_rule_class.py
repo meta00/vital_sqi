@@ -30,7 +30,7 @@ class TestRuleClass(object):
         assert exc_info.match('containing only letter, number')
 
     def test_on_load(self):
-        out = Rule('perfusion')
+        out = Rule('perfusion_sqi')
         source = os.path.abspath('tests/test_data/rule_dict_test.json')
         out.load_def(source)
         assert isinstance(out.rule['def'], list) is True
@@ -73,15 +73,15 @@ class TestRuleClass(object):
 
     def test_on_apply_rule(self):
         out = Rule('test_sqi')
-        out.update_def(op_list = ["<=", ">", '<', ">="],
-                       value_list = [3, 3, 10, 10],
-                       label_list = ["reject", "accept", "accept", "reject"])
+        out.update_def(op_list=["<=", ">", '<', ">="],
+                       value_list=[3, 3, 10, 10],
+                       label_list=["reject", "accept", "accept", "reject"])
         assert out.apply_rule(11) == 'reject'
         assert out.apply_rule(10) == 'reject'
         assert out.apply_rule(3) == 'reject'
 
     def test_on_save(self):
-        rule_obj = Rule('perfusion')
+        rule_obj = Rule('perfusion_sqi')
         source = os.path.abspath('tests/test_data/rule_dict_test.json')
         rule_obj.load_def(source)
         file_out = tempfile.gettempdir() + '/rule_dict.json'
