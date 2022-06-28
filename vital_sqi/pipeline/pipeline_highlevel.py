@@ -187,11 +187,11 @@ def get_qualified_ppg(file_name, sqi_dict_filename, signal_idx, timestamp_idx,
                                         signal_obj.sqis[0]['decision'],
                                         reject_decision)
     if save_image:
-        os.makedirs(os.path.join(output_dir, 'accept', 'img'),exist_ok=True)
-        os.makedirs(os.path.join(output_dir, 'reject', 'img'),exist_ok=True)
+        os.makedirs(os.path.join(output_dir, 'accept', 'img'), exist_ok=True)
+        os.makedirs(os.path.join(output_dir, 'reject', 'img'), exist_ok=True)
     else:
-        os.makedirs(os.path.join(output_dir, 'accept'),exist_ok=True)
-        os.makedirs(os.path.join(output_dir, 'reject'),exist_ok=True)
+        os.makedirs(os.path.join(output_dir, 'accept'), exist_ok=True)
+        os.makedirs(os.path.join(output_dir, 'reject'), exist_ok=True)
     save_segment(a_segments, segment_name=segment_name,
                  save_file_folder=os.path.join(output_dir, 'accept'),
                  save_image=save_image,
@@ -344,11 +344,15 @@ def get_qualified_ecg(file_name, file_type, sqi_dict_filename,
                                                 sqis[i].loc[:, 'decision'],
                                                 reject_decision)
         if save_image:
-            os.makedirs(os.path.join(output_dir, str(i), 'accept', 'img'))
-            os.makedirs(os.path.join(output_dir, str(i), 'reject', 'img'))
+            os.makedirs(os.path.join(output_dir, str(i), 'accept', 'img'),
+                        exist_ok=True)
+            os.makedirs(os.path.join(output_dir, str(i), 'reject', 'img'),
+                        exist_ok=True)
         else:
-            os.makedirs(os.path.join(output_dir, str(i), 'accept'))
-            os.makedirs(os.path.join(output_dir, str(i), 'reject'))
+            os.makedirs(os.path.join(output_dir, str(i), 'accept'),
+                        exist_ok=True)
+            os.makedirs(os.path.join(output_dir, str(i), 'reject'),
+                        exist_ok=True)
         save_segment(a_segments, segment_name=segment_name,
                      save_file_folder=os.path.join(output_dir, str(i),
                                                    'accept'),
@@ -364,26 +368,6 @@ def get_qualified_ecg(file_name, file_type, sqi_dict_filename,
     signal_obj.sqis = sqi_lst
     return signal_obj
 
-
-import tempfile
-file_in = os.path.abspath('../../tests/test_data/example.edf')
-sqi_dict = os.path.abspath('../../tests/test_data/sqi_dict.json')
-rule_dict_filename = os.path.abspath(
-    '../../tests/test_data/rule_dict_test.json')
-ruleset_order = {3: 'skewness_sqi',
-                  2: 'kurtosis_sqi',
-                  1: 'perfusion_sqi'}
-timestamp_idx = ['TIMESTAMP_MS']
-signal_idx = ['PLETH']
-output_dir = tempfile.gettempdir()
-signal_obj = get_qualified_ecg(file_name=file_in,
-									sqi_dict_filename=sqi_dict,
-									file_type='edf', duration=30,
-						 			rule_dict_filename=rule_dict_filename,
-									ruleset_order=ruleset_order,
-									output_dir=output_dir)
-
-print(signal_obj)
 
 def signal_preprocess():
     """ """
