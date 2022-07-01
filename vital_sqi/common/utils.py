@@ -3,7 +3,7 @@ import os
 import datetime as dt
 import json
 import pandas as pd
-from pandas.core.dtypes.common import is_numeric_dtype
+from pandas.core.dtypes.common import is_number
 from vital_sqi.common.rpeak_detection import PeakDetector
 from hrvanalysis import get_nn_intervals
 import dateparser
@@ -398,7 +398,7 @@ def check_signal_format(s):
     assert len(s.columns) is 2, 'Expect a datafram of only two columns.'
     assert isinstance(s.iloc[0, 0], pd.Timestamp), \
         'Expected type of the first column to be pd.Timestamp.'
-    assert is_numeric_dtype(s.iloc[0, 1]), \
+    assert is_number(s.iloc[0, 1]), \
         'Expected type of the second column to be float'
     return True
 

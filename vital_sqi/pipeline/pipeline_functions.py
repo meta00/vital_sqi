@@ -2,19 +2,45 @@ import numpy
 import numpy as np
 import pandas as pd
 import vital_sqi.preprocess.preprocess_signal as sqi_pre
-import os
 import json
 from tqdm import tqdm
 
 from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
-from vital_sqi.common.utils import create_rule_def
 from vital_sqi.rule import RuleSet, Rule, update_rule
 from vital_sqi.common.utils import get_nn
 import inspect
 
 
 def classify_segments(sqis, rule_dict_filename, ruleset_order):
+    """
+    Get the output decision of each segment (accept or reject)
+    by evaluating the threshold of the selected rules
+    with the sqi scores from the sqis dataframe
+    Parameters
+    ----------
+    sqis : DataFrame
+        A nxm table contains the list of sqis of each segment.
+        n is the number of segment
+        m is the number of sqi
+
+    rule_dict_filename : string
+        Path to the json file that define the threshold  of sqis
+        Sample format of the json file can be found at 'vital_sqi/resource/rule_dict.json'
+
+    ruleset_order : dict
+        a dictionary specifies the order of the selected rules.
+        The key indicates the order of that rule
+        The value map with the rule name as defines in 'rule_dict_filename' json
+
+    Returns
+    -------
+    rule_list : dict
+        A dictionary contains the rule-name as the key and the rule object as the value
+    sqis: DataFrame
+        The same sqis table with 1 extended column indicates the decision ('accept' or 'reject')
+         of each segment
+    """
     with open(rule_dict_filename) as rule_file:
         rule_dict = json.loads(rule_file.read())
     rule_list = {}
@@ -36,8 +62,33 @@ def classify_segments(sqis, rule_dict_filename, ruleset_order):
     return rule_list, sqis
 
 
-# Khoa
-def get_reject_segments(segments, wave_type, milestones=None, info=None):
+def get_reject_segments(segments, wave_type, milestones=None, info=None, dict=None):
+    """
+    Handy function to eliminate any invalid signals by other criteria besides SQI
+
+    Parameters
+    ----------
+    segments : list
+        The list of signal (in dataframe)
+
+    wave_type : str
+        Either 'ppg' or 'ecg'
+
+    milestones : list
+        The start indices and end indices of each segment.
+         (Default value = None)
+    info : list
+        The list of criteria column to reject invalid signal
+         (Default value = None)
+
+    dict : dict
+        The dictionary map the info column with rejected threshold
+
+    Returns
+    -------
+    out : Series
+        A Series with accept/reject decision
+    """
     if wave_type == 'ppg':
         out = pd.Series(['accept']*len(segments))
     if wave_type == 'ecg':
@@ -46,6 +97,18 @@ def get_reject_segments(segments, wave_type, milestones=None, info=None):
 
 
 def map_decision(i):
+    """
+    Handy function to transform decision value.
+
+    Parameters
+    ----------
+    i :
+
+
+    Returns
+    -------
+
+    """
     if i == 'accept':
         return 0
     if i == 'reject':
@@ -53,6 +116,26 @@ def map_decision(i):
 
 
 def get_decision_segments(segments, decision, reject_decision):
+    """
+    Return the lists of accepted and rejected segment after evaluating the classification
+    Parameters
+    ----------
+    segments : list
+        The list of all segments
+
+    decision : array like
+        An array with rejected and accepted result of the relevant segment.
+
+    reject_decision : list
+        A list indicates the rejection by other criteria besides sqi
+
+    Returns
+    -------
+    a_segments : list
+        List of accepted segments
+    r_segments : list
+        List of rejected segments
+    """
     decision = list(map(map_decision,decision))
     reject_decision = list(map(map_decision, reject_decision))
     decision = [a + b for a, b in zip(decision,reject_decision)]
@@ -116,10 +199,26 @@ def per_beat_sqi(sqi_func, troughs, signal, taper=False, **kwargs):
 
 def get_sqi_dict(sqis, sqi_name):
     """
+    Handy function to map the sqi name with its output.
 
-    :param sqis:
-    :param sqi_name:
-    :return:
+    When the SQI computes with per-beat option,
+    the suffices of 3-criteria (_mean, _std, _median) is appended.
+
+    When the SQI computes with per-segment option,
+    a suffices _sqi is appended.
+
+    Parameters
+    ----------
+    sqis :  dict, numeric, list
+        The sqi scores
+
+    sqi_name : str
+        The name of the current sqi
+
+    Returns
+    -------
+    SQI_dict: dict
+        A dictionary with the keys indicate the sqi names and the value is the relevant scores
     """
     if sqi_name == 'correlogram_sqi':
         SQI_dict = {}
@@ -158,6 +257,38 @@ def get_sqi_dict(sqis, sqi_name):
 def get_sqi(sqi_func, s, per_beat=False,
             wave_type='ppg', peak_detector=7,
             **kwargs):
+    """
+    Generic function to invoke the computation of SQI
+
+    Parameters
+    ----------
+    sqi_func : function
+        The sqi function in vital_sqi/sqi
+        (or user can define their function)
+
+    s : array like
+        The signal values of the examining segment
+
+    per_beat :
+        Compute the segment with per_beat option
+         (Default value = False)
+
+    wave_type : str
+        Either 'ppg' or 'ecg'
+         (Default value = 'ppg')
+
+    peak_detector : int
+        The peak detector mode (from 1 - 7)
+         (Default value = 7)
+    **kwargs :
+
+
+    Returns
+    -------
+    sqi_score_dict : dict
+        The dictionary with the keys indicate the sqi name and the values indicates the scores
+
+    """
     signal_arg = inspect.getfullargspec(sqi_func)[0][0]
     if signal_arg == 'nn_intervals':
         s = get_nn(s.iloc[:, 1])
@@ -185,12 +316,24 @@ def get_sqi(sqi_func, s, per_beat=False,
 def extract_segment_sqi(s, sqi_list, sqi_arg_list, wave_type):
     """
 
-    :param s:
-    :param sqi_list: list of sqi as in MASTERDICT
-    :param nn_sqi_list: list of sqi using nn_intervals as in 'HRV' MASTER_DICT
-    :param nn_sqi_arg_list:
-    :param sqi_arg_list:
-    :return:
+    Parameters
+    ----------
+    s :
+        param sqi_list: list of sqi as in MASTERDICT
+    nn_sqi_list :
+        list of sqi using nn_intervals as in 'HRV' MASTER_DICT
+    nn_sqi_arg_list :
+        param sqi_arg_list:
+    sqi_list :
+
+    sqi_arg_list :
+
+    wave_type :
+
+
+    Returns
+    -------
+
     """
     sqi_score = {}
     sqi_names = list(sqi_arg_list.keys())
@@ -210,6 +353,25 @@ def extract_segment_sqi(s, sqi_list, sqi_arg_list, wave_type):
 
 
 def extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg'):
+    """
+    Extract all sqis from the list of  segments
+
+    Parameters
+    ----------
+    segments : list
+        List of segments to compute SQI
+
+    milestones :
+
+    sqi_dict_filename :
+
+    wave_type :
+         (Default value = 'ppg')
+
+    Returns
+    -------
+
+    """
     sqi_mapping_list = {
         # Standard SQI
         'perfusion_sqi': sq.perfusion_sqi,
@@ -287,6 +449,19 @@ def extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg'):
 
 
 def generate_rule(rule_name, rule_def):
+    """
+
+    Parameters
+    ----------
+    rule_name :
+
+    rule_def :
+
+
+    Returns
+    -------
+
+    """
     rule_def, boundaries, label_list = update_rule(rule_def, is_update=False)
     rule_detail = {'def': rule_def,
                      'boundaries': boundaries,
