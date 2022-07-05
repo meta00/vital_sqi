@@ -14,6 +14,7 @@ Vital_sqi is a Python package for signal quality index (SQI) extraction and anal
   based SQIs (Details in Section XX).
 - Pipeline and GUIs for SQI extraction and quality assignment. 
 
+
 # Installation and Prerequisites
 
 # Getting started

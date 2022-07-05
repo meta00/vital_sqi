@@ -2,7 +2,6 @@
 import numpy as np
 import pandas as pd
 from scipy import signal
-from vital_sqi.common.utils import check_signal_format
 from vital_sqi.common.generate_template import squeeze_template
 
 
@@ -28,7 +27,6 @@ def taper_signal(s, window=None, shift_min_to_zero=True):
     processed_s : pandas DataFrame
         Processed signal.
     """
-    check_signal_format(s)
     if shift_min_to_zero:
         s = s-np.min(s)
     if window is None:
@@ -56,8 +54,7 @@ def smooth_signal(s, window_len=5, window='flat'):
     processed_s : pandas DataFrame
         Processed signal.
     """
-    check_signal_format(s)
-    assert isinstance(window, int), 'Expected an integer value.'
+    assert isinstance(window_len, int), 'Expected an integer value.'
     assert window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman'], \
         'Options are "flat", "hanning", "hamming", "bartlett", "blackman"'
 
@@ -121,23 +118,4 @@ def scale_pattern(s, window_size):
     smoothed_scale_res = smooth_signal(scale_res)
     processed_s = pd.DataFrame(smoothed_scale_res)
     return processed_s
-
-
-def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,
-           remove_ectopic_beat=False):
-
-    if wave_type=='ppg':
-        detector = PeakDetector(wave_type='ppg')
-        peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
-    else:
-        detector = PeakDetector(wave_type='ecg')
-        peak_list, trough_list = detector.ecg_detector(s, detector_type=rpeak_method)
-
-    rr_list = np.diff(peak_list) * (1000 / sample_rate)
-    if not remove_ectopic_beat:
-        return rr_list
-    nn_list = get_nn_intervals(rr_list)
-    nn_list_non_na = np.copy(nn_list)
-    nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
-    return nn_list_non_na
 
