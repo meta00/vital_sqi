@@ -117,6 +117,7 @@ sphinx_gallery_conf = {
         '../source/_examples/tutorials',
         '../source/_examples/preprocess',
         '../source/_examples/sqi',
+
     ],
     # Other
     'line_numbers': True,
