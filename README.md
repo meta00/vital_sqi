@@ -1,13 +1,41 @@
+# Vital_sqi: Signal quality control of physiological signals
+
 [![Build Status](https://travis-ci.com/meta00/vital_sqi.svg?token=CDjcmJqzLe7opuWagsPJ&branch=main)](https://travis-ci.com/meta00/vital_sqi)
 [![codecov](https://codecov.io/gh/meta00/vital_sqi/branch/main/graph/badge.svg?token=6RV5BUK340)](https://codecov.io/gh/meta00/vital_sqi)
 [![Documentation Status](https://readthedocs.org/projects/vitalsqi/badge/?version=latest)](https://vitalsqi.readthedocs.io/en/latest/?badge=latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# vital_sqi: A python package for signal quality control of physiological signals
 
 # Description
-- SQI indexes.
-- QC pipeline for ECG and PPG.
+Vital_sqi is a Python package for signal quality index (SQI) extraction and analysis from ECG and PPG waveforms.
+
+- For PPG and ECG waveforms: supporting various data formats extracted from wearables.
+- Unified framework for state-of-the-art SQIs: standard statistics, HRV, R peak, waveform, and template matching 
+  based SQIs (Details in Section XX).
+- Pipeline and GUIs for SQI extraction and quality assignment. 
+
+# Installation and Prerequisites
+
+# Getting started
+
+## Preprocessing
+## SQI extraction
+## Quality assignment
+## Pipeline and GUIs
+
+# References
+
+# Authors
+
+# License
+
+# How to contribute
+
+# Acknowledgements
+
+
+
+
 ## PPG
 1. Data format
    
