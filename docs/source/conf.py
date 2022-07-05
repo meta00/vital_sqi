@@ -109,17 +109,14 @@ sphinx_gallery_conf = {
     'examples_dirs': [
         '../../examples/tutorials',
         '../../examples/preprocess',
-        '../../examples/others',
         '../../examples/sqi',
-        '../../examples/raw'
     ],
     # path to save gallery generated output
     'gallery_dirs': [
         '../source/_examples/tutorials',
         '../source/_examples/preprocess',
-        '../source/_examples/others',
         '../source/_examples/sqi',
-        '../source/_examples/raw'],
+    ],
     # Other
     'line_numbers': True,
     'download_all_examples': False,

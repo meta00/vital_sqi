@@ -10,7 +10,6 @@ This example ....
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from scipy import signal
 import scipy.signal.windows as wd
 
 # vitalSQI
@@ -35,8 +34,9 @@ w = list(wd.hann(len(s)))
 # The remaining will be scale according to the windows format. The default
 # tapering method shifts the segment by the value equal to the minimum value
 # to the zero baseline set shift_min_to_zero=False
-tap_zerobaseline_f = preprocess.preprocess_signal.taper_signal(s, shift_min_to_zero=False)
+tap_zerobaseline_t = preprocess.preprocess_signal.taper_signal(s, shift_min_to_zero=False)
 
+tap_zerobaseline_f = preprocess.preprocess_signal.taper_signal(s, shift_min_to_zero=True)
 # Taper data into the zerobaseline to remove the edge effect
 
 # Different windows format can be used to perform tapering process
@@ -72,4 +72,4 @@ fig.update_layout(#height=600,
                   )
 
 # Show
-fig
+fig.show()

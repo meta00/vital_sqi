@@ -148,8 +148,8 @@ fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_complex)),
 fig.add_trace(go.Scatter(x=np.arange(len(ppg_sample_tapering_zerobaseline)),
                          y=ppg_sample_tapering_zerobaseline,
                          name='tapered signal'))
-#fig.show()
-fig
+fig.show()
+# fig
 
 #%% md
 
