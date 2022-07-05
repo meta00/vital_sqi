@@ -1,7 +1,0 @@
-"""
-ECG Pipeline
-====================
-
-.. warning:: Pending!
-
-"""
