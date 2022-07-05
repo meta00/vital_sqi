@@ -15,6 +15,11 @@ Welcome to vital_sqi's documentation!
 
 The code of the project is on Github: https://github.com/meta00/vital_sqi
 
+.. automodule:: vital_sqi.pipeline
+      :members: pipeline_functions, pipeline_highlevel
+      :inherited-members:
+      :private-members:
+      
 .. toctree::
    :maxdepth: 2
    :caption: Getting started
@@ -30,10 +35,6 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
    :maxdepth: 2
    :caption: Documentation
    :hidden:
-
-.. automodule:: vital_sqi.pipeline
-      :members:
-      :inherited-members:
      
 .. toctree::
    :maxdepth: 2
