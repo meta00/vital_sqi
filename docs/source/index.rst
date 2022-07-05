@@ -17,12 +17,7 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
-
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Tutorial
+   :caption: Getting started
    :hidden:
 
    usage/installation
@@ -39,9 +34,14 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
    _examples/tutorials/index
    _examples/preprocess/index
    _examples/sqi/index
-   _examples/raw/index
-   _examples/others/index
+   _examples/pipeline/index
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Documentation:
+
+   docstring/vital_sqi.pipeline
+   docstring/vital_sqi.sqi
 
 Indices and tables
 ==================
