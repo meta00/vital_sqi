@@ -34,12 +34,12 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
    _examples/tutorials/index
    _examples/preprocess/index
    _examples/sqi/index
-   _examples/pipeline/index
 
 .. toctree::
    :maxdepth: 2
    :caption: Documentation:
 
+   docstring/modules
    docstring/vital_sqi.pipeline
    docstring/vital_sqi.sqi
 
