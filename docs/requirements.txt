@@ -3,3 +3,4 @@ sphinx-rtd-theme
 sphinx-gallery
 plotly
 ipython
+jupyter
