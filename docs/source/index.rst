@@ -15,6 +15,9 @@ Welcome to vital_sqi's documentation!
 
 The code of the project is on Github: https://github.com/meta00/vital_sqi
 
+.. automodule:: vital_sqi.pipeline
+    :members:
+    
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
