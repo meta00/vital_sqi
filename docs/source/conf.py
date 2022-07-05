@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.viewcode',        # source source link next to docs
     'sphinx.ext.githubpages',     # gh-pages needs a .nojekyll file
     'sphinx_gallery.gen_gallery'  # galleries with examples
+    'nbsphinx'                    # notebook
 ]
 
 # Add any paths that contain templates here, relative to this directory.
