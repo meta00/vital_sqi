@@ -10,11 +10,13 @@ with different distribution)
 
 # General
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 # vitalSQI
-from vital_sqi import preprocess
+from vital_sqi.preprocess.preprocess_signal import smooth_signal
+from vital_sqi.common.utils import generate_timestamp
 
 # -----------------------
 # Load data
@@ -24,13 +26,17 @@ x = np.linspace(-10*np.pi, 10*np.pi, 201)
 
 # Create signal
 signal = np.sin(30*x)
+# timestamps = generate_timestamp(None,100,len(s))
+# signal = pd.DataFrame(np.hstack((np.array(timestamps).reshape(-1,1),
+#                                  np.array(s).reshape(-1,1))))
+
 
 # -----------------------
 # Apply
 # -----------------------
 # Smoothing
-smooth1 = preprocess.smooth(signal)
-smooth2 = preprocess.smooth(signal, window_len=9)
+smooth1 = smooth_signal(signal)
+smooth2 = smooth_signal(signal, window_len=9)
 
 # -----------------------
 # Visualize
@@ -54,4 +60,4 @@ fig.update_layout(#height=600,
                   )
 
 # Show
-fig
+fig.show()
