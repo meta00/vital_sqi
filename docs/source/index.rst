@@ -28,7 +28,7 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
 
 .. toctree::
    :maxdepth: 2
-   :caption: Example Galleries
+   :caption: Example
    :hidden:
 
    _examples/tutorials/index
