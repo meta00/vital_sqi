@@ -15,11 +15,6 @@ Welcome to vital_sqi's documentation!
 
 The code of the project is on Github: https://github.com/meta00/vital_sqi
 
-.. automodule:: vital_sqi.pipeline
-      :members: pipeline_functions, pipeline_highlevel
-      :inherited-members:
-      :private-members:
-      
 .. toctree::
    :maxdepth: 2
    :caption: Getting started
@@ -33,12 +28,7 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
 
 .. toctree::
    :maxdepth: 2
-   :caption: Documentation
-   :hidden:
-     
-.. toctree::
-   :maxdepth: 2
-   :caption: Example Galleries
+   :caption: Example
    :hidden:
 
    _examples/tutorials/index
@@ -46,6 +36,12 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
    _examples/sqi/index
    _examples/pipeline/index
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Documentation:
+
+   docstring/vital_sqi.pipeline
+   docstring/vital_sqi.sqi
 
 Indices and tables
 ==================
