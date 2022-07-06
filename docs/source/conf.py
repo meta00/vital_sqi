@@ -104,20 +104,22 @@ pio.renderers.default = 'sphinx_gallery'
 # Import library
 from sphinx_gallery.sorting import FileNameSortKey
 
+html_extra_path = ["extra"]
+
 # Configuration for sphinx_gallery
 sphinx_gallery_conf = {
     # path to your example scripts
     'examples_dirs': [
         '../../examples/tutorials',
         '../../examples/preprocess',
-        '../../examples/sqi',
+        '../../examples/sqi'
     ],
     # path to save gallery generated output
     'gallery_dirs': [
         '../source/_examples/tutorials',
         '../source/_examples/preprocess',
         '../source/_examples/sqi',
-
+        '../source/notebooks'
     ],
     # Other
     'pypandoc': True,
