@@ -25,3 +25,6 @@ help:
 github:
 	@make clean html
 	@cp -a build/html/ ../../gh-pages/docs
+doc:
+	rm source/docstring/*
+	sphinx-apidoc -o source/docstring ../vital_sqi
