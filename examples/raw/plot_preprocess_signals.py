@@ -20,7 +20,7 @@ import os
 
 from vital_sqi.dataset import load_ecg, load_ppg
 # ecg_data = load_ecg()
-file_name = os.path.abspath('../../tests/data/example.edf')
+file_name = os.path.abspath('../../tests/test_data/example.edf')
 ecg_data = ECG_reader(file_name, 'edf')
 #%%
 
@@ -71,7 +71,7 @@ fig.add_trace(go.Scatter(x=np.arange(len(ecg_sample_complex)),
 fig
 
 #%%
-file_name = os.path.abspath('../../tests/data/ppg_smartcare.csv')
+file_name = os.path.abspath('../../tests/test_data/ppg_smartcare.csv')
 ppg_data = PPG_reader(file_name,
                     signal_idx=['PLETH'],
                     timestamp_idx=['TIMESTAMP_MS'],

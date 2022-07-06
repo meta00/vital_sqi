@@ -9,8 +9,8 @@ import os
 
 class TestGetPPGSQIs(object):
 	def test_on_get_ppg_sqis(self):
-		file_in = os.path.abspath('tests/data/ppg_smartcare.csv')
-		sqi_dict = os.path.abspath('tests/data/sqi_dict.json')
+		file_in = os.path.abspath('tests/test_data/ppg_smartcare.csv')
+		sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
 		segments, signal_sqi_obj = get_ppg_sqis(file_in,
 												timestamp_idx=['TIMESTAMP_MS'],
 												signal_idx=['PLETH'],
@@ -22,10 +22,10 @@ class TestGetPPGSQIs(object):
 
 class TestGetQualifiedPPG(object):
 	def test_on_get_qualified_ppg(self):
-		file_in = os.path.abspath('tests/data/ppg_smartcare.csv')
-		sqi_dict = os.path.abspath('tests/data/sqi_dict.json')
+		file_in = os.path.abspath('tests/test_data/ppg_smartcare.csv')
+		sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
 		rule_dict_filename = os.path.abspath(
-			'tests/data/rule_dict_test.json')
+			'tests/test_data/rule_dict_test.json')
 		ruleset_order = {3: 'skewness_sqi',
 						2: 'kurtosis_sqi',
 						1: 'perfusion_sqi'}
@@ -46,8 +46,8 @@ class TestGetQualifiedPPG(object):
 
 class TestGetECGSQIs(object):
 	def test_on_get_ecg_sqis(self):
-		file_in = os.path.abspath('tests/data/example.edf')
-		sqi_dict = os.path.abspath('tests/data/sqi_dict.json')
+		file_in = os.path.abspath('tests/test_data/example.edf')
+		sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
 		segments, signal_sqi_obj = get_ecg_sqis(file_in, sqi_dict, 'edf')
 		assert isinstance(segments, list) is True
 		assert isinstance(signal_sqi_obj, SignalSQI) is True
@@ -56,10 +56,10 @@ class TestGetECGSQIs(object):
 
 class TestGetQualifiedSQIs(object):
 	def test_on_get_qualified_ecg(self):
-		file_in = os.path.abspath('tests/data/example.edf')
-		sqi_dict = os.path.abspath('tests/data/sqi_dict.json')
+		file_in = os.path.abspath('tests/test_data/example.edf')
+		sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
 		rule_dict_filename = os.path.abspath(
-			'tests/data/rule_dict_test.json')
+			'tests/test_data/rule_dict_test.json')
 		ruleset_order = {3: 'skewness_sqi', 2: 'kurtosis_sqi',
 						 1: 'perfusion_sqi'}
 		output_dir = tempfile.gettempdir()
@@ -73,7 +73,7 @@ class TestGetQualifiedSQIs(object):
 		assert os.path.isdir(os.path.join(output_dir, 'accept', 'img')) is True
 		assert os.path.isdir(os.path.join(output_dir, 'reject', 'img')) is True
 
-# file_name = "../../tests/data/ppg_smartcare.csv"
+# file_name = "../../tests/test_data/ppg_smartcare.csv"
 		# json_rule_file_name = "../resource/rule_dict.json"
 		# with open(json_rule_file_name) as rule_file:
 		#     json_rule_dict = json.loads(rule_file.read())
@@ -91,15 +91,15 @@ class TestGetQualifiedSQIs(object):
 		#                                     # info_idx = ['PULSE_BPM','SPO2_PCT','PERFUSION_INDEX'])
 
 
-# file_in = os.path.abspath('../../tests/data/example.edf')
-# sqi_dict = os.path.abspath('../../tests/data/sqi_dict.json')
+# file_in = os.path.abspath('../../tests/test_data/example.edf')
+# sqi_dict = os.path.abspath('../../tests/test_data/sqi_dict.json')
 # segments, signal_sqi_obj = get_ecg_sqis(file_in, sqi_dict, 'edf')
 
 # import tempfile
-# file_in = os.path.abspath('../../tests/data/example.edf')
-# sqi_dict = os.path.abspath('../../tests/data/sqi_dict.json')
+# file_in = os.path.abspath('../../tests/test_data/example.edf')
+# sqi_dict = os.path.abspath('../../tests/test_data/sqi_dict.json')
 # rule_dict_filename = os.path.abspath(
-#     '../../tests/data/rule_dict_test.json')
+#     '../../tests/test_data/rule_dict_test.json')
 # ruleset_order = {3: 'skewness_sqi',
 #                   2: 'kurtosis_sqi',
 #                   1: 'perfusion_sqi'}

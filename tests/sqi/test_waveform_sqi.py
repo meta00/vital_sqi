@@ -5,7 +5,7 @@ import os
 
 
 class TestBandEnergySqi(object):
-	file_name = os.path.abspath('tests/data/example.edf')
+	file_name = os.path.abspath('tests/test_data/example.edf')
 	out = ECG_reader(file_name, 'edf')
 
 	def test_on_valid(self):

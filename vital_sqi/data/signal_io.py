@@ -369,49 +369,49 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
 
 # import os, tempfile
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/data/example.edf')
+#                           '/vital_sqi/tests/test_data/example.edf')
 # out = ECG_reader(file_in, 'edf')
 # print(out)
 
 # import os, tempfile
 #
 # file_in = os.path.abspath('/Users/haihb/Documents/Oucru/innovation'
-#                           '/vital_sqi/tests/data/example.edf')
+#                           '/vital_sqi/tests/test_data/example.edf')
 # out = ECG_reader(file_in, 'edf')
 
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/data/out.edf')
+#                           '/vital_sqi/tests/test_data/out.edf')
 # out1 = ECG_reader(file_in, 'edf')
-# file_out = '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/data/out.edf'
+# file_out = '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/out.edf'
 # out.sampling_rate = 15.8
 # out.info[0]['annotations'][0][1] = float(str(out.info[0]['annotations'][0][
 #                                                 1], 'utf-8'))
 # ECG_writer(out, file_out, file_type='edf', info=out.info)
 
 # file_in = os.path.abspath('/Users/haihb/Documents/Oucru/innovation'
-#                           '/vital_sqi/tests/data/a103l')
+#                           '/vital_sqi/tests/test_data/a103l')
 # out = ECG_reader(file_in, 'mit')
 
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/data/a103l')
+#                           '/vital_sqi/tests/test_data/a103l')
 # out = ECG_reader(file_in, 'mit')
 # file_out = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/data/out_mit')
+#                           '/vital_sqi/tests/test_data/out_mit')
 # ECG_writer(out, file_out, file_type='mit', info=out.info)
-# out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/data/ppg_smartcare.csv',
+# out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/ppg_smartcare.csv',
 #                 timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
 #                                                         'SPO2_PCT','PERFUSION_INDEX'],
 #                  start_datetime = '2020-04-12 10:00:00')
 # out.sampling_rate = 2
 #PPG_writer(out, 'D:/Workspace/oucru/medical_signal/Github/vital_sqi/vital_sqi/dataset/ppg_smartcare_w.csv')
 # file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/data/ecg_test2.csv')
+#                           '/vital_sqi/tests/test_data/ecg_test2.csv')
 # out = ECG_reader(file_in, 'csv', channel_name = ['Time', '1'])
 # file_out = '/Users/haihb/Documents/Work/Oucru/innovation ' \
-#            '/vital_sqi/tests/data/ecg_test_write.csv'
+#            '/vital_sqi/tests/test_data/ecg_test_write.csv'
 # ECG_writer(out, file_out, file_type = 'csv')
 
 # import os
 # file_name = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                             '/vital_sqi/tests/data/ecg_test1.csv')
+#                             '/vital_sqi/tests/test_data/ecg_test1.csv')
 # out = ECG_reader(file_name, 'csv', channel_name=['Time', '1'])

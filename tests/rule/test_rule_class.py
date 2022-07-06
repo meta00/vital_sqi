@@ -31,7 +31,7 @@ class TestRuleClass(object):
 
     def test_on_load(self):
         out = Rule('perfusion_sqi')
-        source = os.path.abspath('tests/data/rule_dict_test.json')
+        source = os.path.abspath('tests/test_data/rule_dict_test.json')
         out.load_def(source)
         assert isinstance(out.rule['def'], list) is True
         with pytest.raises(Exception) as exc_info:
@@ -39,7 +39,7 @@ class TestRuleClass(object):
             out.load_def(source)
         assert exc_info.match('not found')
         with pytest.raises(Exception) as exc_info:
-            source = os.path.abspath('tests/data/file_not_exist.json')
+            source = os.path.abspath('tests/test_data/file_not_exist.json')
             out.load_def(source)
         assert exc_info.match('Source file not found')
 
@@ -82,7 +82,7 @@ class TestRuleClass(object):
 
     def test_on_save(self):
         rule_obj = Rule('perfusion_sqi')
-        source = os.path.abspath('tests/data/rule_dict_test.json')
+        source = os.path.abspath('tests/test_data/rule_dict_test.json')
         rule_obj.load_def(source)
         file_out = tempfile.gettempdir() + '/rule_dict.json'
         rule_obj.save_def(file_out)

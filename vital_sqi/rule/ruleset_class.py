@@ -89,7 +89,7 @@ class RuleSet:
 # r3 = Rule("sqi3")
 # import os
 # source = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                            '/vital_sqi/tests/data/rule_dict_test.json')
+#                            '/vital_sqi/tests/test_data/rule_dict_test.json')
 # r1.load_def(source)
 # r2.load_def(source)
 # r3.load_def(source)
