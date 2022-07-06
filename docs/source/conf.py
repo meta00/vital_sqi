@@ -120,6 +120,7 @@ sphinx_gallery_conf = {
 
     ],
     # Other
+    'pypandoc': True,
     'line_numbers': True,
     'download_all_examples': False,
     'within_subsection_order': FileNameSortKey
