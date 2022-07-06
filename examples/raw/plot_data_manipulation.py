@@ -13,10 +13,10 @@ Data manipulation
 
 from vital_sqi.data.signal_io import ECG_reader,PPG_reader
 import os
-file_name = os.path.abspath('../../tests/test_data/example.edf')
+file_name = os.path.abspath('../../tests/data/example.edf')
 ecg_data = ECG_reader(file_name, 'edf')
 # ecg_data = load_ecg()
-file_name = os.path.abspath('../../tests/test_data/ppg_smartcare.csv')
+file_name = os.path.abspath('../../tests/data/ppg_smartcare.csv')
 ppg_data = PPG_reader(file_name,
                     signal_idx=['PLETH'],
                     timestamp_idx=['TIMESTAMP_MS'],
@@ -435,7 +435,7 @@ plt.show()
 
 #%%
 
-out = PPG_reader(os.path.join(os.getcwd(),'../../', 'tests/test_data/ppg_smartcare.csv'),
+out = PPG_reader(os.path.join(os.getcwd(),'../../', 'tests/data/ppg_smartcare.csv'),
                  timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'],
                  info_idx = ['PULSE_BPM','SPO2_PCT','PERFUSION_INDEX'])
 

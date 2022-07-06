@@ -29,7 +29,7 @@ from vital_sqi.dataset import load_ppg, load_ecg
 # Load data
 # ----------------------------
 # Filepath
-filepath = '../../tests/test_data'
+filepath = '../../tests/data'
 filename = 'example.edf'
 
 # Load

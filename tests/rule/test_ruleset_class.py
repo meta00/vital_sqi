@@ -7,7 +7,7 @@ class TestRuleSet(object):
     r1 = Rule("perfusion_sqi")
     r2 = Rule("kurtosis_sqi")
     r3 = Rule("skewness_sqi")
-    source = os.path.abspath('tests/test_data/rule_dict_test.json')
+    source = os.path.abspath('tests/data/rule_dict_test.json')
     r1.load_def(source)
     r2.load_def(source)
     r3.load_def(source)

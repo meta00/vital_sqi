@@ -27,11 +27,12 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
    usage/contributions
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Example
    :hidden:
 
    _examples/tutorials/index
+   _examples/tutorials/Data_manipulation_ECG_PPG
    _examples/preprocess/index
    _examples/sqi/index
 
