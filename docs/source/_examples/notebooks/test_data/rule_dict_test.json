@@ -1,0 +1,28 @@
+{
+"perfusion_sqi": {
+  "name": "perfusion_sqi",
+  "def": [
+      {"op": ">=", "value": "10", "label": "reject"},
+      {"op": ">=", "value": "3", "label": "accept"},
+      {"op": "<", "value": "3", "label": "reject"}],
+  "desc": "",
+  "ref": ""
+  },
+"kurtosis_sqi": {
+   "name": "kurtosis_sqi",
+   "def": [
+      {"op": ">", "value": "0", "label": "accept"},
+      {"op": "<=", "value": "0", "label": "reject"}],
+   "desc": "",
+   "ref": ""
+  },
+"skewness_sqi": {
+   "name": "skewness_sqi",
+   "def": [
+      {"op": "=", "value": "0", "label": "reject"},
+      {"op": ">", "value": "0", "label": "accept"},
+      {"op": "<", "value": "0", "label": "reject"}],
+   "desc": "",
+   "ref": ""
+  }
+}
