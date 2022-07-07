@@ -31,12 +31,14 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
    :maxdepth: 2
    :caption: Data Manipulation:
 
+   _examples/notebooks/index
    _examples/notebooks/Data_manipulation_ECG_PPG
 
 .. toctree::
    :maxdepth: 2
    :caption: Pipeline:
 
+   _examples/notebooks/index
    _examples/notebooks/SQI_pipeline
 
 .. toctree::
