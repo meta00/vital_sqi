@@ -112,14 +112,15 @@ sphinx_gallery_conf = {
     'examples_dirs': [
         '../../examples/tutorials',
         '../../examples/preprocess',
-        '../../examples/sqi'
+        '../../examples/sqi',
+        '../../examples/notebooks'
     ],
     # path to save gallery generated output
     'gallery_dirs': [
         '../source/_examples/tutorials',
         '../source/_examples/preprocess',
         '../source/_examples/sqi',
-        '../source/notebooks'
+        '../source/_examples/notebooks'
     ],
     # Other
     'pypandoc': True,
