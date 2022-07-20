@@ -395,7 +395,7 @@ def format_milestone(start_milestone, end_milestone):
 
 def check_signal_format(s):
     assert isinstance(s, pd.DataFrame), 'Expected a pd.DataFrame.'
-    assert len(s.columns) is 2, 'Expect a datafram of only two columns.'
+    assert len(s.columns) == 2, 'Expect a datafram of only two columns.'
     assert isinstance(s.iloc[0, 0], pd.Timestamp), \
         'Expected type of the first column to be pd.Timestamp.'
     assert is_number(s.iloc[0, 1]), \

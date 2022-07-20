@@ -297,7 +297,7 @@ def interpolate_signal(s, missing_index, missing_len, method='arima',
         'Expected a list or a np.array.'
     assert isinstance(missing_len, (list, tuple, np.array)), \
         'Expected a list or a np.array.'
-    assert isinstance(method, str) and method is 'arima', \
+    assert isinstance(method, str) and method == 'arima', \
         'Expected a string. Only "arima" option is supported for now.'
     assert np.real(lag_ratio), "Expected a numeric value."
 
