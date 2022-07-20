@@ -4,9 +4,9 @@ import os
 
 
 class TestRuleSet(object):
-    r1 = Rule("perfusion_sqi")
-    r2 = Rule("kurtosis_sqi")
-    r3 = Rule("skewness_sqi")
+    r1 = Rule("perfusion")
+    r2 = Rule("entropy")
+    r3 = Rule("skewness_1")
     source = os.path.abspath('tests/test_data/rule_dict_test.json')
     r1.load_def(source)
     r2.load_def(source)
@@ -42,27 +42,27 @@ class TestRuleSet(object):
         assert isinstance(self.s.export_rules(), str)
 
     def test_on_execute(self):
-        dat = pd.DataFrame([[6, 100, 1]], columns=['perfusion_sqi',
-                                                   'kurtosis_sqi',
-                                                   'skewness_sqi'])
+        dat = pd.DataFrame([[6, 100, 1]], columns=['perfusion',
+                                                   'entropy',
+                                                   'skewness_1'])
         assert self.s.execute(dat) == 'accept'
-        dat = pd.DataFrame([[10, 100, 0]], columns=['perfusion_sqi',
-                                                    'kurtosis_sqi',
-                                                    'skewness_sqi'])
+        dat = pd.DataFrame([[10, 100, 0]], columns=['perfusion',
+                                                    'entropy',
+                                                    'skewness_1'])
         assert self.s.execute(dat) == 'reject'
         with pytest.raises(AssertionError) as exc_info:
             self.s.execute([])
         assert exc_info.match('Expected data frame')
         with pytest.raises(AssertionError) as exc_info:
             dat = [[6, 1, 1], [1, 100, 3], [0, 0, 0]]
-            dat = pd.DataFrame(dat, columns=['perfusion_sqi',
-                                             'kurtosis_sqi',
-                                             'skewness_sqi'])
+            dat = pd.DataFrame(dat, columns=['perfusion',
+                                             'entropy',
+                                             'skewness_1'])
             self.s.execute(dat)
         assert exc_info.match('Expected data frame of 1 row')
         with pytest.raises(KeyError) as exc_info:
-            dat = pd.DataFrame([[6, 100, 1]], columns=['perfusion_sqi',
-                                                       'kurtosis_sqi',
+            dat = pd.DataFrame([[6, 100, 1]], columns=['perfusion',
+                                                       'entropy',
                                                        'sqi4'])
             self.s.execute(dat)
         assert exc_info.match('not found in input data frame')
