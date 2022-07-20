@@ -81,7 +81,7 @@ class TestRuleClass(object):
         assert out.apply_rule(3) == 'reject'
 
     def test_on_save(self):
-        rule_obj = Rule('perfusion_sqi')
+        rule_obj = Rule('perfusion')
         source = os.path.abspath('tests/test_data/rule_dict_test.json')
         rule_obj.load_def(source)
         file_out = tempfile.gettempdir() + '/rule_dict.json'
