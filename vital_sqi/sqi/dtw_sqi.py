@@ -57,9 +57,6 @@ def dtw_sqi(s, template_type, template_size = 100,simple_mode=False):
         reference = scaler.fit_transform(reference.reshape(-1, 1)).reshape(-1)
 
         D, wp = dtw(beat,reference)
-        dtw_cost = np.mean([D[i][j] for i, j in zip(wp[:, 1], wp[:, 0])])
-
-    return dtw_cost
-
+        dtw_cost = np.mean([D[i][j] for i, j in zip(wp[:, 1], wp[:, 0])]).item()
 
     return dtw_cost
