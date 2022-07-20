@@ -381,5 +381,3 @@ def signal_preprocess():
 def write_ecg():
     """ """
     return
-
-

@@ -10,8 +10,10 @@ from vital_sqi.common.generate_template import (
 from vital_sqi.common.utils import check_valid_signal
 from scipy.spatial.distance import euclidean
 from scipy.signal import resample
+from librosa.sequence import dtw
+from sklearn.preprocessing import MinMaxScaler
 
-def dtw_sqi(s, template_type, template_size = 100):
+def dtw_sqi(s, template_type, template_size = 100,simple_mode=False):
     """
     Euclidean distance between signal and its template
 
@@ -40,11 +42,24 @@ def dtw_sqi(s, template_type, template_size = 100):
     if template_type == 3:
         reference = ecg_dynamic_template(template_size)
 
-    dtw_distances = np.ones((template_size,template_size)) * \
-                    np.inf
-    #first matching sample is set to zero
-    dtw_distances[0, 0] = 0
-    cost=0
-    for i in range(template_size):
-        cost = cost + euclidean(s[i], reference[i])
-    return cost/template_size
+    if simple_mode:
+        cost = 0
+        for i in range(template_size):
+            cost = cost + euclidean(s[i], reference[i])
+        dtw_cost = cost / template_size
+    else:
+        beat = resample(s, template_size)
+        scaler = MinMaxScaler(feature_range=(0, 1))
+        beat = scaler.fit_transform(beat.reshape(-1, 1)).reshape(-1)
+
+        reference = resample(reference, template_size)
+        scaler = MinMaxScaler(feature_range=(0, 1))
+        reference = scaler.fit_transform(reference.reshape(-1, 1)).reshape(-1)
+
+        D, wp = dtw(beat,reference)
+        dtw_cost = np.mean([D[i][j] for i, j in zip(wp[:, 1], wp[:, 0])])
+
+    return dtw_cost
+
+
+    return dtw_cost
