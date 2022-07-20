@@ -30,7 +30,7 @@ class TestRuleClass(object):
         assert exc_info.match('containing only letter, number')
 
     def test_on_load(self):
-        out = Rule('perfusion_sqi')
+        out = Rule('perfusion')
         source = os.path.abspath('tests/test_data/rule_dict_test.json')
         out.load_def(source)
         assert isinstance(out.rule['def'], list) is True
