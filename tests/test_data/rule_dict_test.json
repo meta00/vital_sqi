@@ -1,5 +1,5 @@
 {
-"perfusion_sqi": {
+"perfusion": {
   "name": "perfusion_sqi",
   "def": [
       {"op": ">=", "value": "10", "label": "reject"},
@@ -8,15 +8,15 @@
   "desc": "",
   "ref": ""
   },
-"kurtosis_sqi": {
-   "name": "kurtosis_sqi",
+"entropy": {
+   "name": "entropy_sqi",
    "def": [
       {"op": ">", "value": "0", "label": "accept"},
       {"op": "<=", "value": "0", "label": "reject"}],
    "desc": "",
    "ref": ""
   },
-"skewness_sqi": {
+"skewness_1": {
    "name": "skewness_sqi",
    "def": [
       {"op": "=", "value": "0", "label": "reject"},

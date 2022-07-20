@@ -26,7 +26,7 @@ class TestGetQualifiedPPG(object):
 		sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
 		rule_dict_filename = os.path.abspath(
 			'tests/test_data/rule_dict_test.json')
-		ruleset_order = {3: 'skewness',
+		ruleset_order = {3: 'skewness_1',
 						2: 'entropy',
 						1: 'perfusion'}
 		timestamp_idx = ['TIMESTAMP_MS']
