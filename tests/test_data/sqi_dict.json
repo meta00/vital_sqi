@@ -14,7 +14,7 @@
       "per_beat": true
     }
   },
-  "skewness_0": {
+  "skewness": {
     "sqi": "skewness_sqi",
     "args": {
       "axis": 0,
@@ -42,7 +42,7 @@
       "per_beat": false
     }
   },
-  "skewness_2": {
+  "skewness_1": {
     "sqi": "skewness_sqi",
     "args": {
       "axis": 0,

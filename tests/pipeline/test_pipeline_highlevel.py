@@ -26,9 +26,9 @@ class TestGetQualifiedPPG(object):
 		sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
 		rule_dict_filename = os.path.abspath(
 			'tests/test_data/rule_dict_test.json')
-		ruleset_order = {3: 'skewness_sqi',
-						2: 'kurtosis_sqi',
-						1: 'perfusion_sqi'}
+		ruleset_order = {3: 'skewness',
+						2: 'entropy',
+						1: 'perfusion'}
 		timestamp_idx = ['TIMESTAMP_MS']
 		signal_idx = ['PLETH']
 		output_dir = tempfile.gettempdir()
