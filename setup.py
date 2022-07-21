@@ -17,7 +17,7 @@ setup(
     maintainer = 'Hai Ho, Khoa Le',
     maintainer_email = 'haihb@oucru.org, khoaldv@oucru.org',
     py_modules = ['common', 'data', 'preprocess', 'sqi'],
-    install_requires = ['dtw-python>=1.1.6',
+    install_requires = ['librosa>=0.9.2',
                         'heartpy>=1.2.6',
                         'pmdarima>=1.8.0',
                         'hrv-analysis>=1.0.3',
