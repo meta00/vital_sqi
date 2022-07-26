@@ -24,4 +24,5 @@ help:
 # implemented by changing the BUILDDIR variable. (add make clean html)
 github:
 	@make clean html
+	@sudo apt-get install libsndfile1-dev
 	@cp -a build/html/ ../../gh-pages/docs
