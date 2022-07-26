@@ -11,6 +11,10 @@ version: 2
 sphinx:
   configuration: docs/source/conf.py
 
+build:
+  apt_packages:
+    - libsndfile1-dev
+
 # Optionally set the version of Python
 python:
   version: 3.7
