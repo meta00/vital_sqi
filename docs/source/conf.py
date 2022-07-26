@@ -141,6 +141,6 @@ class Mock(MagicMock):
         return MagicMock()
 
 MOCK_MODULES = [
-    'librosa', 'librosa.display', 'plotly', 'ipython', 'matplotlib', 'matplotlib.pyplot',
+    'librosa', 'librosa.display', 'plotly',
     'setuptools', 'jupyter', 'pandas']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
