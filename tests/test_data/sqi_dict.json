@@ -1,10 +1,10 @@
 {
-  "perfusion_sqi": {
+  "perfusion": {
     "sqi": "perfusion_sqi",
     "args": {
     }
   },
-  "kurtosis_sqi_1": {
+  "kurtosis_1": {
     "sqi": "kurtosis_sqi",
     "args": {
       "axis": 0,
@@ -14,16 +14,17 @@
       "per_beat": true
     }
   },
-  "skewness_sqi": {
+  "skewness": {
     "sqi": "skewness_sqi",
     "args": {
       "axis": 0,
       "bias": true,
       "nan_policy": "propagate",
-      "per_beat": true
+      "per_beat": true,
+      "use_mean_beat": false
     }
   },
-  "entropy_sqi": {
+  "entropy": {
     "sqi": "entropy_sqi",
     "args": {
       "qk": null,
@@ -31,7 +32,7 @@
       "per_beat": true
     }
   },
-  "kurtosis_sqi_2": {
+  "kurtosis_2": {
     "sqi": "kurtosis_sqi",
     "args": {
       "axis": 0,
@@ -41,7 +42,7 @@
       "per_beat": false
     }
   },
-  "skewness_sqi_2": {
+  "skewness_1": {
     "sqi": "skewness_sqi",
     "args": {
       "axis": 0,
@@ -50,7 +51,7 @@
       "per_beat": false
     }
   },
-  "entropy_sqi_2": {
+  "entropy_2": {
     "sqi": "entropy_sqi",
     "args": {
       "qk": null,
@@ -58,14 +59,14 @@
       "per_beat": false
     }
   },
-  "signal_to_noise_sqi": {
+  "signal_to_noise": {
     "sqi": "signal_to_noise_sqi",
     "args": {
       "axis": 0,
       "ddof": 0
     }
   },
-  "zero_crossings_rate_sqi": {
+  "zero_crossings_rate": {
     "sqi": "zero_crossings_rate_sqi",
     "args": {
       "threshold": 1e-10,
@@ -75,7 +76,7 @@
       "axis": -1
     }
   },
-  "mean_crossing_rate_sqi": {
+  "mean_crossing_rate": {
     "sqi": "mean_crossing_rate_sqi",
     "args": {
       "threshold": 1e-10,
@@ -85,7 +86,7 @@
       "axis": -1
     }
   },
-  "ectopic_sqi": {
+  "ectopic": {
     "sqi": "ectopic_sqi",
     "args": {
       "rule_index": 0,
@@ -96,7 +97,7 @@
       "high_rri": 2000
     }
   },
-  "correlogram_sqi": {
+  "correlogram": {
     "sqi": "correlogram_sqi",
     "args": {
       "sample_rate": 100,
@@ -104,12 +105,12 @@
       "n_selection": 3
     }
   },
-  "interpolation_sqi": {
+  "interpolation": {
     "sqi": "interpolation_sqi",
     "args": {
     }
   },
-  "msq_sqi": {
+  "msq": {
     "sqi": "msq_sqi",
     "args": {
       "peak_detector_1": 7,
@@ -117,14 +118,14 @@
       "wave_type": "ppg"
     }
   },
-  "band_energy_sqi": {
+  "band_energy": {
     "sqi": "band_energy_sqi",
     "args": {
       "sampling_rate": 100,
       "band": null
     }
   },
-  "lfe_sqi": {
+  "lfe": {
     "sqi": "lfe_sqi",
     "args": {
       "sampling_rate": 100,
@@ -134,7 +135,7 @@
       ]
     }
   },
-  "qrse_sqi": {
+  "qrse": {
     "sqi": "qrse_sqi",
     "args": {
       "sampling_rate": 100,
@@ -144,7 +145,7 @@
       ]
     }
   },
-  "hfe_sqi": {
+  "hfe": {
     "sqi": "hfe_sqi",
     "args": {
       "sampling_rate": 100,
@@ -154,7 +155,7 @@
       ]
     }
   },
-  "vhfp_sqi": {
+  "vhfp": {
     "sqi": "vhfp_sqi",
     "args": {
       "sampling_rate": 100,
@@ -164,13 +165,13 @@
       ]
     }
   },
-  "qrsa_sqi": {
+  "qrsa": {
     "sqi": "qrsa_sqi",
     "args": {
       "sampling_rate": 100
     }
   },
-  "dtw_sqi": {
+  "dtw": {
     "sqi": "dtw_sqi",
     "args": {
       "template_type": 0,
@@ -178,69 +179,69 @@
       "per_beat": true
     }
   },
-  "nn_mean_sqi": {
+  "nn_mean": {
     "sqi": "nn_mean_sqi",
     "args": {
     }
   },
-  "sdnn_sqi": {
+  "sdnn": {
     "sqi": "sdnn_sqi",
     "args": {
     }
   },
-  "sdsd_sqi": {
+  "sdsd": {
     "sqi": "sdsd_sqi",
     "args": {
     }
   },
-  "rmssd_sqi": {
+  "rmssd": {
     "sqi": "rmssd_sqi",
     "args": {}
   },
-  "cvsd_sqi": {
+  "cvsd": {
     "sqi": "cvsd_sqi",
     "args": {}
   },
-  "cvnn_sqi": {
+  "cvnn": {
     "sqi": "cvnn_sqi",
     "args": {}
   },
-  "mean_nn_sqi": {
+  "mean_nn": {
     "sqi": "mean_nn_sqi",
     "args": {}
   },
-  "median_nn_sqi": {
+  "median_nn": {
     "sqi": "median_nn_sqi",
     "args": {}
   },
-  "pnn_sqi": {
+  "pnn": {
     "sqi": "pnn_sqi",
     "args": {}
   },
-  "hr_mean_sqi": {
+  "hr_mean": {
     "sqi": "hr_mean_sqi",
     "args": {}
   },
-  "hr_median_sqi": {
+  "hr_median": {
     "sqi": "hr_median_sqi",
     "args": {}
   },
-  "hr_min_sqi": {
+  "hr_min": {
     "sqi": "hr_min_sqi",
     "args": {}
   },
-  "hr_max_sqi": {
+  "hr_max": {
     "sqi": "hr_max_sqi",
     "args": {}
   },
-  "hr_range_sqi": {
+  "hr_range": {
     "sqi": "hr_range_sqi",
     "args": {
       "range_min": 40,
       "range_max": 200
     }
   },
-  "peak_frequency_sqi": {
+  "peak_frequency": {
     "sqi": "peak_frequency_sqi",
     "args": {
       "freqs": null,
@@ -249,7 +250,7 @@
       "f_max": 0.15
     }
   },
-  "absolute_power_sqi": {
+  "absolute_power": {
     "sqi": "absolute_power_sqi",
     "args": {
       "freqs": null,
@@ -258,7 +259,7 @@
       "f_max": 0.15
     }
   },
-  "log_power_sqi": {
+  "log_power": {
     "sqi": "log_power_sqi",
     "args": {
       "freqs": null,
@@ -267,7 +268,7 @@
       "f_max": 0.15
     }
   },
-  "relative_power_sqi": {
+  "relative_power": {
     "sqi": "relative_power_sqi",
     "args": {
       "freqs": null,
@@ -276,7 +277,7 @@
       "f_max": 0.15
     }
   },
-  "normalized_power_sqi": {
+  "normalized_power": {
     "sqi": "normalized_power_sqi",
     "args": {
       "freqs": null,
@@ -287,7 +288,7 @@
       "hf_max": 0.4
     }
   },
-  "lf_hf_ratio_sqi": {
+  "lf_hf_ratio": {
     "sqi": "lf_hf_ratio_sqi",
     "args": {
       "freqs": null,
@@ -298,11 +299,11 @@
       "hf_max": 0.4
     }
   },
-  "poincare_sqi": {
+  "poincare": {
     "sqi": "poincare_sqi",
     "args": {}
   },
-  "hrv_sqi": {
+  "hrv": {
     "sqi": "hrv_sqi",
     "args": {
       "sample_rate": 100,

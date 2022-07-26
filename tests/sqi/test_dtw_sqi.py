@@ -15,10 +15,12 @@ class TestDtwSqi(object):
     def test_on_valid_template_type_0(self):
         template_types = [0, 1, 2, 3]
         for i in template_types:
-            assert type(dtw_sqi(self.x, i)) is float
+            assert type(dtw_sqi(self.x, i, simple_mode=False)) is float
+            assert type(dtw_sqi(self.x, i, simple_mode=True)) is float
 
     def test_on_trace_equal_0(self):
         x = [0]
         template_types = [0, 1, 2, 3]
         for i in template_types:
-            assert type(dtw_sqi(x, i)) is float
+            assert type(dtw_sqi(x, i, simple_mode=False)) is float
+            assert type(dtw_sqi(x, i, simple_mode=True)) is float

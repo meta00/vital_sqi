@@ -297,7 +297,7 @@ def interpolate_signal(s, missing_index, missing_len, method='arima',
         'Expected a list or a np.array.'
     assert isinstance(missing_len, (list, tuple, np.array)), \
         'Expected a list or a np.array.'
-    assert isinstance(method, str) and method is 'arima', \
+    assert isinstance(method, str) and method == 'arima', \
         'Expected a string. Only "arima" option is supported for now.'
     assert np.real(lag_ratio), "Expected a numeric value."
 
@@ -307,7 +307,7 @@ def interpolate_signal(s, missing_index, missing_len, method='arima',
         seg_len = number_of_missing_instances * lag_ratio
         start_seg = max(0, int(pos - seg_len))
         ts = s[start_seg:int(pos)]
-        if method is 'arima':
+        if method == 'arima':
             model = pm.auto_arima(ts, X=None, start_p=2, d=None,
                                   start_q=2, max_p=3, max_d=3, max_q=3,
                                   start_P=1, D=None, start_Q=1, max_P=3,

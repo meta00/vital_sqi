@@ -166,6 +166,8 @@ def get_qualified_ppg(file_name, sqi_dict_filename, signal_idx, timestamp_idx,
     -------
 
     """
+    if output_dir is None:
+        output_dir = os.getcwd()
     assert(os.path.exists(output_dir)) is True
     segments, signal_obj = get_ppg_sqis(file_name, signal_idx,
                                         timestamp_idx, sqi_dict_filename,
@@ -324,6 +326,8 @@ def get_qualified_ecg(file_name, file_type, sqi_dict_filename,
 
     
     """
+    if output_dir is None:
+        output_dir = os.getcwd()
     assert(os.path.exists(output_dir)) is True
     segment_lst, signal_obj = get_ecg_sqis(file_name, sqi_dict_filename, file_type,
                                            channel_num, channel_name,
@@ -377,5 +381,3 @@ def signal_preprocess():
 def write_ecg():
     """ """
     return
-
-

@@ -26,9 +26,9 @@ class TestGetQualifiedPPG(object):
 		sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
 		rule_dict_filename = os.path.abspath(
 			'tests/test_data/rule_dict_test.json')
-		ruleset_order = {3: 'skewness_sqi',
-						2: 'kurtosis_sqi',
-						1: 'perfusion_sqi'}
+		ruleset_order = {3: 'skewness_1',
+						2: 'entropy',
+						1: 'perfusion'}
 		timestamp_idx = ['TIMESTAMP_MS']
 		signal_idx = ['PLETH']
 		output_dir = tempfile.gettempdir()
@@ -60,8 +60,8 @@ class TestGetQualifiedSQIs(object):
 		sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
 		rule_dict_filename = os.path.abspath(
 			'tests/test_data/rule_dict_test.json')
-		ruleset_order = {3: 'skewness_sqi', 2: 'kurtosis_sqi',
-						 1: 'perfusion_sqi'}
+		ruleset_order = {3: 'skewness_1', 2: 'entropy',
+						 1: 'perfusion'}
 		output_dir = tempfile.gettempdir()
 		signal_obj = get_qualified_ecg(file_name=file_in,
 									sqi_dict_filename=sqi_dict,

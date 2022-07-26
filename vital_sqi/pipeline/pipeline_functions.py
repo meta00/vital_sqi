@@ -4,6 +4,7 @@ import pandas as pd
 import vital_sqi.preprocess.preprocess_signal as sqi_pre
 import json
 from tqdm import tqdm
+from scipy.signal import resample
 
 from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
@@ -149,7 +150,8 @@ def get_decision_segments(segments, decision, reject_decision):
     return a_segments, r_segments
 
 
-def per_beat_sqi(sqi_func, troughs, signal, taper=False, **kwargs):
+def per_beat_sqi(sqi_func, troughs, signal, use_mean_beat,
+            mean_resample_size, taper=False, **kwargs):
     """
     Perform a per-beat application of the selected SQI function on the signal
     segment
@@ -165,6 +167,15 @@ def per_beat_sqi(sqi_func, troughs, signal, taper=False, **kwargs):
     signal :
         Signal array containing one segment of the waveform
 
+    use_mean_beat : bool
+        If is True, each beat will be resampled and get the mean.
+        The mean beat is used as the representative of a single_beat for sqi computation
+        (Default value = True)
+
+    mean_resample_size : int
+        The resample size if use mean_beat computation
+        (Default value = 100)
+
     taper : bool
         Is each beat need to be tapered or not before executing the SQI function
 
@@ -179,17 +190,27 @@ def per_beat_sqi(sqi_func, troughs, signal, taper=False, **kwargs):
     """
     #Remove first and last trough as they might be on the edge
     troughs = troughs[1:-1]
+    beat_list = []
+    # sqi_scores = sqi_func(s, **kwargs)
     if len(troughs) > 2:
         sqi_vals = []
         for idx, beat_start in enumerate(troughs[:-1]):
             single_beat = signal[beat_start:troughs[idx+1]]
             if taper:
                 single_beat = sqi_pre.taper_signal(single_beat)
-            if len(kwargs) != 0:
-                args = tuple(kwargs.values())
-                sqi_vals.append(sqi_func(single_beat, *args))
+            if use_mean_beat:
+                beat_list.append(resample(single_beat, mean_resample_size))
             else:
-                sqi_vals.append(sqi_func(single_beat))
+                sqi_vals.append(sqi_func(single_beat, **kwargs))
+            # if len(kwargs) != 0:
+            #     args = tuple(kwargs.values())
+            #     sqi_vals.append(sqi_func(single_beat, *args))
+            # else:
+            #     sqi_vals.append(sqi_func(single_beat))
+        if use_mean_beat:
+            beat_list = np.array(beat_list)
+            beat = np.apply_along_axis(np.mean, axis=0, arr=beat_list)
+            sqi_vals.append(sqi_func(beat, **kwargs))
         return sqi_vals
 
     else:
@@ -241,9 +262,12 @@ def get_sqi_dict(sqis, sqi_name):
     if isinstance(sqis, list):
         SQI_dict = {}
         variations_stats = ['_mean', '_median', '_std']
-        SQI_dict[sqi_name.split("_")[0] + variations_stats[0]+"_sqi"] = np.mean(sqis)
-        SQI_dict[sqi_name.split("_")[0] + variations_stats[1]+"_sqi"] = np.median(sqis)
-        SQI_dict[sqi_name.split("_")[0] + variations_stats[2]+"_sqi"] = np.std(sqis)
+        if len(sqis)>1:
+            SQI_dict[sqi_name + variations_stats[0]+"_sqi"] = np.mean(sqis)
+            SQI_dict[sqi_name + variations_stats[1]+"_sqi"] = np.median(sqis)
+            SQI_dict[sqi_name + variations_stats[2]+"_sqi"] = np.std(sqis)
+        else:
+            SQI_dict[sqi_name] = sqis[0]
         return SQI_dict
 
     if isinstance(sqis, tuple):
@@ -254,7 +278,9 @@ def get_sqi_dict(sqis, sqi_name):
         return SQI_dict
 
 
-def get_sqi(sqi_func, s, per_beat=False,
+def get_sqi(sqi_func, sqi_name, s, per_beat=False,
+            use_mean_beat=True,
+            mean_resample_size = 100,
             wave_type='ppg', peak_detector=7,
             **kwargs):
     """
@@ -268,6 +294,15 @@ def get_sqi(sqi_func, s, per_beat=False,
 
     s : array like
         The signal values of the examining segment
+
+    use_mean_beat : bool
+        If is True, each beat will be resampled and get the mean.
+        The mean beat is used as the representative of a single_beat for sqi computation
+        (Default value = True)
+
+    mean_resample_size : int
+        The resample size if use mean_beat computation
+        (Default value = 100)
 
     per_beat :
         Compute the segment with per_beat option
@@ -303,17 +338,18 @@ def get_sqi(sqi_func, s, per_beat=False,
         else:
             peak_list, trough_list = detector.ecg_detector(s,
                                                     peak_detector)
-        sqi_scores = per_beat_sqi(sqi_func, trough_list, s, **kwargs)
+        sqi_scores = per_beat_sqi(sqi_func, trough_list, s, use_mean_beat,
+            mean_resample_size,**kwargs)
     else:
         if 'wave_type' in inspect.getfullargspec(sqi_func)[0]:
             kwargs['wave_type'] = wave_type
         sqi_scores = sqi_func(s, **kwargs)
-    sqi_name = sqi_func.__name__
+    # sqi_name = sqi_func.__name__
     sqi_score_dict = get_sqi_dict(sqi_scores, sqi_name)
     return sqi_score_dict
 
 
-def extract_segment_sqi(s, sqi_list, sqi_arg_list, wave_type):
+def extract_segment_sqi(s, sqi_list, sqi_names, sqi_arg_list, wave_type):
     """
 
     Parameters
@@ -336,14 +372,17 @@ def extract_segment_sqi(s, sqi_list, sqi_arg_list, wave_type):
 
     """
     sqi_score = {}
-    sqi_names = list(sqi_arg_list.keys())
+    sqi_type = list(sqi_arg_list.keys())
     # for (sqi_,args_) in zip(sqi_list,sqi_arg_list):
     for idx in range(len(sqi_list)):
         try:
-            args_ = sqi_arg_list[sqi_names[idx]]
+            args_ = sqi_arg_list[sqi_type[idx]]
+            sqi_name = sqi_names[idx]
             sqi_ = sqi_list[idx]
             args_["wave_type"] = wave_type
-            sqi_score = {**sqi_score, **get_sqi(sqi_, s, **args_)}
+            if sqi_.__name__ == "perfusion_sqi":
+                args_ = {'y': np.array(s.iloc[:,1])}
+            sqi_score = {**sqi_score, **get_sqi(sqi_, sqi_name, s, **args_)}
         except Exception as err:
             print('Error')
             print(sqi_)
@@ -430,16 +469,19 @@ def extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg'):
     with open(arg_path, 'r') as arg_file:
         sqi_dict = json.loads(arg_file.read())
     sqi_list = []
+    sqi_names = []
     sqi_arg_list = {}
     for item_key, item_value in sqi_dict.items():
         # sqi_name, sqi_arg
+        sqi_names.append(item_key)
         sqi_list.append(sqi_mapping_list[item_value['sqi']])
         sqi_arg_list[item_key] = item_value['args']
     df_sqi = pd.DataFrame()
     for segment_idx in tqdm(range(len(segments))):
         segment = segments[segment_idx]
+        # if
         sqi_arg_list['perfusion_sqi'] = {'y':segment.iloc[:, 1]}
-        sqis = extract_segment_sqi(segment, sqi_list,sqi_arg_list,wave_type)
+        sqis = extract_segment_sqi(segment, sqi_list,sqi_names, sqi_arg_list,wave_type)
         # segment_name_list = file_name.split("/")[-1] + "_" +str(segment_idx)
         # sqis['id'] = segment_name_list
         df_sqi = df_sqi.append(sqis, ignore_index=True)

@@ -54,8 +54,6 @@ examples to visualize the results.
    :hidden:
 
    /_examples/tutorials/plot_ppg_pipeline
-    /_examples/tutorials/Data_manipulation_ECG_PPG
-
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

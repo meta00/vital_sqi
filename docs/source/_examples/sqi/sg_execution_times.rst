@@ -5,10 +5,10 @@
 
 Computation times
 =================
-**00:00.180** total execution time for **_examples_sqi** files:
+**00:00.207** total execution time for **_examples_sqi** files:
 
 +-------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__examples_sqi_plot_sample_01.py` (``plot_sample_01.py``) | 00:00.107 | 0.0 MB |
+| :ref:`sphx_glr__examples_sqi_plot_sample_01.py` (``plot_sample_01.py``) | 00:00.126 | 0.0 MB |
 +-------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__examples_sqi_plot_sample_02.py` (``plot_sample_02.py``) | 00:00.073 | 0.0 MB |
+| :ref:`sphx_glr__examples_sqi_plot_sample_02.py` (``plot_sample_02.py``) | 00:00.081 | 0.0 MB |
 +-------------------------------------------------------------------------+-----------+--------+
