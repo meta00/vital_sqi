@@ -1,7 +1,6 @@
 from dash.testing.application_runners import import_app
 from conftest import pytest_setup_options
 from selenium.webdriver import Chrome
-from webdriver_manager.chrome import ChromeDriverManager
 
 def test_homepage_app(dash_duo):
     app = import_app('vital_sqi.app.index')
