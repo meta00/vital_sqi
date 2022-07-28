@@ -17,11 +17,12 @@ install:
   - pip install matplotlib==3.3.4
   - pip install pytest-cov codecov
   - pip install dash[testing]
+  - pip install webdriver_manager
   - pip install selenium
   - pip install --upgrade setuptools
   - pip install --upgrade importlib-metadata
   - pip install -e .
-  - export PATH=$PATH:$(pwd)'/tests/app/'
+#  - export PATH=$PATH:$(pwd)'/tests/app/'
 # Command to run tests, e.g. python setup.py test
 script:
   - python -c "import numpy; print(numpy.version.version)"
