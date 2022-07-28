@@ -10,6 +10,7 @@ def test_homepage_app(dash_duo):
     # Chrome('./chromedriver',options=pytest_setup_options())
     if 'TRAVIS' in os.environ:
         dash_duo.driver = ChromeDriverManager().install()
+        # dash_duo.driver = ('./chromedriver')
         # dash_duo.driver = \
         #     Remote(command_executor='http://localhost:9222',
         #                          options=pytest_setup_options())
