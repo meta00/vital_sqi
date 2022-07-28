@@ -21,7 +21,7 @@ install:
   - pip install flake8 tox pytest
   - pip install matplotlib==3.3.4
   - pip install pytest-cov codecov
-  - pip install dash-boostrap-components
+  - pip install dash-bootstrap-components
   - pip install dash[testing]
   - pip install webdriver_manager
   - pip install selenium
