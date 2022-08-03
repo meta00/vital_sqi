@@ -1,8 +1,7 @@
 """
-Implementation of SQIs for waveform:
+Implementation of waveform-based SQIs for waveform:
  - For ECG based on DiMarco2012.
- - For PPG to be coded (Khoa check with Stefan)
- Doi lai tham so signal
+ - For PPG to be done.
 """
 import scipy.signal as sn
 import numpy as np
@@ -10,7 +9,7 @@ from vital_sqi.common.rpeak_detection import PeakDetector
 from vital_sqi.common.utils import *
 
 
-def band_energy_sqi(s, sampling_rate=100, band=None,nperseg=2048):
+def band_energy_sqi(s, sampling_rate=100, band=None, nperseg=2048):
     """
     Compute the peak value of the time marginal of the energy distribution in a
     frequency band (DiMarco et al., 2012).
