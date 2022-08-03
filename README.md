@@ -13,7 +13,7 @@ for ECG and PPG waveforms. The package provides:
 1. Support PPG and ECG waveforms in various data formats extracted from wearables.
 2. Unified framework for state-of-the-art SQIs: standard statistics, HRV, R peak, waveform, and template matching 
   based SQIs.
-3. Rule-based assignment of signal quality using user-defined thresholds for the extracted SQIs.
+3. Rule-based classification of signal quality using user-defined thresholds for the extracted SQIs per signal segment.
 4. Pipeline and GUIs for SQI extraction and quality assignment. 
 
 # Prerequisites and Installation
@@ -31,10 +31,9 @@ The package is built around three classes: `SignalSQI` `Rule` `Ruleset`
     - `signal_obj.signal` containing waveform data (pandas dataframe).
     - `signal_obj.sampling_rate` containing sampling rate, either input by user or automatically inferred from the waveform.
     - `signal_obj.sqis` containing SQIs (pandas dataframe) that are derived by functions of `vital_sqi.sqi` modules or an 
-    external table, with SQI values as columns and signal segment per row. If derived using the vital_sqi package, i
-      
-The table also contains a column
-  named `decision`, if signal classification is applied on the SQI table. Columns 
+    external table, with SQI values as columns and signal segments as rows. After signal classification, decision of
+      `accept` or `reject` for each signal segment is in `decision` column. If signal segmentation is done with the package,
+      the table will contain also coordinates in column `start` and `end`.
     - `signal_obj.rules` and `signal_obj.ruleset` containing a list of `rules` and a `ruleset`, respectively, to classify signals as `accept` or `reject`.
 - `rules` list of `Rule` objects, in which each corresponds to an SQI and contains thresholds for quality assignment. 
     Rules could be read into `signal_obj` from `.json` file in the following format:
