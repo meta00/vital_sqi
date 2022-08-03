@@ -7,17 +7,72 @@
 
 
 # Description
-Vital_sqi is a Python package for signal quality index (SQI) extraction and analysis from ECG and PPG waveforms.
+Vital_sqi is a Python package for signal quality index (SQI) extraction and quality assignment 
+for ECG and PPG waveforms. The package provides:
 
-- For PPG and ECG waveforms: supporting various data formats extracted from wearables.
-- Unified framework for state-of-the-art SQIs: standard statistics, HRV, R peak, waveform, and template matching 
-  based SQIs (Details in Section XX).
-- Pipeline and GUIs for SQI extraction and quality assignment. 
+1. Support PPG and ECG waveforms in various data formats extracted from wearables.
+2. Unified framework for state-of-the-art SQIs: standard statistics, HRV, R peak, waveform, and template matching 
+  based SQIs.
+3. Rule-based assignment of signal quality using user-defined thresholds for the extracted SQIs.
+4. Pipeline and GUIs for SQI extraction and quality assignment. 
 
+# Prerequisites and Installation
 
-# Installation and Prerequisites
+The package works with `Python 3.7` and `Python 3.8`.
+
+```cmd
+pip install vital_sqi
+```
 
 # Getting started
+The package is built around three classes: `SignalSQI` `Rule` `Ruleset`
+
+- `signal_obj` `SignalSQI` object, has the following attributes:
+    - `signal_obj.signal` containing waveform data (pandas dataframe).
+    - `signal_obj.sampling_rate` containing sampling rate, either input by user or automatically inferred from the waveform.
+    - `signal_obj.sqis` containing SQIs (pandas dataframe) that are derived by functions of `vital_sqi.sqi` modules or an 
+    external table, with SQI values as columns and signal segment per row. If derived using the vital_sqi package, i
+      
+The table also contains a column
+  named `decision`, if signal classification is applied on the SQI table. Columns 
+    - `signal_obj.rules` and `signal_obj.ruleset` containing a list of `rules` and a `ruleset`, respectively, to classify signals as `accept` or `reject`.
+- `rules` list of `Rule` objects, in which each corresponds to an SQI and contains thresholds for quality assignment. 
+    Rules could be read into `signal_obj` from `.json` file in the following format:
+  ```python
+    "test_sqi": {
+        "name": "test_sqi",
+        "def": [
+            {"op": ">", "value": "10", "label": "reject"},
+            {"op": ">=", "value": "3", "label": "accept"},
+            {"op": "<", "value": "3", "label": "reject"}],
+        "desc": "",
+        "ref": ""
+  }
+  ```
+- `ruleset` object of class `Ruleset` contains a set of selected `rules` (selected from the list of rules in `signal_obj.rule`) and the order to apply them in quality 
+assignment (see schema below). Notice that this is not a tree-based classification.
+  
+![Example of a rule set](images/sample_rule_chart.png "Example of a rule set")
+
+## Pipelines and GUIs
+We provide two pipelines for ECG (similarly for PPG) data as follows:
+- `vital_sqi.pipeline_highlevel.get_ecg_sqis` to extract SQIs for ECG segments.
+- `vital_sqi.pipeline_highlevel.get_qualified_ecg` to extract SQIs, use those to classify ECG waveform as `accept` or
+  `reject` using user-defined thresholds. 
+  
+We also provide an GUI to define `rules` and `ruleset` and execute them for an SQI table.
+
+## Reading
+The module `vital_sqi.data` provides functions to read (and write) data in the following formats:
+
+- ECG: EDF, MIT (physio.net), csv.
+- PPG: csv.
+Data is read into an object of `SignalSQI class`:
+```python
+import vital_sqi.data
+ecg_obj = ECG_reader()
+ppg_obj = PPG_reader()
+```
 
 ## Preprocessing
 ## SQI extraction
