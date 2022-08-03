@@ -54,14 +54,40 @@ assignment (see schema below). Notice that this is not a tree-based classificati
 ![Example of a rule set](images/sample_rule_chart.png "Example of a rule set")
 
 ## Pipelines and GUIs
-We provide two pipelines for ECG (similarly for PPG) data as follows:
+The package includes two pipelines for ECG (similarly for PPG) data as follows:
 - `vital_sqi.pipeline_highlevel.get_ecg_sqis` to extract SQIs for ECG segments.
-- `vital_sqi.pipeline_highlevel.get_qualified_ecg` to extract SQIs, use those to classify ECG waveform as `accept` or
-  `reject` using user-defined thresholds. 
-  
-We also provide an GUI to define `rules` and `ruleset` and execute them for an SQI table.
+    ```python
+        from vital_sqi.pipeline.pipeline_highlevel import *
+        from vital_sqi.data.signal_sqi_class import SignalSQI
+        import os
+        file_in = os.path.abspath('tests/test_data/example.edf')
+        sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
+        segments, signal_sqi_obj = get_ecg_sqis(file_in, sqi_dict, 'edf')
+    ```  
 
-## Reading
+- `vital_sqi.pipeline_highlevel.get_qualified_ecg` to extract SQIs, use those to classify ECG signal as `accept` or
+  `reject` using user-defined thresholds. The `rules` and `ruleset` are defined in json format. Templates are found in 
+  `vital_sqi/resource` folder: `sqi_dict.json` for `rules` and `rule_dict_test.json` for `ruleset`. 
+    ```python
+        from vital_sqi.pipeline.pipeline_highlevel import *
+        from vital_sqi.data.signal_sqi_class import SignalSQI
+        import os
+        file_in = os.path.abspath('tests/test_data/example.edf')
+        sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
+        rule_dict_filename = os.path.abspath('tests/test_data/rule_dict_test.json')
+        ruleset_order = {3: 'skewness_1', 2: 'entropy', 1: 'perfusion'}
+        output_dir = tempfile.gettempdir()
+        signal_obj = get_qualified_ecg(file_name=file_in,
+									sqi_dict_filename=sqi_dict,
+									file_type='edf', duration=30,
+									rule_dict_filename=rule_dict_filename,
+									ruleset_order=ruleset_order,
+									output_dir=output_dir)
+    ```
+
+We also provide an GUI to easily define `rule` and `ruleset`, and execute them with an input SQI table (Help - hyperlink to readthedocs)
+
+## S
 The module `vital_sqi.data` provides functions to read (and write) data in the following formats:
 
 - ECG: EDF, MIT (physio.net), csv.
@@ -76,7 +102,6 @@ ppg_obj = PPG_reader()
 ## Preprocessing
 ## SQI extraction
 ## Quality assignment
-## Pipeline and GUIs
 
 # References
 
