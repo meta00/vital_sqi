@@ -27,15 +27,15 @@ pip install vital_sqi
 # Getting started
 The package is built around three classes: `SignalSQI` `Rule` `Ruleset`
 
-- `signal_obj` `SignalSQI` object, has the following attributes:
+1. `signal_obj` `SignalSQI` object, has the following attributes:
     - `signal_obj.signal` containing waveform data (pandas dataframe).
     - `signal_obj.sampling_rate` containing sampling rate, either input by user or automatically inferred from the waveform.
     - `signal_obj.sqis` containing SQIs (pandas dataframe) that are derived by functions of `vital_sqi.sqi` modules or an 
     external table, with SQI values as columns and signal segments as rows. After signal classification, decision of
       `accept` or `reject` for each signal segment is in `decision` column. If signal segmentation is done with the package,
       the table will contain also coordinates in column `start` and `end`.
-    - `signal_obj.rules` and `signal_obj.ruleset` containing a list of `rules` and a `ruleset`, respectively, to classify signals as `accept` or `reject`.
-- `rules` list of `Rule` objects, in which each corresponds to an SQI and contains thresholds for quality assignment. 
+    - `signal_obj.rules` and `signal_obj.ruleset` containing a list of `rules` and a `ruleset` used for signal classification.
+2. `rules` list of `Rule` objects, in which each corresponds to an SQI and contains thresholds for quality assignment. 
     Rules could be read into `signal_obj` from `.json` file in the following format:
   ```python
     "test_sqi": {
@@ -48,7 +48,7 @@ The package is built around three classes: `SignalSQI` `Rule` `Ruleset`
         "ref": ""
   }
   ```
-- `ruleset` object of class `Ruleset` contains a set of selected `rules` (selected from the list of rules in `signal_obj.rule`) and the order to apply them in quality 
+3. `ruleset` object of class `Ruleset` contains a set of selected `rules` (selected from the list of rules in `signal_obj.rule`) and the order to apply them in quality 
 assignment (see schema below). Notice that this is not a tree-based classification.
   
 ![Example of a rule set](images/sample_rule_chart.png "Example of a rule set")
