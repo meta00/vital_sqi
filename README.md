@@ -90,12 +90,14 @@ We also provide an GUI to easily define `rule` and `ruleset`, and execute them w
 Following are the main steps to use the package for SQI extraction and signal classification. For details, see the 
 [documentation](https://vitalsqi.readthedocs.io/en/latest/).
 
-**1. Reading signal** 
+**1. Reading/Writing** 
    
-Signal waveform is read into an object of `SignalSQI` class using `vital_sqi.data` module. Supported formats include:
+Signal waveform is read into an object of `SignalSQI` class and written to the following format using `vital_sqi.data` 
+module.
    - ECG: EDF, MIT (physio.net), csv.
    - PPG: csv.
-
+Classified segments are written to csv files using `vital_sqi.preprocess.segment_split.save_segment`
+     
 **2.Preprocessing and segmentation**
    `vital_sqi.preprocessing` allows doing:
 - Several signal preprocessing steps such as trimming, tapering, smoothing, bandpass filter etc. For PPG, 
@@ -116,19 +118,14 @@ parameters, in `vital_sqi/resource/sqi_dict.json`.
 
 **4. Quality classification**
 
-Quality classification is
+The package allows making rule set from SQIs and user-defined thresholds for quality classification. A segment assigned 
+as `accept` pass all rules in the set, otherwise `reject`. Rules in the set have ordered, which might help to 
+improve speed.
 
-**5. Writing segment signal**
-
-The module `vital_sqi.data` provides functions to read (and write) data in the following formats:
+We ran brute force threshold searching for an in-house PPG dataset (generated with Smartcare, doubly annotated 
+by domain experts) to obtain a set of recommended thresholds, as found in `resource/rule_dict.json`.
 
 # References
 
-# Authors
 
-# License
-
-# How to contribute
-
-# Acknowledgements
 
