@@ -36,17 +36,14 @@ def dtw_sqi(s, template_type, template_size = 100,simple_mode=False):
     if template_type == 0:
         reference = ppg_nonlinear_dynamic_system_template(template_size).reshape(-1)
     elif template_type == 1:
-        reference = ppg_dual_double_frequency_template(template_size).reshape(-1)
+        reference = ppg_dual_double_frequency_template(template_size)
     if template_type == 2:
-        reference = ppg_absolute_dual_skewness_template(template_size).reshape(-1)
+        reference = ppg_absolute_dual_skewness_template(template_size)
     if template_type == 3:
         reference = np.array(ecg_dynamic_template(template_size)).reshape(-1)
 
     if simple_mode:
-        cost = 0
-        for i in range(template_size):
-            cost = cost + euclidean(s[i], reference[i])
-        dtw_cost = cost / template_size
+        dtw_cost = euclidean(s, reference) / template_size
     else:
         beat = resample(s, template_size)
         scaler = MinMaxScaler(feature_range=(0, 1))
