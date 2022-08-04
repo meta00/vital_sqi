@@ -28,3 +28,5 @@ github:
 doc:
 	rm source/docstring/*
 	sphinx-apidoc -o source/docstring ../vital_sqi
+	@sudo apt-get install libsndfile1-dev
+	@cp -a build/html/ ../../gh-pages/docs

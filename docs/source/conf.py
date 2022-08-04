@@ -128,3 +128,19 @@ sphinx_gallery_conf = {
     'download_all_examples': False,
     'within_subsection_order': FileNameSortKey
 }
+
+autodoc_mock_imports = ["librosa"]
+from unittest.mock import MagicMock
+
+sys.path.append(os.path.abspath('..'))
+
+# Mock module to bypass pip install
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+MOCK_MODULES = [
+    'librosa', 'librosa.display', 'plotly',
+    'setuptools', 'jupyter', 'pandas']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
