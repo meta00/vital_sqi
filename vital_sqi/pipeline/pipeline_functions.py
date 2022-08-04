@@ -393,16 +393,19 @@ def extract_segment_sqi(s, sqi_list, sqi_names, sqi_arg_list, wave_type):
 
 def extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg'):
     """
-    Extract all sqis from the list of  segments
+    Extract SQIs requested in SQI dictionary for a list of  segments
 
     Parameters
     ----------
     segments : list
-        List of segments to compute SQI
+        List of segments to compute SQIs
 
-    milestones :
+    milestones : pandas dataframe
+        Dataframe with 2 columns for start and end milestones of segments.
 
     sqi_dict_filename :
+        Path to SQI dictionary json file which contains the requested SQIs and
+        their corresponding parameters.
 
     wave_type :
          (Default value = 'ppg')

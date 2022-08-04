@@ -30,7 +30,7 @@ def dtw_sqi(s, template_type, template_size = 100,simple_mode=False):
 
     """
     check_valid_signal(s)
-    s = resample(s, template_size)
+    s = resample(s, template_size).reshape(-1)
     if template_type > 3 or type(template_type) != int:
         raise ValueError("Invalid template type")
     if template_type == 0:
@@ -40,12 +40,12 @@ def dtw_sqi(s, template_type, template_size = 100,simple_mode=False):
     if template_type == 2:
         reference = ppg_absolute_dual_skewness_template(template_size)
     if template_type == 3:
-        reference = ecg_dynamic_template(template_size)
+        reference = np.array(ecg_dynamic_template(template_size)).reshape(-1)
 
     if simple_mode:
         cost = 0
         for i in range(template_size):
-            cost = cost + euclidean(s[i], reference[i])
+            cost = cost + euclidean([s[i]], [reference[i]])
         dtw_cost = cost / template_size
     else:
         beat = resample(s, template_size)
