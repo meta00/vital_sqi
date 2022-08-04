@@ -1,43 +1,59 @@
 from dash.testing.application_runners import import_app
-from vital_sqi.app.index import display_page,update_output
+from vital_sqi.app.index import display_page
 from vital_sqi.app.views.dashboard1 import on_data_set_table as load_data_dashboard_1
 from vital_sqi.app.views.dashboard2 import on_data_set_table as load_data_dashboard_2
 from vital_sqi.app.views import dashboard2
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-from selenium.webdriver import Chrome
-from selenium import webdriver
-import os
-from dash.testing.composite import DashComposite
-from time import sleep
 import pandas as pd
-import os
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from mock import Mock,MagicMock
-import json
 
 
-# def test_onload_app(dash_duo):
-#     app = import_app('vital_sqi.app.index')
-#     dash_duo.start_server(app)
-#     assert dash_duo.get_logs() == [], "Browser console should contain no error"
-#
-#
-# def test_load_dashboard1(dash_duo):
-#     dashboard1_content = display_page('/views/dashboard1')
-#     assert dashboard1_content.children is not None
-#
-#
-# def test_load_dashboard2(dash_duo):
-#     dashboard2_content = display_page('/views/dashboard2')
-#     assert dashboard2_content.children is not None
-#
-#
-# def test_load_dashboard3(dash_duo):
-#     dashboard3_content = display_page('/views/dashboard3')
-#     assert dashboard3_content.children is not None
+def test_onload_app(dash_duo):
+    app = import_app('vital_sqi.app.index')
+    dash_duo.start_server(app)
+    assert dash_duo.get_logs() == [], "Browser console should contain no error"
+    dashboard1_content = display_page('/views/dashboard1')
+    assert dashboard1_content.children is not None
+    dashboard2_content = display_page('/views/dashboard2')
+    assert dashboard2_content.children is not None
+    dashboard3_content = display_page('/views/dashboard3')
+    assert dashboard3_content.children is not None
+
+
+def test_dashboard_1(dash_duo):
+    mock_data = pd.read_csv('tests/test_data/mock_sqis.csv')
+    mock_content_db1 = load_data_dashboard_1(mock_data)
+    assert mock_content_db1 is not None
+
+
+def test_dashboard_2(dash_duo):
+    mock_app = import_app('vital_sqi.app.views.dashboard2')
+    mock_data = pd.read_csv('tests/test_data/mock_sqis.csv')
+    mock_data_rule = {
+        "skewness_sqi": {
+            "name": "skewness_sqi",
+            "def": [
+                {"op": ">=", "value": "10", "label": "reject"},
+                {"op": ">=", "value": "3", "label": "accept"},
+                {"op": "<", "value": "3", "label": "reject"}],
+            "desc": "",
+            "ref": ""
+        }
+    }
+    mock_content_db2 = load_data_dashboard_2(mock_data, mock_data_rule)
+    mock_app.layout = dashboard2.layout
+    mock_app.layout.children[2] = mock_content_db2[0]
+
+    dash_duo.start_server(mock_app)
+    driver = dash_duo.driver
+    driver.get(dash_duo.server_url)
+
+    driver.find_element(
+            by=By.ID,
+            value='confirm-rule-button')
+
+    assert dash_duo.get_logs() == [], "Confirm Button doesnot load"
+
+
 #
 #
 # def test_upload_data(dash_duo):
@@ -61,51 +77,6 @@ import json
 #     assert True
 #
 #
-# def test_on_data_set_table(dash_duo):
-#     mock_data = pd.read_csv('mock_sqis.csv')
-#     mock_content_db1 = load_data_dashboard_1(mock_data)
-#     assert mock_content_db1 is not None
-
-
-def test_dashboard_2(dash_duo):
-    mock_app = import_app('vital_sqi.app.views.dashboard2')
-    mock_data = pd.read_csv('mock_sqis.csv')
-    mock_data_rule = {
-        "skewness_sqi": {
-            "name": "skewness_sqi",
-            "def": [
-                {"op": ">=", "value": "10", "label": "reject"},
-                {"op": ">=", "value": "3", "label": "accept"},
-                {"op": "<", "value": "3", "label": "reject"}],
-            "desc": "",
-            "ref": ""
-        }
-    }
-    mock_content_db2 = load_data_dashboard_2(mock_data, mock_data_rule)
-    mock_app.layout = dashboard2.layout
-    # mock_app.layout = import_app('vital_sqi.app.views.dashboard2').layout
-    mock_app.layout.children[2] = mock_content_db2[0]
-
-    dash_duo.start_server(mock_app)
-    driver = dash_duo.driver
-    driver.get(dash_duo.server_url)
-
-    print("=================== get layout ======================")
-    # assert dash_duo.find_element('#confirm-rule-button').text == "Confirm"
-    # print("=================== get layout children======================")
-    mock_confirmed_button = \
-        driver.find_element(
-            by=By.ID,
-            value='confirm-rule-button')
-
-    mock_switch_selection = driver.find_element(
-            by=By.ID,
-            value='switch-selection')
-    mock_switch_selection.send_keys(True)
-    mock_confirmed_button.click()
-    print(dash_duo.get_logs() == [])
-    # assert dash_duo.get_logs() == [], "Click got Error"
-
 
 # def test_upload_data(dash_duo):
 #     app = import_app('vital_sqi.app.index')
