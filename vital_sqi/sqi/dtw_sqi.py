@@ -43,7 +43,10 @@ def dtw_sqi(s, template_type, template_size = 100,simple_mode=False):
         reference = np.array(ecg_dynamic_template(template_size)).reshape(-1)
 
     if simple_mode:
-        dtw_cost = euclidean(s, reference) / template_size
+        cost = 0
+        for i in range(template_size):
+            cost = cost + euclidean([s[i]], [reference[i]])
+        dtw_cost = cost / template_size
     else:
         beat = resample(s, template_size)
         scaler = MinMaxScaler(feature_range=(0, 1))
