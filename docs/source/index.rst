@@ -14,18 +14,8 @@ The code of the project is on Github: https://github.com/meta00/vital_sqi
 
    usage/installation
    usage/introduction
-   usage/quickstart
-   usage/development
    usage/contributions
 
-.. toctree::
-   :maxdepth: 3
-   :caption: Example
-   :hidden:
-
-   _examples/tutorials/index
-   _examples/preprocess/index
-   _examples/sqi/index
 
 .. toctree::
    :maxdepth: 2
