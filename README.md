@@ -20,7 +20,7 @@ for ECG and PPG waveforms. The package provides:
 The package works with `Python 3.7` and `Python 3.8`.
 
 ```cmd
-pip install vital_sqi
+pip install vital-sqi
 ```
 
 # Getting started
