@@ -3,7 +3,6 @@
 - By beat
 """
 import warnings
-
 import pandas as pd
 from tqdm import tqdm
 import plotly.graph_objects as go
@@ -68,7 +67,7 @@ def save_segment(segment_list, segment_name=None, save_file_folder=None,
             np.savetxt(os.path.join(save_file_folder, saved_filename + '.csv'),
                        segment, delimiter=',')  # as an array
         except Exception as e:
-            print(e)
+            warnings.warn(f'Segment {segment} raises {e}')
         i = i+1
 
 

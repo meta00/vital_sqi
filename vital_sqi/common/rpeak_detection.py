@@ -6,7 +6,7 @@
 import numpy as np
 from sklearn.cluster import KMeans
 from scipy import signal
-
+import warnings
 from vital_sqi.common.band_filter import BandpassFilter
 from vital_sqi.common.generate_template import ecg_dynamic_template
 import warnings
@@ -91,9 +91,6 @@ class PeakDetector:
         b, a = signal.butter(1, [f1*2, f2*2], btype='bandpass')
 
         filtered_ecg = signal.lfilter(b, a, s)
-        # bandpass = BandpassFilter()
-        # filtered_ecg = bandpass.signal_lowpass_filter(s,f2)
-        # filtered_ecg = bandpass.signal_highpass_filter(filtered_ecg,f1)
 
         diff = np.diff(filtered_ecg).reshape(-1)
         squared = diff**2
@@ -123,7 +120,6 @@ class PeakDetector:
             mwa_peaks = detector.matched_filter_detector(s)
         else:
             mwa_peaks = detector.pan_tompkins_detector(s)
-            # mwa_peaks = panPeakDetect(mwa, self.fs)
 
         if len(mwa_peaks) == 0:
             return [],[]
@@ -136,7 +132,7 @@ class PeakDetector:
         # compute the segment points
         trough_list = []
         nadir_min_list = []
-        for idx in range(len(mwa_peaks)-1):
+        for idx,val in enumerate(np.arange(len(mwa_peaks)-1)):
             peak_idx = mwa_peaks[idx]
             next_peak_idx = mwa_peaks[idx+1]
             interval = mwa[peak_idx:next_peak_idx]
@@ -206,7 +202,8 @@ class PeakDetector:
                 peak_finalist, trough_finalist = \
                     self.detect_peak_trough_adaptive_threshold(s)
         except Exception as err:
-            print(err)
+            warnings.warn(f"Current peak detection method raise {err} \n"
+                          f"Package changed to default peak detection")
             return signal.find_peaks(s)[0], []
 
         return peak_finalist, trough_finalist
@@ -525,7 +522,8 @@ class PeakDetector:
                 peak_finalist.append(np.argmax(s[left:right]) + left)
                 trough_finalist.append(np.argmin(s[left:right]) + left)
             except Exception as e:
-                print(e)
+                warnings.warn(f'Peak detection - SLOPE_SUM_METHOD - '
+                              f'raise {e} at index {trough_idx}')
         return peak_finalist, onset_list
 
     def search_for_onset(Z, idx, local_max):
@@ -608,7 +606,7 @@ class PeakDetector:
         # index where the block move to other block
         BOI_width_idx = np.where(BOI_diff > 1)[0]
 
-        for i in range(len(BOI_width_idx)):
+        for i,val in enumerate(np.arange(len(BOI_width_idx))):
             if i == 0:
                 BOI_width = BOI_width_idx[i]
             else:
@@ -686,7 +684,7 @@ class PeakDetector:
         mn, mx = np.Inf, -np.Inf
         mnpos, mxpos = np.NaN, np.NaN
         lookformax = True
-        for i in np.arange(len(v)):
+        for i,val in enumerate(np.arange(len(v))):
             this = v[i]
             if this > mx:
                 mx = this
@@ -707,11 +705,3 @@ class PeakDetector:
                     mxpos = x[i]
                     lookformax = True
         return np.array(maxtab), np.array(mintab)
-
-# from vital_sqi.dataset import load_ecg
-#
-# ecg = load_ecg()
-# ecg_signal = ecg.signals
-# ecg_fs = ecg.sampling_rate
-# detector = PeakDetector(wave_type='ecg',fs=ecg_fs)
-# detector.ecg_detector(ecg_signal)

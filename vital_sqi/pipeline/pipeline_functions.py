@@ -5,11 +5,11 @@ import vital_sqi.preprocess.preprocess_signal as sqi_pre
 import json
 from tqdm import tqdm
 from scipy.signal import resample
-
 from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
 from vital_sqi.rule import RuleSet, Rule, update_rule
 from vital_sqi.common.utils import get_nn
+import warnings
 import inspect
 
 
@@ -50,7 +50,7 @@ def classify_segments(sqis, rule_dict_filename, ruleset_order):
         rule_list[rule_order] = rule
     ruleset = RuleSet(rule_list)
     selected_sqi = list(ruleset_order.values())
-    for i in range(len(sqis)):
+    for i,val in enumerate(np.arange(len(sqis))):
         sqi_df = sqis[i]
         decision_list = []
         for idx in range(len(sqi_df)):
@@ -142,7 +142,7 @@ def get_decision_segments(segments, decision, reject_decision):
     decision = [a + b for a, b in zip(decision,reject_decision)]
     a_segments= []
     r_segments = []
-    for i in decision:
+    for i,val in enumerate(decision):
         if decision[i] == 0:
             a_segments.append(segments[i])
         if decision[i] == 1:
@@ -202,11 +202,6 @@ def per_beat_sqi(sqi_func, troughs, signal, use_mean_beat,
                 beat_list.append(resample(single_beat, mean_resample_size))
             else:
                 sqi_vals.append(sqi_func(single_beat, **kwargs))
-            # if len(kwargs) != 0:
-            #     args = tuple(kwargs.values())
-            #     sqi_vals.append(sqi_func(single_beat, *args))
-            # else:
-            #     sqi_vals.append(sqi_func(single_beat))
         if use_mean_beat:
             beat_list = np.array(beat_list)
             beat = np.apply_along_axis(np.mean, axis=0, arr=beat_list)
@@ -272,7 +267,7 @@ def get_sqi_dict(sqis, sqi_name):
 
     if isinstance(sqis, tuple):
         SQI_dict = {}
-        for features_dict in sqis:
+        for idx,features_dict in enumerate(sqis):
             features_dict_ = dict((key+"_sqi", value) for (key, value) in features_dict.items())
             SQI_dict = {**SQI_dict, **features_dict_}
         return SQI_dict
@@ -344,7 +339,6 @@ def get_sqi(sqi_func, sqi_name, s, per_beat=False,
         if 'wave_type' in inspect.getfullargspec(sqi_func)[0]:
             kwargs['wave_type'] = wave_type
         sqi_scores = sqi_func(s, **kwargs)
-    # sqi_name = sqi_func.__name__
     sqi_score_dict = get_sqi_dict(sqi_scores, sqi_name)
     return sqi_score_dict
 
@@ -373,36 +367,35 @@ def extract_segment_sqi(s, sqi_list, sqi_names, sqi_arg_list, wave_type):
     """
     sqi_score = {}
     sqi_type = list(sqi_arg_list.keys())
-    # for (sqi_,args_) in zip(sqi_list,sqi_arg_list):
-    for idx in range(len(sqi_list)):
+    for idx,sqi_ in enumerate(sqi_list):
         try:
             args_ = sqi_arg_list[sqi_type[idx]]
             sqi_name = sqi_names[idx]
-            sqi_ = sqi_list[idx]
             args_["wave_type"] = wave_type
             if sqi_.__name__ == "perfusion_sqi":
                 args_ = {'y': np.array(s.iloc[:,1])}
             sqi_score = {**sqi_score, **get_sqi(sqi_, sqi_name, s, **args_)}
         except Exception as err:
-            print('Error')
-            print(sqi_)
-            print(err)
+            warnings.warn(f"{sqi_.__name__} raises exception {err}")
             continue
     return pd.Series(sqi_score)
 
 
 def extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg'):
     """
-    Extract all sqis from the list of  segments
+    Extract SQIs requested in SQI dictionary for a list of  segments
 
     Parameters
     ----------
     segments : list
-        List of segments to compute SQI
+        List of segments to compute SQIs
 
-    milestones :
+    milestones : pandas dataframe
+        Dataframe with 2 columns for start and end milestones of segments.
 
     sqi_dict_filename :
+        Path to SQI dictionary json file which contains the requested SQIs and
+        their corresponding parameters.
 
     wave_type :
          (Default value = 'ppg')
@@ -472,18 +465,13 @@ def extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg'):
     sqi_names = []
     sqi_arg_list = {}
     for item_key, item_value in sqi_dict.items():
-        # sqi_name, sqi_arg
         sqi_names.append(item_key)
         sqi_list.append(sqi_mapping_list[item_value['sqi']])
         sqi_arg_list[item_key] = item_value['args']
     df_sqi = pd.DataFrame()
-    for segment_idx in tqdm(range(len(segments))):
-        segment = segments[segment_idx]
-        # if
+    for segment_idx,segment in enumerate(tqdm(segments)):
         sqi_arg_list['perfusion_sqi'] = {'y':segment.iloc[:, 1]}
         sqis = extract_segment_sqi(segment, sqi_list,sqi_names, sqi_arg_list,wave_type)
-        # segment_name_list = file_name.split("/")[-1] + "_" +str(segment_idx)
-        # sqis['id'] = segment_name_list
         df_sqi = df_sqi.append(sqis, ignore_index=True)
     df_sqi['start_idx'] = milestones.iloc[:, 0]
     df_sqi['end_idx'] = milestones.iloc[:, 1]

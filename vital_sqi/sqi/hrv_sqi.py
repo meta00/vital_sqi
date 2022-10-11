@@ -29,8 +29,8 @@ import warnings
 from hrvanalysis import get_time_domain_features, \
     get_frequency_domain_features,  get_nn_intervals, get_csi_cvi_features, \
     get_geometrical_features
-import sys,os
 from vital_sqi.common.rpeak_detection import PeakDetector
+from vital_sqi.common.utils import HiddenPrints
 
 
 def nn_mean_sqi(nn_intervals):
@@ -650,15 +650,6 @@ def get_all_features_hrva(s, sample_rate=100, rpeak_method=0,wave_type='ecg'):
 
 
     """
-
-    # if rpeak_method in [1, 2, 3, 4]:
-    #     detector = PeakDetector()
-    #     peak_list = detector.ppg_detector(data_sample, rpeak_method)[0]
-    # else:
-    #     rol_mean = rolling_mean(data_sample, windowsize=0.75, sample_rate=100.0)
-    #     peaks_wd = detect_peaks(data_sample, rol_mean, ma_perc=20,
-    #                             sample_rate=100.0)
-    #     peak_list = peaks_wd["peaklist"]
     if wave_type =='ppg':
         detector = PeakDetector(wave_type='ppg')
         peak_list, trough_list = detector.ppg_detector(s, detector_type=rpeak_method)
@@ -672,18 +663,16 @@ def get_all_features_hrva(s, sample_rate=100, rpeak_method=0,wave_type='ecg'):
 
     rr_list = np.diff(peak_list) * (1000 / sample_rate)  # 1000 milisecond
 
-    old_stdout = sys.stdout
-    sys.stdout = open(os.devnull, 'w')
-    nn_list = get_nn_intervals(rr_list)
-    sys.stdout = old_stdout
+    with HiddenPrints():
+        nn_list = get_nn_intervals(rr_list)
 
-    nn_list_non_na = np.copy(nn_list)
-    nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+        nn_list_non_na = np.copy(nn_list)
+        nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
 
-    time_domain_features = get_time_domain_features(rr_list)
-    frequency_domain_features = get_frequency_domain_features(rr_list)
-    geometrical_features = get_geometrical_features(rr_list)
-    csi_cvi_features = get_csi_cvi_features(rr_list)
+        time_domain_features = get_time_domain_features(rr_list)
+        frequency_domain_features = get_frequency_domain_features(rr_list)
+        geometrical_features = get_geometrical_features(rr_list)
+        csi_cvi_features = get_csi_cvi_features(rr_list)
 
     return time_domain_features, frequency_domain_features, geometrical_features, csi_cvi_features
 

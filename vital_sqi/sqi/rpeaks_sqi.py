@@ -8,11 +8,8 @@ using the resulted NN series to evaluate the raw signal quality.
     evaluate gap in the non-interpolated NN interval.
 """
 import numpy as np
-import scipy.interpolate
 from scipy import signal
-import heartpy as hp
-from heartpy.analysis import clean_rr_intervals,calc_rr
-from heartpy.peakdetection import check_peaks
+from vital_sqi.common.utils import HiddenPrints
 from hrvanalysis.preprocessing import remove_outliers, remove_ectopic_beats, interpolate_nan_values
 from statsmodels.tsa.stattools import acf
 from vital_sqi.common.rpeak_detection import PeakDetector
@@ -54,42 +51,26 @@ def ectopic_sqi(s, rule_index=1, sample_rate=100, rpeak_detector=0,
     
     """
     rules = ["malik", "karlsson", "kamath", "acar"]
-    # try:
-    #     wd, m = hp.process(s, sample_rate, calc_freq=True)
-    # except:
-    #     try:
-    #         wd, m = hp.process(s, sample_rate)
-    #     except:
-    #         return np.nan
-    #
-    # # if rpeak_detector in [1, 2, 3, 4]:
-    # if wave_type=='ecg':
-    #     detector = PeakDetector(wave_type='ecg')
-    #     peak_list = detector.ecg_detector(s, rpeak_detector)[0]
-    # else:
-    #     detector = PeakDetector(wave_type='ppg')
-    #     peak_list = detector.ppg_detector(s, rpeak_detector,
-    #                                       preprocess=False)[0]
-    # wd["peaklist"] = peak_list
-    # wd = calc_rr(peak_list, sample_rate, working_data=wd)
-    #
-    # rr_intervals = wd["RR_list"]
-    rr_intervals = get_nn(s,wave_type=wave_type,sample_rate=sample_rate,
-                          rpeak_method=rpeak_detector,remove_ectopic_beat=False)
-    rr_intervals_cleaned = remove_outliers(rr_intervals, low_rri=low_rri,
-                                           high_rri=high_rri)
-    number_outliers = len(np.where(np.isnan(rr_intervals_cleaned))[0])
-    outlier_ratio = number_outliers/(len(rr_intervals_cleaned)-number_outliers)
-    if rule_index == 0:
-        return outlier_ratio
+    with HiddenPrints():
+        rr_intervals = get_nn(s,wave_type=wave_type,sample_rate=sample_rate,
+                              rpeak_method=rpeak_detector,remove_ectopic_beat=False)
 
-    interpolated_rr_intervals = interpolate_nan_values(rr_intervals_cleaned)
+        rr_intervals_cleaned = remove_outliers(rr_intervals, low_rri=low_rri,
+                                                   high_rri=high_rri)
+        number_outliers = len(np.where(np.isnan(rr_intervals_cleaned))[0])
+        outlier_ratio = number_outliers/(len(rr_intervals_cleaned)-number_outliers)
+        if rule_index == 0:
+            return outlier_ratio
 
-    rule = rules[rule_index]
-    nn_intervals = remove_ectopic_beats(interpolated_rr_intervals,
-                                            method=rule)
-    number_ectopics = len(np.where(np.isnan(nn_intervals))[0])
-    ectopic_ratio = number_ectopics/(len(nn_intervals)-number_ectopics)
+        interpolated_rr_intervals = interpolate_nan_values(rr_intervals_cleaned)
+
+        rule = rules[rule_index]
+
+        nn_intervals = remove_ectopic_beats(interpolated_rr_intervals,
+                                                method=rule)
+
+        number_ectopics = len(np.where(np.isnan(nn_intervals))[0])
+        ectopic_ratio = number_ectopics/(len(nn_intervals)-number_ectopics)
 
     return ectopic_ratio
 
