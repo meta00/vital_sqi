@@ -7,7 +7,6 @@ Implementation of SQIs for waveform:
 import scipy.signal as sn
 import numpy as np
 from vital_sqi.common.rpeak_detection import PeakDetector
-from vital_sqi.common.utils import *
 
 
 def band_energy_sqi(s, sampling_rate=100, band=None,nperseg=2048):
