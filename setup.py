@@ -12,8 +12,10 @@ setup(
     description = "Signal quality control pipeline for electrocardiogram and "
                  "photoplethysmogram",
     long_description = long_description,
-    author = 'Heloise Greeff, Hai Ho, Stefan Karolcik, Khoa Le, Kien Trinh (alphabetical order)',
-    author_email = 'heloise.greeff@eng.ox.ac.uk, haihb@oucru.org, s.karolcik@imperial.ac.uk, khoaldv@oucru.org, kientt@oucru.org',
+    long_description_content_type = 'text/markdown',
+    author = 'Khoa Le, Hai Ho, Stefan Karolcik, Heloise Greeff',
+    author_email = 'khoaldv@oucru.org, haihb@oucru.org, s.karolcik@imperial.ac.uk, '
+                   'heloise.greeff@eng.ox.ac.uk',
     maintainer = 'Hai Ho, Khoa Le',
     maintainer_email = 'haihb@oucru.org, khoaldv@oucru.org',
     py_modules = ['common', 'data', 'preprocess', 'sqi'],

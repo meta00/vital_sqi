@@ -54,7 +54,7 @@ Acronym                        Domain                                      Statu
 
     See: :py:func:`vital_sqi.sqi.standard_sqi.perfusion_sqi`
 
-    Examples: XXX | XXX | XXX
+
 
 - **Kurtosis**
 
@@ -62,7 +62,7 @@ Acronym                        Domain                                      Statu
 
     See: :py:func:`vital_sqi.sqi.standard_sqi.kurtosis_sqi`
 
-    Examples: XXX | XXX | XXX
+
 
 - **Skewness**
 
@@ -70,7 +70,7 @@ Acronym                        Domain                                      Statu
 
     See: :py:func:`vital_sqi.sqi.standard_sqi.skewness_sqi`
 
-    Examples: XXX | XXX | XXX
+
 
 - **Signal to noise**
 
@@ -78,7 +78,7 @@ Acronym                        Domain                                      Statu
 
     See: :py:func:`vital_sqi.sqi.standard_sqi.signal_to_noise_sqi`
 
-    Examples: XXX | XXX | XXX
+
 
 - **Zero crossings rate**
 
@@ -86,7 +86,7 @@ Acronym                        Domain                                      Statu
 
     See: :py:func:`vital_sqi.sqi.standard_sqi.zero_crossings_rate_sqi`
 
-    Examples: XXX | XXX | XXX
+
 
 - **Mean crossing rate**
 
@@ -94,7 +94,7 @@ Acronym                        Domain                                      Statu
 
     See: :py:func:`vital_sqi.sqi.standard_sqi.mean_crossing_rate_sqi`
 
-    Examples: XXX | XXX | XXX
+
 
 - **Dynamic time warping**
 
@@ -102,4 +102,3 @@ Acronym                        Domain                                      Statu
 
     See: :py:func:`vital_sqi.sqi.dtw_sqi.dtw_sqi`
 
-    Examples: XXX | XXX | XXX

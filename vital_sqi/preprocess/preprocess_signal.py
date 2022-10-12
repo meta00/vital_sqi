@@ -5,7 +5,6 @@ from scipy import signal
 from vital_sqi.common.generate_template import squeeze_template
 
 
-
 def taper_signal(s, window=None, shift_min_to_zero=True):
     """Pinning the leftmost and rightmost signal to the zero baseline
     and amplifying the remainder according to the window shape.
