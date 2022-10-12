@@ -40,6 +40,7 @@ from vital_sqi.sqi.hrv_sqi import (
 	hr_median_sqi,
 	hr_min_sqi,
 	hr_max_sqi,
+	hr_std_sqi,
 	hr_range_sqi,
 	peak_frequency_sqi,
 	absolute_power_sqi,

@@ -442,6 +442,7 @@ def extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg'):
         'hr_median_sqi': sq.hr_median_sqi,
         'hr_min_sqi': sq.hr_min_sqi,
         'hr_max_sqi': sq.hr_max_sqi,
+        'hr_std_sqi':sq.hr_std_sqi,
         'hr_range_sqi': sq.hr_range_sqi,
         'peak_frequency_sqi': sq.peak_frequency_sqi,
         'absolute_power_sqi': sq.absolute_power_sqi,
