@@ -154,15 +154,15 @@ def ECG_reader(file_name, file_type, channel_num=None,
                                                          float):
                 start_datetime = pd.Timestamp(start_datetime)
                 timestamps[0] = start_datetime
-                for i in range(1, len(signals)):
-                    timestamps[i] = timestamps[i-1] + \
-                                    pd.Timedelta(seconds=timestamps[i])
+                timestamps = np.array(start_datetime + pd.to_timedelta(timestamps, unit='seconds'))
+                # for i in range(1, len(signals)):
+                #     timestamps[i] = timestamps[i-1] + \
+                #                     pd.Timedelta(seconds=timestamps[i])
             # no start_datetime and column in datetime
             if start_datetime is None:
                 timestamps = signals.iloc[:, 0].apply(pd.Timestamp)
             if sampling_rate is None:
-                sampling_rate = utils.calculate_sampling_rate(signals.iloc[:,
-                                                              0])
+                sampling_rate = utils.calculate_sampling_rate(signals.iloc[:,0])
         except ValueError:
             assert sampling_rate is not None, \
                     'Sampling rate is not found nor able to be inferred ' \
@@ -304,7 +304,7 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx=[],
     if isinstance(timestamp_idx[0], str):
         timestamp_idx[0] = tmp.columns.get_loc(timestamp_idx[0])
 
-    timestamps = tmp.iloc[:, timestamp_idx[0]]
+    timestamps = np.array(tmp.iloc[:, timestamp_idx[0]])
     if isinstance(start_datetime, str):
         try:
             start_datetime = pd.Timestamp(start_datetime)
@@ -322,13 +322,9 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx=[],
     elif timestamp_unit != 's':
         raise Exception("Timestamp unit must be either second (s) or "
                         "millisecond (ms)")
-
-    for i in range(0, len(timestamps)):
-        timestamps[i] = start_datetime + pd.Timedelta(timestamps[i],
-                                                      unit='seconds')
+    timestamps = np.array(start_datetime + pd.to_timedelta(timestamps,unit='seconds'))
     if sampling_rate is None:
         sampling_rate = utils.calculate_sampling_rate(timestamps)
-    
     info = pd.DataFrame(tmp.iloc[:, info_idx])
     signals = tmp.iloc[:, signal_idx]
     signals.insert(0, 'timestamps', timestamps)
@@ -366,52 +362,3 @@ def PPG_writer(signal_sqi, file_name, file_type='csv'):
     if file_type == 'xlsx':
         out_df.to_excel(file_name, index=False, header=True)
     return os.path.isfile(file_name)
-
-# import os, tempfile
-# file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/test_data/example.edf')
-# out = ECG_reader(file_in, 'edf')
-# print(out)
-
-# import os, tempfile
-#
-# file_in = os.path.abspath('/Users/haihb/Documents/Oucru/innovation'
-#                           '/vital_sqi/tests/test_data/example.edf')
-# out = ECG_reader(file_in, 'edf')
-
-# file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/test_data/out.edf')
-# out1 = ECG_reader(file_in, 'edf')
-# file_out = '/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/out.edf'
-# out.sampling_rate = 15.8
-# out.info[0]['annotations'][0][1] = float(str(out.info[0]['annotations'][0][
-#                                                 1], 'utf-8'))
-# ECG_writer(out, file_out, file_type='edf', info=out.info)
-
-# file_in = os.path.abspath('/Users/haihb/Documents/Oucru/innovation'
-#                           '/vital_sqi/tests/test_data/a103l')
-# out = ECG_reader(file_in, 'mit')
-
-# file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/test_data/a103l')
-# out = ECG_reader(file_in, 'mit')
-# file_out = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/test_data/out_mit')
-# ECG_writer(out, file_out, file_type='mit', info=out.info)
-# out = PPG_reader('/Users/haihb/Documents/Work/Oucru/innovation/vital_sqi/tests/test_data/ppg_smartcare.csv',
-#                 timestamp_idx = ['TIMESTAMP_MS'], signal_idx = ['PLETH'], info_idx = ['PULSE_BPM',
-#                                                         'SPO2_PCT','PERFUSION_INDEX'],
-#                  start_datetime = '2020-04-12 10:00:00')
-# out.sampling_rate = 2
-#PPG_writer(out, 'D:/Workspace/oucru/medical_signal/Github/vital_sqi/vital_sqi/dataset/ppg_smartcare_w.csv')
-# file_in = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                           '/vital_sqi/tests/test_data/ecg_test2.csv')
-# out = ECG_reader(file_in, 'csv', channel_name = ['Time', '1'])
-# file_out = '/Users/haihb/Documents/Work/Oucru/innovation ' \
-#            '/vital_sqi/tests/test_data/ecg_test_write.csv'
-# ECG_writer(out, file_out, file_type = 'csv')
-
-# import os
-# file_name = os.path.abspath('/Users/haihb/Documents/Work/Oucru/innovation'
-#                             '/vital_sqi/tests/test_data/ecg_test1.csv')
-# out = ECG_reader(file_name, 'csv', channel_name=['Time', '1'])

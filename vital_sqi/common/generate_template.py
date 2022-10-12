@@ -28,7 +28,7 @@ def squeeze_template(s, width):
     total_len = len(s)
     span_unit = 2
     out_res = []
-    for i in range(int(width)):
+    for i,val in enumerate(np.arange(int(width))):
         if i == 0:
             centroid = (total_len / width) * i
         else:

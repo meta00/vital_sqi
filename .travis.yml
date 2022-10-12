@@ -9,9 +9,13 @@ env:
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 sudo: required
 addons:
-  chrome: stable
-services:
-  - xvfb
+  apt:
+    sources:
+    - google-chrome
+    packages:
+    - google-chrome-stable
+#  chrome: stable
+
 before_install:
   - export DISPLAY=:99.0
   - sleep 3
@@ -28,9 +32,25 @@ install:
   - pip install --upgrade setuptools
   - pip install --upgrade importlib-metadata
   - pip install -e .
-  - export PATH=$PATH:$(pwd)'/tests/app/'
+#  - export PATH=$PATH:$(pwd)'/tests/app/'
 # Command to run tests, e.g. python setup.py test
+before_script:
+  - wget http://chromedriver.storage.googleapis.com/106.0.5249.61/chromedriver_linux64.zip
+  - unzip chromedriver_linux64.zip
+  - sudo apt-get install libnss3
+#  - sudo apt-get install -y chromium-browser
+#  - sudo apt-get --only-upgrade install google-chrome-stable
+  - sudo cp chromedriver /usr/local/bin/.
+  - sudo chmod +x /usr/local/bin/chromedriver
+#    - export DISPLAY=:99.0
+#  - sh -e /etc/init.d/xvfb start
+#  - sleep 3
+
+services:
+  - xvfb
+
 script:
+  - sleep 3
   - python -c "import numpy; print(numpy.version.version)"
   - pytest --cov=vital_sqi tests
 after_success:

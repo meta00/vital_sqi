@@ -1,28 +1,11 @@
-import sys
-
-import vital_sqi
-# from sklearn.metrics import auc,brier_score_loss,f1_score,roc_auc_score,fbeta_score,jaccard_score,hamming_loss
-# import numpy as np
-# import vital_sqi.sqi as sq
-from vital_sqi.data.signal_io import PPG_reader, ECG_reader
 from vital_sqi.preprocess.segment_split import split_segment, save_segment
-from vital_sqi.pipeline.pipeline_functions import *
-# import json
+from vital_sqi.pipeline.pipeline_functions import extract_sqi,classify_segments,\
+    get_reject_segments,get_decision_segments
+from vital_sqi.data.signal_io import PPG_reader, ECG_reader
 import os
 import pandas as pd
-
-# D:\Workspace\oucru\classification_sqi
-
-# PPG_ALL_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/ppg_all"
-# G_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/good"
-# NG_1_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/NG_1"
-# NG_2_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/NG_2"
-# NG_OUTPUT_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/NG_output"
-# G_OUTPUT_FOLDER = "D:/Workspace/oucru/classification_sqi/dataset/G_output"
-#
-# good_files = [".".join(x.split(".")[:-1])+".csv" for x in next(os.walk(G_FOLDER), (None, None, []))[2]]
-# ng_1_files = [".".join(x.split(".")[:-1])+".csv" for x in next(os.walk(NG_1_FOLDER), (None, None, []))[2]]
-# ng_2_files = [".".join(x.split(".")[:-1])+".csv" for x in next(os.walk(NG_2_FOLDER), (None, None, []))[2]]
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def get_ppg_sqis(file_name, signal_idx, timestamp_idx, sqi_dict_filename,

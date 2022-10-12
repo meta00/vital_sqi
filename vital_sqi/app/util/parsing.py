@@ -47,7 +47,7 @@ def generate_rule(rule_name,rule_def):
 
 def generate_rule_set(rule_set_dict):
     rule_set = {}
-    for rule_dict in rule_set_dict:
+    for i,rule_dict in enumerate(rule_set_dict):
         rule_name = rule_dict["name"]
         rule_def = rule_dict["def"]
         rule = generate_rule(rule_name,rule_def)
@@ -57,7 +57,7 @@ def generate_rule_set(rule_set_dict):
 
 def parse_rule_list(rule_def):
     rule_dict_list = []
-    for rule in rule_def:
+    for i,rule in enumerate(rule_def):
         rule_dict = {
             "op":rule['op'],
             "value":rule['value'],
@@ -68,7 +68,7 @@ def parse_rule_list(rule_def):
 
 def generate_boundaries(boundaries):
     bound_list = []
-    for idx in range(len(boundaries)):
+    for idx,boundary in enumerate(boundaries):
         if idx == 0:
             bound_list.append("[-inf, "+str(boundaries[idx])+"]")
             bound_list.append(str(boundaries[idx]))

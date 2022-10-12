@@ -1,5 +1,5 @@
 import numpy as np
-import os
+import os,sys
 import datetime as dt
 import json
 import pandas as pd
@@ -15,6 +15,16 @@ OPERAND_MAPPING_DICT = {
     "<=": 2,
     "<": 1
 }
+
+
+class HiddenPrints:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
+        sys.stdout = self._original_stdout
 
 
 def get_nn(s,wave_type='ppg',sample_rate=100,rpeak_method=7,
@@ -54,10 +64,7 @@ def check_valid_signal(x):
                          "0}:".format(type(x)))
     if len(x) == 0:
         raise ValueError("Empty signal")
-    types = []
-    x = list(x)
-    for i in range(len(x)):
-        types.append(str(type(x[i])))
+    types = [str(type(xi)) for idx,xi in enumerate(x)]
     type_unique = np.unique(np.array(types))
     if len(type_unique) != 1 and (type_unique[0].find("int") != -1 or
                                   type_unique[0].find("float") != -1):
@@ -83,24 +90,24 @@ def calculate_sampling_rate(timestamps):
     if isinstance(timestamps[0], float):
         timestamps_second = timestamps
     elif isinstance(timestamps[0], pd.Timestamp):
-        timestamps_second = []
-        for i in range(0, len(timestamps)):
-            timestamps_second.append((timestamps[i] -
-                                      timestamps[0]).total_seconds())
+        timestamps_second = timestamps - np.array([timestamps[0]]*len(timestamps))
+    elif isinstance(timestamps[0],np.datetime64):
+        timestamps_second = (timestamps - np.array([timestamps[0]] * len(timestamps))) / np.timedelta64(1, "s")
     else:
         try:
             v_parse_datetime = np.vectorize(parse_datetime)
-            timestamps = v_parse_datetime(timestamps)
-            timestamps_second = []
-            timestamps_second.append(0)
-            for i in range(1, len(timestamps)):
-                timestamps_second.append((timestamps[i] - timestamps[
-                    i - 1]).total_seconds())
+            timestamps_second = v_parse_datetime(timestamps)
+            # timestamps_second = [0]
+            # timestamps_second = timestamps_second + list(np.diff(timestamps))
         except Exception:
             sampling_rate = None
             return sampling_rate
     steps = np.diff(timestamps_second)
-    sampling_rate = round(1 / np.min(steps[steps != 0]), 3)
+    min_step = np.min(steps[steps != 0])
+    if not isinstance(min_step,dt.timedelta):
+        min_step = dt.timedelta(seconds=min_step)
+    # sampling_rate = round(1 / pd.Timedelta.total_seconds(min_step), 3)
+    sampling_rate = round(1 /min_step.total_seconds(), 3)
     return sampling_rate
 
 
@@ -122,23 +129,29 @@ def generate_timestamp(start_datetime, sampling_rate, signal_length):
     """
     assert np.isreal(sampling_rate), 'Sampling rate is expected to be a int ' \
                                      'or float.'
-    number_of_seconds = signal_length / sampling_rate
+    # number_of_seconds = signal_length / sampling_rate
     if start_datetime is None:
         start_datetime = dt.datetime.now()
-    timestamps = []
-    try:
-        timestamps.append(dt.datetime.timestamp(start_datetime))
-    except Exception as e:
-        print(e)
-    # end_datetime = start_datetime + dt.timedelta(seconds=number_of_seconds)
-    # time_range = DateTimeRange(start_datetime, end_datetime)
+
+    step_size = 1 / sampling_rate
+    # if type(start_datetime) is pd.Timestamp:
+    #     timestamps = np.arange(0, signal_length) * step_size + (start_datetime.timestamp())
+    # else:
+    #     timestamps = np.arange(0, signal_length) * step_size + dt.datetime.timestamp(start_datetime)
+    timestamps = np.arange(0, signal_length) * step_size + (start_datetime.timestamp())
+    timestamps = np.array(list(map(lambda x: pd.Timestamp(x, unit='s'), timestamps)))
+    # timestamps = (np.vectorize(lambda x: pd.Timedelta(x, unit='seconds')))\
+    #     (np.arange(0, signal_length) * step_size + dt.datetime.timestamp(start_datetime))
     # timestamps = []
-    # for value in time_range.range(dt.timedelta(seconds=1 / sampling_rate)):
-    for value in range(1, signal_length):
-            timestamps.append(timestamps[value-1] + 1 /
-                                           sampling_rate)
-    for x in range(0, len(timestamps)):
-        timestamps[x] = pd.Timestamp(timestamps[x], unit = 's')
+    # try:
+    #     timestamps.append(dt.datetime.timestamp(start_datetime))
+    # except Exception as e:
+    #     print(e)
+    # for value in range(1, signal_length):
+    #         timestamps.append(timestamps[value-1] + 1 /
+    #                                        sampling_rate)
+    # for x in range(0, len(timestamps)):
+    #     timestamps[x] = pd.Timestamp(timestamps[x], unit = 's')
     return timestamps
 
 
@@ -183,7 +196,7 @@ def parse_datetime(string, type='datetime'):
         formats = date_formats
     if type == 'datetime':
         formats = datime_formats
-    for f in formats:
+    for i,f in enumerate(formats):
         try:
             return dt.datetime.strptime(string, f)
         except:
@@ -216,7 +229,7 @@ def update_rule(rule_def, threshold_list=[], is_update=True):
         all_rules = []
     else:
         all_rules = list(np.copy(rule_def))
-    for threshold in threshold_list:
+    for i,threshold in enumerate(threshold_list):
         all_rules.append(threshold)
     df = sort_rule(all_rules)
     df = decompose_operand(df.to_dict('records'))
@@ -225,7 +238,7 @@ def update_rule(rule_def, threshold_list=[], is_update=True):
     value_label_list = get_value_label_list(df, boundaries, inteveral_label_list)
 
     label_list = []
-    for i in range(len(value_label_list)):
+    for i,va in enumerate(np.arange(len(value_label_list))):
         label_list.append(inteveral_label_list[i])
         label_list.append(value_label_list[i])
     label_list.append(inteveral_label_list[-1])
@@ -321,7 +334,7 @@ def get_inteveral_label_list(df, boundaries):
     assert df["op"].iloc[0] == "<", \
         "The rule is missing a decision from -inf to " + str(df["value"].iloc[0])
     inteveral_label_list[0] = df.iloc[0]["label"]
-    for idx in range(len(boundaries) - 1):
+    for idx,val in enumerate(np.arange((len(boundaries) - 1))):
         decision = get_decision(df, boundaries, idx)
         inteveral_label_list[idx + 1] = decision
     assert df["op"].iloc[-1] == ">", \
@@ -332,7 +345,7 @@ def get_inteveral_label_list(df, boundaries):
 
 def get_value_label_list(df, boundaries, interval_label_list):
     value_label_list = np.array([None] * (len(boundaries)))
-    for idx in range(len(boundaries)):
+    for idx,val in enumerate(np.arange(len(boundaries))):
         decision = df[(df["value"] == boundaries[idx]) &
                       (df["op"] == "=")]
         check_unique_pair(decision)
@@ -366,7 +379,7 @@ def cut_segment(df,milestone):
     start_milestone = np.array(milestone.iloc[:,0])
     end_milestone = np.array(milestone.iloc[:, 1])
     processed_df = []
-    for start, end in zip(start_milestone, end_milestone):
+    for idx, (start, end) in enumerate(zip(start_milestone, end_milestone)):
         processed_df.append(df.iloc[int(start):int(end)])
     return processed_df
 
