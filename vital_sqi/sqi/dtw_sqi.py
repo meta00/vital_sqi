@@ -45,7 +45,7 @@ def dtw_sqi(s, template_type, template_size = 100,simple_mode=False):
     if simple_mode:
         cost = 0
         for i in range(template_size):
-            cost = cost + euclidean(s[i], reference[i])
+            cost = cost + euclidean([s[i]], [reference[i]])
         dtw_cost = cost / template_size
     else:
         beat = resample(s, template_size)

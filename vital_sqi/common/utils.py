@@ -106,7 +106,8 @@ def calculate_sampling_rate(timestamps):
     min_step = np.min(steps[steps != 0])
     if not isinstance(min_step,dt.timedelta):
         min_step = dt.timedelta(seconds=min_step)
-    sampling_rate = round(1 / pd.Timedelta.total_seconds(min_step), 3)
+    # sampling_rate = round(1 / pd.Timedelta.total_seconds(min_step), 3)
+    sampling_rate = round(1 /min_step.total_seconds(), 3)
     return sampling_rate
 
 
