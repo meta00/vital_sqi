@@ -63,8 +63,8 @@
     "desc": "",
     "ref": ""
   },
-  "mean_cross_sqi": {
-    "name": "mean_cross_sqi",
+  "mean_crossing_rate_sqi": {
+    "name": "mean_crossing_rate_sqi",
     "def": [
       {
         "op": ">",

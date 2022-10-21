@@ -9,9 +9,9 @@ warnings.filterwarnings("ignore")
 
 
 def get_ppg_sqis(file_name, signal_idx, timestamp_idx, sqi_dict_filename,
-                 info_idx=[],
-                 timestamp_unit='ms', sampling_rate=None, start_datetime=None,
-                 split_type=0, duration=30, overlapping=None, peak_detector=7):
+                 info_idx=[],timestamp_unit='ms', sampling_rate=None,
+                 start_datetime=None,split_type=0, duration=30,
+                 overlapping=None, peak_detector=7,delete_signal=True):
     """This function takes input signal, computes a number of SQIs, and outputs
     a table (row - signal segments, column SQI values.
     
@@ -72,7 +72,8 @@ def get_ppg_sqis(file_name, signal_idx, timestamp_idx, sqi_dict_filename,
                                     overlapping=overlapping,
                                     peak_detector=peak_detector,
                                     wave_type='ppg')
-    signal_obj.signals = pd.DataFrame()
+    if delete_signal:
+        signal_obj.signals = pd.DataFrame()
     sqi_lst = [
         extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg')]
     signal_obj.sqis = sqi_lst
@@ -84,8 +85,9 @@ def get_qualified_ppg(file_name, sqi_dict_filename, signal_idx, timestamp_idx,
                       predefined_reject=False, info_idx=[],
                       timestamp_unit='ms', sampling_rate=None,
                       start_datetime=None, split_type=0, duration=30,
+                      auto_mode=False,lower_bound=0.1,upper_bound=0.9,
                       overlapping=None, peak_detector=7, segment_name=None,
-                      save_image=False, output_dir=None):
+                      save_image=False, output_dir=None, delete_signal=False):
     """Step 1: Read data to make SignalSQI object. (filename, other ppg
     parameter for PPG_reader()
     - PPG_reader > signalSQI obj
@@ -157,10 +159,11 @@ def get_qualified_ppg(file_name, sqi_dict_filename, signal_idx, timestamp_idx,
                                         info_idx,
                                         timestamp_unit, sampling_rate,
                                         start_datetime, split_type, duration,
-                                        overlapping, peak_detector)
+                                        overlapping, peak_detector,delete_signal=delete_signal)
     signal_obj.ruleset, signal_obj.sqis = classify_segments(signal_obj.sqis,
                                                             rule_dict_filename,
-                                                            ruleset_order)
+                                                            ruleset_order,auto_mode,
+                                                            lower_bound,upper_bound)
     if predefined_reject is True:
         milestones = signal_obj.sqis[0].iloc['start', 'end']
         reject_decision = get_reject_segments(segments, wave_type='ppg',

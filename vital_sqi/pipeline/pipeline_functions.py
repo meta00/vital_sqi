@@ -8,12 +8,13 @@ from scipy.signal import resample
 from vital_sqi.common.rpeak_detection import PeakDetector
 import vital_sqi.sqi as sq
 from vital_sqi.rule import RuleSet, Rule, update_rule
-from vital_sqi.common.utils import get_nn
+from vital_sqi.common.utils import get_nn,create_rule_def
 import warnings
 import inspect
 
 
-def classify_segments(sqis, rule_dict_filename, ruleset_order):
+def classify_segments(sqis, rule_dict_filename, ruleset_order,
+                      auto_mode,lower_bound,upper_bound):
     """
     Get the output decision of each segment (accept or reject)
     by evaluating the threshold of the selected rules
@@ -46,6 +47,12 @@ def classify_segments(sqis, rule_dict_filename, ruleset_order):
         rule_dict = json.loads(rule_file.read())
     rule_list = {}
     for rule_order, rule_name in ruleset_order.items():
+        if auto_mode:
+            sqi_name = rule_dict[rule_name]['name']
+            lower_unit = np.quantile(sqis[0][sqi_name], lower_bound) #HEREEEEE
+            upper_unit = np.quantile(sqis[0][sqi_name], upper_bound)
+            sqi_rule = create_rule_def(sqi_name,lower_bound=lower_unit,upper_bound=upper_unit)
+            rule_dict[rule_name]['def'] = sqi_rule[sqi_name]['def']
         rule = generate_rule(rule_name, rule_dict[rule_name]['def'])
         rule_list[rule_order] = rule
     ruleset = RuleSet(rule_list)

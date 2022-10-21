@@ -31,6 +31,14 @@
       "per_beat": true
     }
   },
+  "entropy_sqi_2": {
+    "sqi": "entropy_sqi",
+    "args": {
+      "qk": null,
+      "base": null,
+      "per_beat": false
+    }
+  },
   "kurtosis_sqi_2": {
     "sqi": "kurtosis_sqi",
     "args": {

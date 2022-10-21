@@ -58,14 +58,18 @@ def save_segment(segment_list, segment_name=None, save_file_folder=None,
             if save_image:
 
                 fig = go.Figure()
-                fig.add_traces(go.Scatter(x=np.arange(1, len(segment)),
-                                          y=segment, mode="lines"))
+                fig.add_traces(go.Scatter(x=segment['timestamps'],
+                                          y=segment['PLETH'], mode="lines"))
+                # fig.add_traces(go.Scatter(x=np.arange(1, len(segment)),
+                #                           y=segment, mode="lines"))
                 fig.update_layout(autosize=True)
                 fig.write_image(os.path.join(save_img_folder,
                                              saved_filename + '.png'))
-
-            np.savetxt(os.path.join(save_file_folder, saved_filename + '.csv'),
-                       segment, delimiter=',')  # as an array
+            if type(segment) is pd.DataFrame:
+                segment.to_csv(os.path.join(save_file_folder, saved_filename + '.csv'))
+            else:
+                np.savetxt(os.path.join(save_file_folder, saved_filename + '.csv'),
+                       np.array(segment), delimiter=',')  # as an array
         except Exception as e:
             warnings.warn(f'Segment {segment} raises {e}')
         i = i+1
