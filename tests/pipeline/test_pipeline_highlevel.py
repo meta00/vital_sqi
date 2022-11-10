@@ -43,6 +43,18 @@ class TestGetQualifiedPPG(object):
 		assert os.path.isdir(os.path.join(output_dir, 'accept', 'img')) is True
 		assert os.path.isdir(os.path.join(output_dir, 'reject', 'img')) is True
 
+
+	def test_on_get_qualified_ppg_auto_mode(self):
+		file_in = os.path.abspath('tests/test_data/ppg_smartcare.csv')
+		sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
+		rule_dict_filename = os.path.abspath(
+			'tests/test_data/rule_dict_test.json')
+		ruleset_order = {3: 'skewness_1',
+						2: 'entropy',
+						1: 'perfusion'}
+		timestamp_idx = ['TIMESTAMP_MS']
+		signal_idx = ['PLETH']
+		output_dir = tempfile.gettempdir()
 		signal_obj = get_qualified_ppg(file_in, sqi_dict_filename=sqi_dict,
 									   signal_idx=signal_idx,
 									   timestamp_idx=timestamp_idx,
@@ -52,6 +64,7 @@ class TestGetQualifiedPPG(object):
 									   output_dir=output_dir,
 									   save_image=True)
 		assert isinstance(signal_obj, SignalSQI) is True
+
 
 class TestGetECGSQIs(object):
 	def test_on_get_ecg_sqis(self):
@@ -82,6 +95,15 @@ class TestGetQualifiedSQIs(object):
 		assert os.path.isdir(os.path.join(output_dir, 'accept', 'img')) is True
 		assert os.path.isdir(os.path.join(output_dir, 'reject', 'img')) is True
 
+
+	def test_on_get_qualified_ecg_auto_mode(self):
+		file_in = os.path.abspath('tests/test_data/example.edf')
+		sqi_dict = os.path.abspath('tests/test_data/sqi_dict.json')
+		rule_dict_filename = os.path.abspath(
+			'tests/test_data/rule_dict_test.json')
+		ruleset_order = {3: 'skewness_1', 2: 'entropy',
+						 1: 'perfusion'}
+		output_dir = tempfile.gettempdir()
 		signal_obj = get_qualified_ecg(file_name=file_in,
 									   sqi_dict_filename=sqi_dict,
 									   file_type='edf', duration=30,
