@@ -314,15 +314,19 @@ def PPG_reader(file_name, signal_idx, timestamp_idx, info_idx=[],
     if start_datetime is None:
         start_datetime = pd.Timestamp.now()
 
-    if timestamp_unit is None:
-        raise Exception("Missing sampling_rate, not able to infer "
-                        "sampling_rate without timestamp_unit")
-    elif timestamp_unit == 'ms':
-        timestamps = timestamps / 1000
-    elif timestamp_unit != 's':
-        raise Exception("Timestamp unit must be either second (s) or "
-                        "millisecond (ms)")
-    timestamps = np.array(start_datetime + pd.to_timedelta(timestamps,unit='seconds'))
+    try:
+        timestamps = list(map(pd.Timestamp,timestamps))
+    except Exception:
+        if timestamp_unit is None:
+            raise Exception("Missing sampling_rate, not able to infer "
+                            "sampling_rate without timestamp_unit")
+        elif timestamp_unit == 'ms':
+            timestamps = timestamps / 1000
+        elif timestamp_unit != 's':
+            raise Exception("Timestamp unit must be either second (s) or "
+                            "millisecond (ms)")
+        timestamps = np.array(start_datetime + pd.to_timedelta(timestamps,unit='seconds'))
+
     if sampling_rate is None:
         sampling_rate = utils.calculate_sampling_rate(timestamps)
     info = pd.DataFrame(tmp.iloc[:, info_idx])

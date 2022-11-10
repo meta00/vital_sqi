@@ -204,7 +204,10 @@ class PeakDetector:
         except Exception as err:
             warnings.warn(f"Current peak detection method raise {err} \n"
                           f"Package changed to default peak detection")
-            return signal.find_peaks(s)[0], []
+            peak_finalist = signal.find_peaks(s)[0]
+            trough_finalist = [0]+list(np.round(np.diff(signal.find_peaks(s)[0])/2) + signal.find_peaks(s)[0][:-1])
+            trough_finalist = list(map(lambda x:int(x),trough_finalist))
+            return signal.find_peaks(s)[0], trough_finalist
 
         return peak_finalist, trough_finalist
 

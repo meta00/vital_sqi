@@ -667,12 +667,13 @@ def get_all_features_hrva(s, sample_rate=100, rpeak_method=0,wave_type='ecg'):
         nn_list = get_nn_intervals(rr_list)
 
         nn_list_non_na = np.copy(nn_list)
-        nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+        # nn_list_non_na[np.where(np.isnan(nn_list_non_na))[0]] = -1
+        nn_list_non_na = nn_list_non_na[~np.isnan(nn_list_non_na)]
 
-        time_domain_features = get_time_domain_features(rr_list)
-        frequency_domain_features = get_frequency_domain_features(rr_list)
-        geometrical_features = get_geometrical_features(rr_list)
-        csi_cvi_features = get_csi_cvi_features(rr_list)
+        time_domain_features = get_time_domain_features(nn_list_non_na)
+        frequency_domain_features = get_frequency_domain_features(nn_list_non_na)
+        geometrical_features = get_geometrical_features(nn_list_non_na)
+        csi_cvi_features = get_csi_cvi_features(nn_list_non_na)
 
     return time_domain_features, frequency_domain_features, geometrical_features, csi_cvi_features
 

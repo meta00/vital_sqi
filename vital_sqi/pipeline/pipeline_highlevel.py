@@ -261,7 +261,8 @@ def get_qualified_ecg(file_name, file_type, sqi_dict_filename,
                       channel_num=None, channel_name=None,
                       predefined_reject=False,
                       sampling_rate=None, start_datetime=None, split_type=0,
-                      duration=30, overlapping=None, peak_detector=7,
+                      duration=30, auto_mode=False,lower_bound=0.1,upper_bound=0.9,
+                      overlapping=None, peak_detector=7,
                       segment_name=None, save_image=False, output_dir=None):
     """Extract intended SQI
 
@@ -323,8 +324,9 @@ def get_qualified_ecg(file_name, file_type, sqi_dict_filename,
     sqi_lst = []
     for i in range(0, len(segment_lst)):
         signal_obj.ruleset, sqis = classify_segments(signal_obj.sqis,
-                                                     rule_dict_filename,
-                                                     ruleset_order)
+                          rule_dict_filename,
+                          ruleset_order, auto_mode,
+                          lower_bound, upper_bound)
         if predefined_reject is True:
             reject_decision = get_reject_segments(segment_lst[i],
                                                   wave_type='ecg')
