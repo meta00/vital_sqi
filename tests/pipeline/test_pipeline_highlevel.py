@@ -43,6 +43,15 @@ class TestGetQualifiedPPG(object):
 		assert os.path.isdir(os.path.join(output_dir, 'accept', 'img')) is True
 		assert os.path.isdir(os.path.join(output_dir, 'reject', 'img')) is True
 
+		signal_obj = get_qualified_ppg(file_in, sqi_dict_filename=sqi_dict,
+									   signal_idx=signal_idx,
+									   timestamp_idx=timestamp_idx,
+									   auto_mode=True,
+									   rule_dict_filename=rule_dict_filename,
+									   ruleset_order=ruleset_order,
+									   output_dir=output_dir,
+									   save_image=True)
+		assert isinstance(signal_obj, SignalSQI) is True
 
 class TestGetECGSQIs(object):
 	def test_on_get_ecg_sqis(self):
@@ -72,6 +81,15 @@ class TestGetQualifiedSQIs(object):
 		assert isinstance(signal_obj, SignalSQI) is True
 		assert os.path.isdir(os.path.join(output_dir, 'accept', 'img')) is True
 		assert os.path.isdir(os.path.join(output_dir, 'reject', 'img')) is True
+
+		signal_obj = get_qualified_ecg(file_name=file_in,
+									   sqi_dict_filename=sqi_dict,
+									   file_type='edf', duration=30,
+									   auto_mode=True,
+									   rule_dict_filename=rule_dict_filename,
+									   ruleset_order=ruleset_order,
+									   output_dir=output_dir)
+		assert isinstance(signal_obj, SignalSQI) is True
 
 # file_name = "../../tests/test_data/ppg_smartcare.csv"
 		# json_rule_file_name = "../resource/rule_dict.json"
