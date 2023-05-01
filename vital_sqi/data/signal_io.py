@@ -229,8 +229,8 @@ def ECG_writer(signal_sqi, file_name, file_type, info=None):
                     header['annotations'][i][1] = \
                         float(str(header['annotations'][i][1], 'utf-8'))
             highlevel.write_edf(file_name, signals, signal_headers,
-                                header, file_type=-1, digital=False,
-                                block_size=-1)
+                                header, file_type=-1, digital=False
+                                )
         else:
             highlevel.write_edf_quick(file_name, signals, sampling_rate)
         return os.path.isfile(file_name)
