@@ -1,4 +1,5 @@
 librosa>=0.9.2
+numba>=0.56.0
 heartpy>=1.2.6
 hrv-analysis>=1.0.3
 matplotlib==3.3.4
