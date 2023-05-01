@@ -470,10 +470,13 @@ def extract_sqi(segments, milestones, sqi_dict_filename, wave_type='ppg'):
         sqi_list.append(sqi_mapping_list[item_value['sqi']])
         sqi_arg_list[item_key] = item_value['args']
     df_sqi = pd.DataFrame()
+
     for segment_idx,segment in enumerate(tqdm(segments)):
         sqi_arg_list['perfusion_sqi'] = {'y':segment.iloc[:, 1]}
         sqis = extract_segment_sqi(segment, sqi_list,sqi_names, sqi_arg_list,wave_type)
-        df_sqi = df_sqi.append(sqis, ignore_index=True)
+        df_sqi = pd.concat([df_sqi, sqis], ignore_index=True, axis=1)
+    df_sqi = df_sqi.T
+
     df_sqi['start_idx'] = milestones.iloc[:, 0]
     df_sqi['end_idx'] = milestones.iloc[:, 1]
     return df_sqi
